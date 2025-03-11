@@ -21,8 +21,8 @@ RUN apk add --no-cache ca-certificates && \
 
 
 # Copy hooks
-COPY ./pb_hooks /app/pb_hooks
-COPY ./pb_migrations /app/pb_migrations
+COPY ./apps/backend/pb_hooks /app/pb_hooks
+COPY ./apps/backend/pb_migrations /app/pb_migrations
 
 # Dokku-specific: Use $PORT environment variable
 ENV PORT=5000
