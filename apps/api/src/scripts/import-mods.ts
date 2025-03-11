@@ -6,12 +6,25 @@ async function importMods() {
     './apps/api/src/mods/civ7_mods.json',
     'utf-8'
   );
+
+  (await pb.collection('mod_versions').getFullList()).forEach(
+    async (record) => {
+      await pb.collection('mod_versions').delete(record.id);
+    }
+  );
+  (await pb.collection('mods').getFullList()).forEach(async (record) => {
+    await pb.collection('mods').delete(record.id);
+  });
+
+  // await pb.collection('mods').delete();
   const mods = JSON.parse(allMods);
   for (const mod of mods) {
     console.log(`Importing mod: ${mod.modName}`);
     const modRecord = await pb.collection('mods').create({
       mod_updated: new Date(mod.versions[0].date),
       name: mod.modName,
+      author: mod.modAuthor,
+      rating: parseFloat(mod.rating),
       short_description: mod.shortDescription,
       url: mod.modPageUrl,
     });

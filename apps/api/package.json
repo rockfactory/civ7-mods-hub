@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.2",
+    "lodash": "^4.17.21",
     "pocketbase": "^0.25.2"
   },
   "devDependencies": {
