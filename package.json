@@ -1,0 +1,29 @@
+{
+  "name": "civ7-mods-hub",
+  "version": "0.1.0",
+  "description": "Unofficial Civ7 Mod Manager",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest",
+    "build": "npm run --workspaces build",
+    "dev": "npm run --workspaces dev"
+  },
+  "author": "leonardfactory",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.2",
+    "cheerio": "^1.0.0",
+    "random-useragent": "^0.5.0",
+    "sleep-promise": "^9.1.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/random-useragent": "^0.3.3"
+  },
+  "workspaces": [
+    "apps/api",
+    "apps/backend"
+  ]
+}

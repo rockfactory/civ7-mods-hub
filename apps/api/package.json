@@ -1,0 +1,22 @@
+{
+  "name": "@civmods/api",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:worker": "node dist/worker.js",
+    "dev": "tsx watch --env-file=../../.env ./src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "pocketbase": "^0.25.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0"
+  }
+}
