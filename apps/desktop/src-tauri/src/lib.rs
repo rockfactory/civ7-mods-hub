@@ -1,6 +1,7 @@
-use tauri::{Manager, plugin::TauriPlugin};
-use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
+use mods::{extract_archive, traversal::scan_civ_mods};
 use std::path::PathBuf;
+use tauri::{plugin::TauriPlugin, Manager};
+use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
 mod mods;
 use crate::mods::get_civ_mods_folder;
@@ -16,19 +17,32 @@ async fn get_mods_folder(app_handle: tauri::AppHandle) -> Result<String, String>
     let mods_folder = get_civ_mods_folder::get_civ7_mods_folder().ok_or("Mods folder not found")?;
 
     // Dynamically grant read/write permission
-    app_handle.fs_scope().allow_directory(&mods_folder, true)
+    app_handle
+        .fs_scope()
+        .allow_directory(&mods_folder, true)
         .map_err(|e| format!("Failed to grant permission: {}", e))?;
 
     Ok(mods_folder.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+async fn extract_mod_archive(archive_path: &str, extract_to: &str) -> Result<(), String> {
+    extract_archive::extract_archive(&archive_path, &extract_to)
+        .map_err(|e| format!("Failed to extract archive: {}", e))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
-        .invoke_handler(tauri::generate_handler![get_mods_folder])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            get_mods_folder,
+            extract_mod_archive,
+            scan_civ_mods
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

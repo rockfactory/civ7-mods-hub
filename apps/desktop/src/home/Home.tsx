@@ -8,39 +8,53 @@ import {
   Card,
   Group,
   Badge,
+  Space,
+  Flex,
+  ActionIcon,
+  Stack,
+  TextInput,
 } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import PocketBase from 'pocketbase';
 import { invoke } from '@tauri-apps/api/core';
+import { IconRefresh, IconSearch } from '@tabler/icons-react';
 import { getAllModsInfo } from '../mods/getAllModsInfo';
 import {
   ModsResponse,
   ModVersionsRecord,
   TypedPocketBase,
 } from '../pocketbase-types';
+import { installMod } from '../mods/installMod';
+import { FetchedMod, ModBox } from '../mods/ModBox';
+import { ModInfo } from './IModInfo';
 
 /// <reference path="../../../../backend/pb_data/types.d.ts" />
 const pb = new PocketBase('http://localhost:8090') as TypedPocketBase;
 
-type FetchedMod = ModsResponse<{
-  mod_versions_via_mod_id: ModVersionsRecord[];
-}>;
-
 export default function ModsListPage() {
   const [mods, setMods] = useState<FetchedMod[]>([]);
-  const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
+
+  const [modsInfo, setModsInfo] = useState<ModInfo[]>([]);
+
+  const [localModsReloadIndex, setLocalModsReloadIndex] = useState(0);
+
+  const [query, setQuery] = useState({ text: '', onlyInstalled: false });
 
   useEffect(() => {
     async function findMods() {
       const folder = await invoke('get_mods_folder', {});
       console.log('Mods folder:', folder);
 
-      const modsInfo = await getAllModsInfo();
+      const modsInfo = await invoke<ModInfo[]>('scan_civ_mods', {
+        modsFolderPath: folder,
+      });
+
+      setModsInfo(modsInfo);
       console.log('Mods info:', modsInfo);
     }
 
     findMods().catch(console.error);
-  }, []);
+  }, [localModsReloadIndex]);
 
   useEffect(() => {
     async function fetchMods() {
@@ -55,10 +69,27 @@ export default function ModsListPage() {
     fetchMods();
   }, []);
 
-  const applyFilters = () => {
-    // Placeholder: implement actual filtering logic
-    console.log('Applying filters:', selectedRatings);
-  };
+  const filteredMods = useMemo(() => {
+    const installedModIds = new Set(modsInfo.map((info) => info.modinfo_id));
+
+    return mods.filter((mod) => {
+      if (query.text) {
+        const searchText =
+          mod.name.toLocaleLowerCase() + ' ' + mod.id + ' ' + mod.author;
+        return searchText
+          .toLocaleLowerCase()
+          .includes(query.text.toLocaleLowerCase());
+      }
+
+      if (query.onlyInstalled) {
+        return installedModIds.has(
+          mod.expand?.mod_versions_via_mod_id[0].modinfo_id
+        );
+      }
+
+      return true;
+    });
+  }, [mods, query]);
 
   return (
     <AppShell
@@ -67,9 +98,17 @@ export default function ModsListPage() {
       header={{ height: 60 }}
     >
       <AppShell.Header p="xs">
-        <Text fw={700} size="xl">
-          Civ7 Mod Manager
-        </Text>
+        <Group gap="sm">
+          <Text fw={700} size="xl">
+            Civ7 Mod Manager
+          </Text>
+          <ActionIcon
+            variant="subtle"
+            onClick={() => setLocalModsReloadIndex((i) => i + 1)}
+          >
+            <IconRefresh size={16} />
+          </ActionIcon>
+        </Group>
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
@@ -77,48 +116,41 @@ export default function ModsListPage() {
           Filter Mods
         </Text>
 
-        <Checkbox.Group
-          value={selectedRatings}
-          onChange={setSelectedRatings}
-          label="Ratings"
-        >
-          <Checkbox value="5" label="5 stars" />
-          <Checkbox value="4" label="4 stars" />
-          <Checkbox value="3" label="3 stars" />
-          <Checkbox value="No rating" label="No rating" />
-        </Checkbox.Group>
+        <Stack>
+          <TextInput
+            placeholder="Search..."
+            value={query.text}
+            onChange={(event) =>
+              setQuery((q) => ({ ...query, text: event.currentTarget.value }))
+            }
+            rightSection={<IconSearch size={16} />}
+          />
+          <Checkbox
+            label="Only Installed"
+            checked={query.onlyInstalled}
+            onChange={(event) =>
+              setQuery((q) => ({
+                ...query,
+                onlyInstalled: event.currentTarget.checked,
+              }))
+            }
+          />
+        </Stack>
 
-        <Button mt="md" onClick={applyFilters}>
+        {/* <Button mt="md" onClick={applyFilters}>
           Apply Filters
-        </Button>
+        </Button> */}
       </AppShell.Navbar>
 
       <AppShell.Main>
         <ScrollArea>
-          {mods.map((mod) => (
-            <Card key={mod.id} shadow="sm" p="lg" mb="md">
-              <Group justify="space-between">
-                <Text fw={600}>{mod.name}</Text>
-                <Badge>{mod.rating} ★</Badge>
-              </Group>
-
-              <Text size="sm" c="dimmed">
-                by {mod.author}
-              </Text>
-              <Text mt="xs">{mod.short_description}</Text>
-
-              {mod.expand?.mod_versions_via_mod_id &&
-                mod.expand.mod_versions_via_mod_id.length > 0 && (
-                  <Badge mt="sm" variant="outline">
-                    Latest:{' '}
-                    {mod.expand?.mod_versions_via_mod_id[0].name ?? 'N/A'}
-                  </Badge>
-                )}
-
-              <Button mt="md" variant="light">
-                Install
-              </Button>
-            </Card>
+          {filteredMods.map((mod) => (
+            <ModBox
+              key={mod.id}
+              mod={mod}
+              modsInfo={modsInfo}
+              onActionComplete={() => setLocalModsReloadIndex((i) => i + 1)}
+            />
           ))}
         </ScrollArea>
       </AppShell.Main>

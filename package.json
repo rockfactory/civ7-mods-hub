@@ -26,6 +26,7 @@
   "workspaces": [
     "apps/api",
     "apps/backend",
-    "apps/desktop"
+    "apps/desktop",
+    "packages/parser"
   ]
 }
