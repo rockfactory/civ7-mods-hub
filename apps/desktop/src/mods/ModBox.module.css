@@ -1,0 +1,8 @@
+.plainLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.plainLink:hover {
+  text-decoration: underline;
+}

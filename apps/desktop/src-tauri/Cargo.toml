@@ -33,3 +33,4 @@ sha2 = "0.10"
 walkdir = "2"
 quick-xml = { version = "0.37.2", features = ["serialize"] } # XML parsing
 fs_extra = "1.3.0"
+tauri-plugin-shell = "2"

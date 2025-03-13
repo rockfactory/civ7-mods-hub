@@ -22,7 +22,9 @@ import {
   IconChecklist,
   IconCircleCheckFilled,
   IconDownload,
+  IconExternalLink,
   IconFileDescription,
+  IconLink,
   IconSettings,
   IconSettings2,
   IconTransitionBottom,
@@ -31,6 +33,7 @@ import {
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { modals } from '@mantine/modals';
+import styles from './ModBox.module.css';
 
 export interface IModBoxProps {
   mod: FetchedMod;
@@ -154,13 +157,16 @@ export function ModBox(props: IModBoxProps) {
           <Flex justify="space-between" w="100%">
             <Stack gap={0} align="flex-start">
               <Text fw={600}>
-                {mod.name}
-                {latestVersion?.name && (
-                  <Text span c="dimmed">
-                    {' '}
-                    {latestVersion.name}
-                  </Text>
-                )}
+                <a className={styles.plainLink} href={mod.url} target="_blank">
+                  {mod.name}
+                  {latestVersion?.name && (
+                    <Text span c="dimmed">
+                      {' '}
+                      {latestVersion.name}
+                    </Text>
+                  )}{' '}
+                  <IconExternalLink size={12} />
+                </a>
               </Text>
               <Text c="dimmed" fz={'0.85rem'}>
                 <IconUser size={12} /> {mod.author}

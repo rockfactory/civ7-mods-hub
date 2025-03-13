@@ -2,7 +2,9 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "opener:default",
@@ -10,7 +12,12 @@
     "fs:write-all",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "https://forums.civfanatics.com" }]
-    }
+      "allow": [
+        {
+          "url": "https://forums.civfanatics.com"
+        }
+      ]
+    },
+    "shell:default"
   ]
 }

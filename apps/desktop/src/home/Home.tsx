@@ -11,6 +11,7 @@ import {
   Box,
   Button,
   Tooltip,
+  BackgroundImage,
 } from '@mantine/core';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import PocketBase from 'pocketbase';
@@ -133,71 +134,88 @@ export default function ModsListPage() {
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        <Text fw={600} size="lg" mb="sm">
-          Filter Mods
-        </Text>
+        <AppShell.Section grow>
+          <Text fw={600} size="lg" mb="sm">
+            Filter Mods
+          </Text>
 
-        <Stack>
-          <TextInput
-            placeholder="Search..."
-            value={query.text}
-            onChange={(event) =>
-              setQuery((q) => ({ ...query, text: event.currentTarget.value }))
-            }
-            rightSection={<IconSearch size={16} />}
-          />
-          <Checkbox
-            label="Only Installed"
-            checked={query.onlyInstalled}
-            onChange={(event) =>
-              setQuery((q) => ({
-                ...query,
-                onlyInstalled: event.currentTarget.checked,
-              }))
-            }
-          />
-        </Stack>
+          <Stack>
+            <TextInput
+              placeholder="Search..."
+              value={query.text}
+              onChange={(event) =>
+                setQuery((q) => ({ ...query, text: event.currentTarget.value }))
+              }
+              rightSection={<IconSearch size={16} />}
+            />
+            <Checkbox
+              label="Only Installed"
+              checked={query.onlyInstalled}
+              onChange={(event) =>
+                setQuery((q) => ({
+                  ...query,
+                  onlyInstalled: event.currentTarget.checked,
+                }))
+              }
+            />
+          </Stack>
 
-        {/* <Button mt="md" onClick={applyFilters}>
+          {/* <Button mt="md" onClick={applyFilters}>
           Apply Filters
         </Button> */}
 
-        <Stack mt="md">
-          {availableUpdates.length > 0 ? (
-            <Tooltip
-              color="dark.8"
-              style={{
-                border: '1px solid rgb(66, 64, 53)',
-                borderRadius: 0,
-              }}
-              position="bottom-start"
-              label={
-                <Stack gap="sm">
-                  <Text fz="sm">Will update:</Text>
-                  {availableUpdates.map((update) => (
-                    <Text fz="sm" key={update.mod.id}>
-                      {update.mod.name}: {update.installedVersion?.name} →{' '}
-                      {update.latestVersion.name}
-                    </Text>
-                  ))}
-                </Stack>
-              }
-            >
-              <Button
-                color="blue"
-                leftSection={<IconDownload size={16} />}
-                loading={isUpdating}
-                onClick={runApplyUpdates}
+          <Stack mt="md">
+            {availableUpdates.length > 0 ? (
+              <Tooltip
+                color="dark.8"
+                style={{
+                  border: '1px solid rgb(66, 64, 53)',
+                  borderRadius: 0,
+                }}
+                position="bottom-start"
+                label={
+                  <Stack gap="sm">
+                    <Text fz="sm">Will update:</Text>
+                    {availableUpdates.map((update) => (
+                      <Text fz="sm" key={update.mod.id}>
+                        {update.mod.name}: {update.installedVersion?.name} →{' '}
+                        {update.latestVersion.name}
+                      </Text>
+                    ))}
+                  </Stack>
+                }
               >
-                Update {availableUpdates.length} mods
+                <Button
+                  color="blue"
+                  leftSection={<IconDownload size={16} />}
+                  loading={isUpdating}
+                  onClick={runApplyUpdates}
+                >
+                  Update {availableUpdates.length} mods
+                </Button>
+              </Tooltip>
+            ) : (
+              <Button disabled leftSection={<IconChecks size={16} />}>
+                All mods are updated
               </Button>
-            </Tooltip>
-          ) : (
-            <Button disabled leftSection={<IconChecks size={16} />}>
-              All mods are updated
-            </Button>
-          )}
-        </Stack>
+            )}
+          </Stack>
+        </AppShell.Section>
+        <AppShell.Section>
+          <Box p="sm" bg="dark.8" style={{ borderRadius: '8px' }}>
+            {/* <BackgroundImage src="https://www.civfanatics.com/wp-content/uploads/2016/10/logo.png"> */}
+            <Text fz="sm" c="dimmed">
+              All mods are the property of their respective creators.
+              <br />
+              Special thanks to{' '}
+              <a href="https://www.civfanatics.com/" target="_blank">
+                CivFanatics
+              </a>{' '}
+              for hosting and supporting the modding community.
+            </Text>
+            {/* </BackgroundImage> */}
+          </Box>
+        </AppShell.Section>
       </AppShell.Navbar>
 
       <AppShell.Main>
