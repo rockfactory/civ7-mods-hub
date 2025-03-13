@@ -30,6 +30,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { modals } from '@mantine/modals';
 
 export interface IModBoxProps {
   mod: FetchedMod;
@@ -78,6 +79,37 @@ export function ModBox(props: IModBoxProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUnknownUpdate = async (mod: FetchedMod) => {
+    modals.openConfirmModal({
+      title: 'Update mod with unknown version',
+      children: (
+        <Stack>
+          <Text size="sm">
+            You are about to update the mod{' '}
+            <Text fw={600} span>
+              {mod.name}
+            </Text>
+            .
+          </Text>
+          <Text size="sm">
+            The mod is already installed, but the version is unknown. Do you
+            want to update to the latest version? Mod Manager will not be able
+            to revert to the previous version.
+          </Text>
+          <Text size="sm" c="red">
+            Please make sure you have a backup of the mod folder.
+          </Text>
+        </Stack>
+      ),
+      labels: {
+        confirm: 'Update and overwrite',
+        cancel: 'Do not update',
+      },
+      confirmProps: { color: 'red' },
+      onConfirm: () => handleInstall(mod),
+    });
   };
 
   const handleUninstall = async (mod: FetchedMod) => {
@@ -178,7 +210,7 @@ export function ModBox(props: IModBoxProps) {
                   <Tooltip label="Install latest version, current version unknown">
                     <ActionIcon
                       color="grape"
-                      onClick={() => handleInstall(mod)}
+                      onClick={() => handleUnknownUpdate(mod)}
                     >
                       <IconTransitionBottom size={16} />
                     </ActionIcon>
