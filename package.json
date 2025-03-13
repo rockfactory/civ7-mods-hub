@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "vitest",
-    "build": "npm run --workspaces build",
+    "build": "npm run -w @civmods/api build",
     "dev": "run-p \"dev -w @civmods/api\" \"dev -w @civmods/desktop dev\""
   },
   "author": "leonardfactory",

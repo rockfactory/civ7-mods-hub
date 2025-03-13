@@ -1,11 +1,11 @@
 /// <reference path="../../../backend/pb_data/types.d.ts" />
 /// <reference path="../../../desktop/src/pocketbase-types.ts" />
 import { type TypedPocketBase } from '../../../desktop/src/pocketbase-types';
-import PocketBase from 'pocketbase';
+import PocketBase from 'pocketbase/cjs';
 
 const pb = new PocketBase(
   process.env.POCKETBASE_URL || 'http://127.0.0.1:8090'
-) as TypedPocketBase;
+) as unknown as TypedPocketBase;
 
 if (!process.env.POCKETBASE_TOKEN) {
   console.error('POCKETBASE_TOKEN is required');

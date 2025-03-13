@@ -61,20 +61,24 @@ export async function installMod(mod: ModVersionsRecord) {
   const buffer = await response.arrayBuffer();
 
   console.log('Writing mod archive to disk..');
-  await fs.writeFile(tempArchivePath, new Uint8Array(buffer));
+  try {
+    await fs.writeFile(tempArchivePath, new Uint8Array(buffer));
 
-  const extractPath = await path.join(
-    modsFolderPath,
-    `civmods_${mod.modinfo_id!}_${mod.id}`
-  );
-  console.log('Extracting mod to:', extractPath);
-  const result = await invoke<string>('extract_mod_archive', {
-    archivePath: tempArchivePath,
-    extractTo: extractPath,
-  });
+    const extractPath = await path.join(
+      modsFolderPath,
+      `civmods_${mod.modinfo_id!}_${mod.id}`
+    );
+    console.log('Extracting mod to:', extractPath);
+    const result = await invoke<string>('extract_mod_archive', {
+      archivePath: tempArchivePath,
+      extractTo: extractPath,
+    });
 
-  console.log('Mod installed!', result);
-  await fs.remove(tempArchivePath);
+    console.log('Mod installed!', result);
+  } finally {
+    console.log('Removing temp archive:', tempArchivePath);
+    await fs.remove(tempArchivePath);
+  }
 }
 
 export async function uninstallMod(modInfo: ModInfo) {
