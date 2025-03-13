@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::fs::{self, File};
-use std::io::{BufReader, Read};
-use std::path::{Path, PathBuf};
-use tauri::command;
+use std::fs::File;
+use std::fs::{self};
+use std::io::Read;
+use std::path::Path;
 use walkdir::WalkDir;
 
 #[derive(Serialize)]
@@ -23,12 +23,27 @@ struct ModXml {
     id: Option<String>,
 }
 
-/// Computes SHA-256 hash of all files inside a directory.
+/// Computes SHA-256 hash of all files inside a directory,
+/// including the filename and relative path in the hash.
 fn compute_folder_hash(directory: &Path) -> Result<String, String> {
     let mut hasher = Sha256::new();
 
     for entry in WalkDir::new(directory).into_iter().filter_map(Result::ok) {
         if entry.file_type().is_file() {
+            // Skipping file name for now.
+
+            // Get relative path (relative to the given directory)
+            // let relative_path = entry
+            //     .path()
+            //     .strip_prefix(directory)
+            //     .map_err(|e| format!("Failed to get relative path: {}", e))?
+            //     .to_string_lossy();
+
+            // // Update the hash with the relative path
+            // hasher.update(relative_path.as_bytes());
+            // println!("Hashing: {}", relative_path);
+
+            // Read file content and update hash
             let mut file =
                 File::open(entry.path()).map_err(|e| format!("Failed to open file: {}", e))?;
             let mut buffer = Vec::new();
@@ -92,7 +107,12 @@ pub async fn scan_civ_mods(mods_folder_path: String) -> Result<Vec<ModInfo>, Str
                 .into_string()
                 .unwrap_or_else(|_| "Unknown Mod".to_string());
             let (modinfo_path, modinfo_id) = find_modinfo_file(&mod_dir);
-            let folder_hash = compute_folder_hash(&mod_dir)
+            let modinfo_path_str = modinfo_path.as_deref().ok_or("Modinfo not found")?;
+            let modinfo_folder = Path::new(modinfo_path_str)
+                .parent()
+                .ok_or("Invalid modinfo path")?;
+
+            let folder_hash = compute_folder_hash(&modinfo_folder)
                 .unwrap_or_else(|_| "Error computing hash".to_string());
 
             mods_list.push(ModInfo {

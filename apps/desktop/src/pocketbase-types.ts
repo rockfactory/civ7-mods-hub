@@ -91,6 +91,7 @@ export type ModVersionsRecord = {
 	affect_saves?: boolean
 	archive_hash?: string
 	created?: IsoDateString
+	download_error?: boolean
 	download_url?: string
 	hash?: string
 	id: string
@@ -102,6 +103,7 @@ export type ModVersionsRecord = {
 	name?: string
 	rating?: number
 	released?: IsoDateString
+	skip_install?: boolean
 	updated?: IsoDateString
 }
 

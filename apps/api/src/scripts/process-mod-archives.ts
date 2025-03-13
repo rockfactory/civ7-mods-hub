@@ -18,12 +18,27 @@ async function computeFileHash(filePath: string): Promise<string> {
   return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-// Utility: Compute SHA-256 hash of folder content
+/**
+ * Utility: Compute SHA-256 hash of folder content, including filename and relative path.
+ * @param folderPath - Path to the folder to hash
+ * @returns SHA-256 hash as a hexadecimal string
+ */
 async function computeFolderHash(folderPath: string): Promise<string> {
   const files = await getFilesRecursively(folderPath);
   const hash = crypto.createHash('sha256');
+  console.log(`Hashing folder: ${folderPath}`);
 
   for (const file of files) {
+    // Skipping for now
+
+    // Get the relative path
+    // const relativePath = path.relative(folderPath, file);
+    // console.log(` Hashing: ${relativePath}`);
+
+    // // Update hash with the relative path
+    // hash.update(relativePath);
+
+    // Read file content and update hash
     const content = await fs.readFile(file);
     hash.update(content);
   }
@@ -53,6 +68,14 @@ async function findModInfoFile(directory: string): Promise<string | null> {
   const files = await getFilesRecursively(directory);
   return files.find((file) => file.endsWith('.modinfo')) || null;
 }
+
+/**
+ * Given a base directory, finds the `.modinfo` file and extracts its parent folder.
+ */
+// async function findModInfoFolder(mod: string): Promise<string | null> {
+//   const modInfoPath = await findModInfoFile(directory);
+//   return modInfoPath ? path.dirname(modInfoPath) : null;
+// }
 
 // Extract ZIP and 7z using `7zip-min`
 async function extract7ZipOrZip(
@@ -112,36 +135,53 @@ async function processModArchives() {
 
   for (const version of modsVersions) {
     try {
-      if (!version.download_url) continue;
+      if (!version.download_url || version.skip_install) continue;
 
-      // Download archive
-      const archivePath = await downloadFile(version.download_url, version.id);
-      console.log(`Downloaded: ${archivePath}`);
-
-      // const archivePath = path.join(ARCHIVE_DIR, `${version.id}`);
       const extractPath = path.join(EXTRACTED_DIR, version.id);
 
-      // Compute archive hash
-      const archiveHash = await computeFileHash(archivePath);
+      if (!version.download_url.startsWith('https://forums.civfanatics.com/')) {
+        console.warn(`Skipping non-CivFanatics mod: ${version.name}`);
+        continue;
+      }
 
-      // Extract the archive
-      await extractArchive(archivePath, extractPath);
-      console.log(`Extracted to: ${extractPath}`);
+      const isAlreadyDownloaded = await fs.stat(extractPath).catch(() => null);
 
+      let archiveHash = undefined as string | undefined;
+      if (!isAlreadyDownloaded?.isDirectory) {
+        // Download archive
+        const archivePath = await downloadFile(
+          version.download_url,
+          version.id
+        );
+        if (!archivePath) continue;
+
+        console.log(`Downloaded: ${archivePath}`);
+
+        // Extract the archive
+        await extractArchive(archivePath, extractPath);
+        console.log(`Extracted to: ${extractPath}`);
+
+        // Compute archive hash
+        archiveHash = await computeFileHash(archivePath);
+
+        const sleepTime = Math.floor(Math.random() * (2000 - 300 + 1)) + 1000; // Random sleep between 2-5 seconds
+        console.log(`Sleeping for ${sleepTime} ms`);
+        await sleep(sleepTime);
+      }
       // Find .modinfo file
       const modInfoPath = await findModInfoFile(extractPath);
       if (!modInfoPath) {
         console.warn(`No .modinfo found in ${version.name}`);
-        // await pb
-        //   .collection('mod_versions')
-        //   .update<ModVersionsRecord>(version.id, {
-
-        //   } as ModVersionsRecord);
+        await pb
+          .collection('mod_versions')
+          .update<ModVersionsRecord>(version.id, {
+            skip_install: true,
+          } as ModVersionsRecord);
         continue;
       }
 
       // Compute extracted folder hash
-      const folderHash = await computeFolderHash(extractPath);
+      const folderHash = await computeFolderHash(path.dirname(modInfoPath));
 
       // Parse .modinfo XML file
       const modInfoXML = await fs.readFile(modInfoPath, 'utf8');
@@ -159,10 +199,6 @@ async function processModArchives() {
       } as Partial<ModVersionsRecord>);
 
       console.log(`Updated PocketBase for: ${version.name}`);
-
-      const sleepTime = Math.floor(Math.random() * (2000 - 300 + 1)) + 1000; // Random sleep between 2-5 seconds
-      console.log(`Sleeping for ${sleepTime} ms`);
-      await sleep(sleepTime);
     } catch (error) {
       console.error(`Failed to process ${version.name}: ${error}`);
     }
@@ -171,19 +207,61 @@ async function processModArchives() {
   }
 }
 
+/**
+ * Converts a Google Drive file URL into a direct download link.
+ * @param url - The original Google Drive file URL
+ * @returns Direct download URL or null if invalid
+ */
+function getGoogleDriveDirectDownloadUrl(url: string): string | null {
+  const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  if (match && match[1]) {
+    return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+  }
+  return null;
+}
+
 // Utility: Download a file
-async function downloadFile(url: string, id: string): Promise<string> {
-  const res = await fetch(url);
+async function downloadFile(url: string, id: string): Promise<string | null> {
+  let isExternal = false;
+  let res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to download ${url}`);
-  console.log(`Downloading: ${url}`, {
+
+  if (res.redirected) {
+    await pb.collection('mod_versions').update(id, {
+      is_external_download: true,
+    } as Partial<ModVersionsRecord>);
+  }
+
+  if (res.redirected && res.url.includes('//drive.google.com/')) {
+    const updatedUrl = getGoogleDriveDirectDownloadUrl(res.url);
+    if (!updatedUrl) {
+      console.warn(`Failed to get direct download link for ${url}`);
+      return null;
+    }
+
+    res = await fetch(updatedUrl);
+    if (!res.ok) throw new Error(`Failed to download ${updatedUrl}`);
+  }
+
+  console.log(`Downloaded: ${url}`, {
     status: res.status,
     statusText: res.statusText,
-    headers: res.headers,
+    disposition: res.headers.get('content-disposition'),
+    type: res.headers.get('content-type'),
   });
+
   const buffer = await res.arrayBuffer();
   const { filename, extension } = parseContentDisposition(
     res.headers.get('content-disposition')
   );
+
+  if (extension == null) {
+    console.warn(`No extension found for ${url}`, { filename, extension });
+    await pb.collection('mod_versions').update(id, {
+      download_error: true,
+    } as Partial<ModVersionsRecord>);
+    return null;
+  }
 
   await fs.writeFile(
     path.join(ARCHIVE_DIR, `${id}.${extension}`),
