@@ -40,7 +40,22 @@ async function checkForManualScheduledTasks() {
   isRunning = true;
 
   try {
-    await scrapeMods({ firstPage: 1, maxPages: 1 });
+    const scheduleTask = scheduledTasks.items[0];
+    const firstPage =
+      typeof scheduleTask.options === 'object' &&
+      scheduleTask.options !== null &&
+      'firstPage' in scheduleTask.options
+        ? (scheduleTask.options.firstPage as number)
+        : 1;
+
+    const maxPages =
+      typeof scheduleTask.options === 'object' &&
+      scheduleTask.options !== null &&
+      'maxPages' in scheduleTask.options
+        ? (scheduleTask.options.maxPages as number)
+        : 1;
+
+    await scrapeMods({ firstPage, maxPages });
     await pb.collection('scheduled_tasks').update(scheduledTasks.items[0].id, {
       is_processed: true,
       processed_at: new Date().toISOString(),

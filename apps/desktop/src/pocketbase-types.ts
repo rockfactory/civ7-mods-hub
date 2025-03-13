@@ -127,10 +127,11 @@ export type ModsRecord = {
 	versions?: RecordIdString[]
 }
 
-export type ScheduledTasksRecord = {
+export type ScheduledTasksRecord<Toptions = unknown> = {
 	created?: IsoDateString
 	id: string
 	is_processed?: boolean
+	options?: null | Toptions
 	processed_at?: IsoDateString
 	updated?: IsoDateString
 }
@@ -156,7 +157,7 @@ export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemF
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type ModVersionsResponse<Texpand = unknown> = Required<ModVersionsRecord> & BaseSystemFields<Texpand>
 export type ModsResponse<Texpand = unknown> = Required<ModsRecord> & BaseSystemFields<Texpand>
-export type ScheduledTasksResponse<Texpand = unknown> = Required<ScheduledTasksRecord> & BaseSystemFields<Texpand>
+export type ScheduledTasksResponse<Toptions = unknown, Texpand = unknown> = Required<ScheduledTasksRecord<Toptions>> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions

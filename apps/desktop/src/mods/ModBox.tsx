@@ -88,22 +88,25 @@ export function ModBox(props: IModBoxProps) {
     <Card key={mod.id} shadow="sm" p="lg" mb="md" pos="relative">
       <LoadingOverlay visible={loading} />
       <Group justify="space-between" wrap="nowrap">
-        <Image width={40} height={40} src={mod.icon_url} alt={mod.name} />
-        <Stack gap="xs" align="flex-start">
-          <Text fw={600}>{mod.name}</Text>
-          <Text mt="xs" c="dimmed">
-            <IconUser size={12} /> {mod.author}{' '}
-            <IconFileDescription size={12} /> {mod.short_description}
+        {/* <Image width={40} height={40} src={mod.icon_url} alt={mod.name} /> */}
+        <Stack gap={0} align="flex-start">
+          <Text fw={600}>{mod.name} </Text>
+          <Text c="dimmed" fz={'0.85rem'}>
+            <IconUser size={12} /> {mod.author}
           </Text>
-          {latestVersion && (
-            <Badge mt="sm" variant="outline">
-              {latestVersion.name ?? 'N/A'}
-            </Badge>
-          )}
         </Stack>
+        {latestVersion && (
+          <Badge mt="sm" variant="outline">
+            {latestVersion.name ?? 'N/A'}
+          </Badge>
+        )}
         {/* <Badge>{mod.rating} ★</Badge> */}
       </Group>
 
+      <Text c="dimmed">
+        {/* <IconUser size={12} /> {mod.author}{' '} */}
+        {mod.short_description}
+      </Text>
       {installedModInfo ? (
         <Group grow>
           {isLatest ? (
