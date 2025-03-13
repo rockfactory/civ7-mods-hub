@@ -12,6 +12,9 @@ import {
   Grid,
   ActionIcon,
   Tooltip,
+  Menu,
+  Modal,
+  Loader,
 } from '@mantine/core';
 import * as React from 'react';
 import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
@@ -21,12 +24,14 @@ import {
   IconCheck,
   IconChecklist,
   IconCircleCheckFilled,
+  IconDots,
   IconDownload,
   IconExternalLink,
   IconFileDescription,
   IconLink,
   IconSettings,
   IconSettings2,
+  IconSwitch,
   IconTransitionBottom,
   IconTrash,
   IconUser,
@@ -102,124 +107,164 @@ export function ModBox(props: IModBoxProps) {
   };
 
   const [isSelected, setSelected] = useState(false);
+  const [isChoosingVersion, setChoosingVersion] = useState(false);
 
   return (
-    <Card
-      key={fetched.id}
-      className={styles.modCard}
-      shadow="sm"
-      p="sm"
-      mb="sm"
-      pos="relative"
-      onClick={() => setSelected(!isSelected)}
-    >
-      <LoadingOverlay visible={loading} />
-      <Flex justify="space-between" align="flex-start">
-        <Group justify="normal" wrap="nowrap" w="100%">
-          {fetched.icon_url ? (
-            <Image
-              width={40}
-              height={40}
-              style={{ borderRadius: '4px' }}
-              src={fetched.icon_url}
-              alt={fetched.name}
-            />
-          ) : (
-            <IconSettings size={40} />
-          )}
-          <Flex justify="space-between" w="100%">
-            <Stack gap={0} align="flex-start">
-              <Text fw={600}>
-                <a
-                  className={styles.plainLink}
-                  href={fetched.url}
-                  target="_blank"
-                >
-                  {fetched.name}
-                  {latestVersion?.name && (
-                    <Text span c="dimmed">
-                      {' '}
-                      {latestVersion.name}
-                    </Text>
-                  )}{' '}
-                  <IconExternalLink size={12} />
-                </a>
-              </Text>
-              <Text c="dimmed" fz={'0.85rem'}>
-                <IconUser size={12} /> {fetched.author}
-              </Text>
-            </Stack>
-            {/* {latestVersion && (
+    <>
+      <Card
+        key={fetched.id}
+        className={styles.modCard}
+        shadow="sm"
+        p="sm"
+        mb="sm"
+        pos="relative"
+        onClick={() => setSelected(!isSelected)}
+      >
+        <LoadingOverlay visible={loading} />
+        <Flex justify="space-between" align="flex-start">
+          <Group justify="normal" wrap="nowrap" w="100%">
+            {fetched.icon_url ? (
+              <Image
+                width={40}
+                height={40}
+                style={{ borderRadius: '4px' }}
+                src={fetched.icon_url}
+                alt={fetched.name}
+              />
+            ) : (
+              <IconSettings size={40} />
+            )}
+            <Flex justify="space-between" w="100%">
+              <Stack gap={0} align="flex-start">
+                <Text fw={600}>
+                  <a
+                    className={styles.plainLink}
+                    href={fetched.url}
+                    target="_blank"
+                  >
+                    {fetched.name}
+                    {latestVersion?.name && (
+                      <Text span c="dimmed">
+                        {' '}
+                        {latestVersion.name}
+                      </Text>
+                    )}{' '}
+                    <IconExternalLink size={12} />
+                  </a>
+                </Text>
+                <Text c="dimmed" fz={'0.85rem'}>
+                  <IconUser size={12} /> {fetched.author}
+                </Text>
+              </Stack>
+              {/* {latestVersion && (
               <Box flex="0 0 auto">
                 <Badge mt="sm" variant="outline">
                   {latestVersion.name ?? 'N/A'}
                 </Badge>
               </Box>
             )} */}
-          </Flex>
-          {/* <Badge>{mod.rating} ★</Badge> */}
-        </Group>
-        <Box flex="0 0 80px" w="100%">
-          <Flex align="flex-end" justify="flex-end">
-            {local ? (
-              <Group gap={4} align="flex-end">
-                <ActionIcon
-                  mt="sm"
-                  variant="light"
-                  color="red"
-                  onClick={() => handleUninstall()}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
-                {isLatest ? (
-                  <ActionIcon variant="filled" color="green">
-                    <IconCircleCheckFilled size={16} />
-                  </ActionIcon>
-                ) : mod.installedVersion ? (
-                  <Tooltip
-                    label={`Update to ${
-                      latestVersion?.name ?? 'latest'
-                    }, installed ${mod.installedVersion.name}`}
+            </Flex>
+            {/* <Badge>{mod.rating} ★</Badge> */}
+          </Group>
+          <Box flex="0 0 100px" w="100%">
+            <Flex align="flex-end" justify="flex-end">
+              {local ? (
+                <Group gap={4} align="flex-end">
+                  <ActionIcon
+                    mt="sm"
+                    variant="light"
+                    color="red"
+                    onClick={() => handleUninstall()}
                   >
-                    <ActionIcon
-                      variant="filled"
-                      color="blue"
-                      onClick={() => handleInstall(latestVersion!)}
-                    >
-                      <IconDownload size={16} />
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                  {isLatest ? (
+                    <ActionIcon variant="filled" color="green">
+                      <IconCircleCheckFilled size={16} />
                     </ActionIcon>
-                  </Tooltip>
-                ) : (
-                  <Tooltip label="Install latest version, current version unknown">
-                    <ActionIcon
-                      color="grape"
-                      onClick={() => handleInstall(latestVersion!)}
+                  ) : mod.installedVersion ? (
+                    <Tooltip
+                      label={`Update to ${
+                        latestVersion?.name ?? 'latest'
+                      }, installed ${mod.installedVersion.name}`}
                     >
-                      <IconTransitionBottom size={16} />
-                    </ActionIcon>
-                  </Tooltip>
-                )}
-              </Group>
-            ) : (
-              <ActionIcon
-                mt="md"
-                variant="light"
-                onClick={() => handleInstall(latestVersion!)}
+                      <ActionIcon
+                        variant="filled"
+                        color="blue"
+                        onClick={() => handleInstall(latestVersion!)}
+                      >
+                        <IconDownload size={16} />
+                      </ActionIcon>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip label="Install latest version, current version unknown">
+                      <ActionIcon
+                        color="grape"
+                        onClick={() => handleInstall(latestVersion!)}
+                      >
+                        <IconTransitionBottom size={16} />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </Group>
+              ) : (
+                <ActionIcon
+                  mt="md"
+                  variant="light"
+                  onClick={() => handleInstall(latestVersion!)}
+                >
+                  <IconDownload size={16} />
+                </ActionIcon>
+              )}
+              <Menu
+                shadow="md"
+                width={200}
+                position="bottom-end"
+                trigger={'click-hover'}
               >
-                <IconDownload size={16} />
-              </ActionIcon>
-            )}
-          </Flex>
-        </Box>
-      </Flex>
+                <Menu.Target>
+                  <ActionIcon ml={4} mt="sm" variant="light" color="gray">
+                    <IconDots size={16} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>Mod Actions</Menu.Label>
+                  <Menu.Item
+                    leftSection={<IconSwitch size={16} />}
+                    onClick={() => setChoosingVersion(true)}
+                  >
+                    Choose version...
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Flex>
+          </Box>
+        </Flex>
 
-      <Text c="dimmed">{fetched.short_description}</Text>
-
-      {isSelected && (
-        <Card.Section>
-          <ModBoxVersions mod={mod} onInstall={handleInstall} />
-        </Card.Section>
+        <Text c="dimmed">{fetched.short_description}</Text>
+      </Card>
+      {isChoosingVersion && (
+        <Modal
+          opened={isChoosingVersion}
+          size="lg"
+          title="Choose version"
+          onClose={() => setChoosingVersion(false)}
+          zIndex={1200}
+        >
+          <Text size="sm">
+            Choose version of the mod{' '}
+            <Text fw={600} span>
+              {fetched.name}
+            </Text>
+            .
+          </Text>
+          <ModBoxVersions
+            mod={mod}
+            onInstall={handleInstall}
+            loading={loading}
+          />
+        </Modal>
       )}
-    </Card>
+    </>
   );
 }

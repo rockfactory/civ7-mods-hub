@@ -174,7 +174,7 @@ export default function ModsListPage() {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <ScrollArea>
+        <ScrollArea scrollbars="y">
           {filteredMods.map((mod) => (
             <ModBox key={mod.fetched.id} mod={mod} />
           ))}

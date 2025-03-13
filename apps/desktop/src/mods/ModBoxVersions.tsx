@@ -1,21 +1,23 @@
 import * as React from 'react';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { ModVersionsRecord } from '../pocketbase-types';
-import { ActionIcon, Box, Table, Text } from '@mantine/core';
+import { ActionIcon, Box, LoadingOverlay, Table, Text } from '@mantine/core';
 import { IconCircleCheckFilled, IconDownload } from '@tabler/icons-react';
 import { DateFormatter } from '../ui/DateFormatter';
 
 export interface IModBoxVersionsProps {
   mod: ModData;
   onInstall: (version: ModVersionsRecord) => void;
+  loading?: boolean;
 }
 
 export function ModBoxVersions(props: IModBoxVersionsProps) {
   const { mod } = props;
   const modVersions = mod.fetched.expand?.mod_versions_via_mod_id;
   return (
-    <Box>
-      <Table>
+    <Box mt="sm" pos="relative">
+      <LoadingOverlay visible={props.loading} />
+      <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Version</Table.Th>
