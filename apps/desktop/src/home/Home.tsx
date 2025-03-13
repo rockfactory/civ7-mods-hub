@@ -27,6 +27,7 @@ import { TypedPocketBase } from '../pocketbase-types';
 import { FetchedMod, ModBox } from '../mods/ModBox';
 import { ModInfo } from './IModInfo';
 import { applyUpdates, checkUpdates } from '../mods/checkUpdates';
+import { sortVersionsByDate } from '../mods/fetchMods';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -64,8 +65,20 @@ export default function ModsListPage() {
         expand: 'mod_versions_via_mod_id',
       });
 
-      console.log('Mods data:', records);
-      setMods(records);
+      const data = records.map((record) => {
+        return {
+          ...record,
+          expand: {
+            ...record.expand,
+            mod_versions_via_mod_id: sortVersionsByDate(
+              record.expand?.mod_versions_via_mod_id ?? []
+            ),
+          },
+        };
+      });
+
+      console.log('Mods data:', data);
+      setMods(data);
     }
 
     fetchMods();
