@@ -20,9 +20,12 @@ import { installMod, uninstallMod } from './installMod';
 import {
   IconCheck,
   IconChecklist,
+  IconCircleCheckFilled,
   IconDownload,
   IconFileDescription,
+  IconSettings,
   IconSettings2,
+  IconTransitionBottom,
   IconTrash,
   IconUser,
 } from '@tabler/icons-react';
@@ -114,7 +117,7 @@ export function ModBox(props: IModBoxProps) {
               alt={mod.name}
             />
           ) : (
-            <IconSettings2 size={40} />
+            <IconSettings size={40} />
           )}
           <Flex justify="space-between" w="100%">
             <Stack gap={0} align="flex-start">
@@ -155,7 +158,7 @@ export function ModBox(props: IModBoxProps) {
                 </ActionIcon>
                 {isLatest ? (
                   <ActionIcon variant="filled" color="green">
-                    <IconChecklist size={16} />
+                    <IconCircleCheckFilled size={16} />
                   </ActionIcon>
                 ) : installedVersion ? (
                   <Tooltip
@@ -177,7 +180,7 @@ export function ModBox(props: IModBoxProps) {
                       color="grape"
                       onClick={() => handleInstall(mod)}
                     >
-                      <IconDownload size={16} />
+                      <IconTransitionBottom size={16} />
                     </ActionIcon>
                   </Tooltip>
                 )}

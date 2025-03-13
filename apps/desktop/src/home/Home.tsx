@@ -9,14 +9,23 @@ import {
   Stack,
   TextInput,
   Box,
+  Button,
+  Tooltip,
 } from '@mantine/core';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import PocketBase from 'pocketbase';
 import { invoke } from '@tauri-apps/api/core';
-import { IconEyeQuestion, IconRefresh, IconSearch } from '@tabler/icons-react';
+import {
+  IconChecks,
+  IconDownload,
+  IconEyeQuestion,
+  IconRefresh,
+  IconSearch,
+} from '@tabler/icons-react';
 import { TypedPocketBase } from '../pocketbase-types';
 import { FetchedMod, ModBox } from '../mods/ModBox';
 import { ModInfo } from './IModInfo';
+import { applyUpdates, checkUpdates } from '../mods/checkUpdates';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -89,6 +98,20 @@ export default function ModsListPage() {
     });
   }, [mods, query]);
 
+  const availableUpdates = useMemo(() => {
+    return checkUpdates(filteredMods, modsInfo).filter(
+      (u) => !u.isUnknown && u.installedVersion
+    );
+  }, [filteredMods, modsInfo]);
+
+  const [isUpdating, setIsUpdating] = useState(false);
+  const runApplyUpdates = useCallback(async () => {
+    setIsUpdating(true);
+    await applyUpdates(availableUpdates);
+    setIsUpdating(false);
+    setLocalModsReloadIndex((i) => i + 1);
+  }, [availableUpdates]);
+
   return (
     <AppShell
       padding="sm"
@@ -138,6 +161,43 @@ export default function ModsListPage() {
         {/* <Button mt="md" onClick={applyFilters}>
           Apply Filters
         </Button> */}
+
+        <Stack mt="md">
+          {availableUpdates.length > 0 ? (
+            <Tooltip
+              color="dark.8"
+              style={{
+                border: '1px solid rgb(66, 64, 53)',
+                borderRadius: 0,
+              }}
+              position="bottom-start"
+              label={
+                <Stack gap="sm">
+                  <Text fz="sm">Will update:</Text>
+                  {availableUpdates.map((update) => (
+                    <Text fz="sm" key={update.mod.id}>
+                      {update.mod.name}: {update.installedVersion?.name} →{' '}
+                      {update.latestVersion.name}
+                    </Text>
+                  ))}
+                </Stack>
+              }
+            >
+              <Button
+                color="blue"
+                leftSection={<IconDownload size={16} />}
+                loading={isUpdating}
+                onClick={runApplyUpdates}
+              >
+                Update {availableUpdates.length} mods
+              </Button>
+            </Tooltip>
+          ) : (
+            <Button disabled leftSection={<IconChecks size={16} />}>
+              All mods are updated
+            </Button>
+          )}
+        </Stack>
       </AppShell.Navbar>
 
       <AppShell.Main>
