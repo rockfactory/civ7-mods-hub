@@ -8,11 +8,12 @@ import {
   ActionIcon,
   Stack,
   TextInput,
+  Box,
 } from '@mantine/core';
 import { useState, useEffect, useMemo } from 'react';
 import PocketBase from 'pocketbase';
 import { invoke } from '@tauri-apps/api/core';
-import { IconRefresh, IconSearch } from '@tabler/icons-react';
+import { IconEyeQuestion, IconRefresh, IconSearch } from '@tabler/icons-react';
 import { TypedPocketBase } from '../pocketbase-types';
 import { FetchedMod, ModBox } from '../mods/ModBox';
 import { ModInfo } from './IModInfo';
@@ -64,27 +65,33 @@ export default function ModsListPage() {
     const installedModIds = new Set(modsInfo.map((info) => info.modinfo_id));
 
     return mods.filter((mod) => {
+      let shouldInclude = true;
+
       if (query.text) {
         const searchText =
           mod.name.toLocaleLowerCase() + ' ' + mod.id + ' ' + mod.author;
-        return searchText
-          .toLocaleLowerCase()
-          .includes(query.text.toLocaleLowerCase());
+        shouldInclude =
+          shouldInclude &&
+          searchText
+            .toLocaleLowerCase()
+            .includes(query.text.toLocaleLowerCase());
       }
 
       if (query.onlyInstalled) {
-        return installedModIds.has(
-          mod.expand?.mod_versions_via_mod_id[0].modinfo_id
-        );
+        shouldInclude =
+          shouldInclude &&
+          installedModIds.has(
+            mod.expand?.mod_versions_via_mod_id[0].modinfo_id
+          );
       }
 
-      return true;
+      return shouldInclude;
     });
   }, [mods, query]);
 
   return (
     <AppShell
-      padding="md"
+      padding="sm"
       navbar={{ width: 300, breakpoint: 'sm' }}
       header={{ height: 60 }}
     >
@@ -143,6 +150,15 @@ export default function ModsListPage() {
               onActionComplete={() => setLocalModsReloadIndex((i) => i + 1)}
             />
           ))}
+          {filteredMods.length === 0 && (
+            <Box p="lg">
+              <Stack gap={'xs'} align="center">
+                <IconEyeQuestion size={40} />
+                <Text>No mods found</Text>
+                <Text c="dimmed">Try changing your filters</Text>
+              </Stack>
+            </Box>
+          )}
         </ScrollArea>
       </AppShell.Main>
     </AppShell>

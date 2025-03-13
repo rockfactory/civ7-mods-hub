@@ -9,6 +9,9 @@ import {
   Stack,
   Box,
   Flex,
+  Grid,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
 import * as React from 'react';
 import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
@@ -91,8 +94,8 @@ export function ModBox(props: IModBoxProps) {
     <Card
       key={mod.id}
       shadow="sm"
-      p="lg"
-      mb="md"
+      p="sm"
+      mb="sm"
       pos="relative"
       style={{
         borderRadius: 0,
@@ -100,82 +103,93 @@ export function ModBox(props: IModBoxProps) {
       }}
     >
       <LoadingOverlay visible={loading} />
-      <Group justify="normal" wrap="nowrap">
-        {mod.icon_url ? (
-          <Image
-            width={40}
-            height={40}
-            style={{ borderRadius: '4px' }}
-            src={mod.icon_url}
-            alt={mod.name}
-          />
-        ) : (
-          <IconSettings2 size={40} />
-        )}
-        <Flex justify="space-between" w="100%">
-          <Stack gap={0} align="flex-start">
-            <Text fw={600}>{mod.name} </Text>
-            <Text c="dimmed" fz={'0.85rem'}>
-              <IconUser size={12} /> {mod.author}
-            </Text>
-          </Stack>
-          {latestVersion && (
-            <Box flex="0 0 auto">
-              <Badge mt="sm" variant="outline">
-                {latestVersion.name ?? 'N/A'}
-              </Badge>
-            </Box>
+      <Flex justify="space-between" align="flex-start">
+        <Group justify="normal" wrap="nowrap" w="100%">
+          {mod.icon_url ? (
+            <Image
+              width={40}
+              height={40}
+              style={{ borderRadius: '4px' }}
+              src={mod.icon_url}
+              alt={mod.name}
+            />
+          ) : (
+            <IconSettings2 size={40} />
           )}
-        </Flex>
-        {/* <Badge>{mod.rating} ★</Badge> */}
-      </Group>
+          <Flex justify="space-between" w="100%">
+            <Stack gap={0} align="flex-start">
+              <Text fw={600}>
+                {mod.name}
+                {latestVersion?.name && (
+                  <Text span c="dimmed">
+                    {' '}
+                    {latestVersion.name}
+                  </Text>
+                )}
+              </Text>
+              <Text c="dimmed" fz={'0.85rem'}>
+                <IconUser size={12} /> {mod.author}
+              </Text>
+            </Stack>
+            {/* {latestVersion && (
+              <Box flex="0 0 auto">
+                <Badge mt="sm" variant="outline">
+                  {latestVersion.name ?? 'N/A'}
+                </Badge>
+              </Box>
+            )} */}
+          </Flex>
+          {/* <Badge>{mod.rating} ★</Badge> */}
+        </Group>
+        <Box flex="0 0 80px" w="100%">
+          <Flex align="flex-end" justify="flex-end">
+            {installedModInfo ? (
+              <Group gap={4} align="flex-end">
+                <ActionIcon
+                  mt="sm"
+                  variant="light"
+                  color="red"
+                  onClick={() => handleUninstall(mod)}
+                >
+                  <IconTrash size={16} />
+                </ActionIcon>
+                {isLatest ? (
+                  <ActionIcon variant="filled" color="green">
+                    <IconChecklist size={16} />
+                  </ActionIcon>
+                ) : (
+                  <Tooltip
+                    label={`Update to ${
+                      latestVersion?.name ?? 'latest'
+                    }, installed ${installedVersion?.name}`}
+                  >
+                    <ActionIcon
+                      variant="filled"
+                      color="blue"
+                      onClick={() => handleInstall(mod, true)}
+                    >
+                      <IconDownload size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+              </Group>
+            ) : (
+              <ActionIcon
+                mt="md"
+                variant="light"
+                onClick={() => handleInstall(mod)}
+              >
+                <IconDownload size={16} />
+              </ActionIcon>
+            )}
+          </Flex>
+        </Box>
+      </Flex>
 
       <Text c="dimmed">
         {/* <IconUser size={12} /> {mod.author}{' '} */}
         {mod.short_description}
       </Text>
-      {installedModInfo ? (
-        <Group grow>
-          {isLatest ? (
-            <Button
-              leftSection={<IconChecklist size={16} />}
-              mt="sm"
-              variant="filled"
-              color="green"
-            >
-              Installed
-            </Button>
-          ) : (
-            <Button
-              leftSection={<IconDownload size={16} />}
-              mt="sm"
-              variant="filled"
-              color="blue"
-              onClick={() => handleInstall(mod, true)}
-            >
-              Update from {installedVersion?.name ?? 'previous'}
-            </Button>
-          )}
-          <Button
-            leftSection={<IconTrash size={16} />}
-            mt="sm"
-            variant="light"
-            color="red"
-            onClick={() => handleUninstall(mod)}
-          >
-            Uninstall
-          </Button>
-        </Group>
-      ) : (
-        <Button
-          leftSection={<IconDownload size={16} />}
-          mt="md"
-          variant="light"
-          onClick={() => handleInstall(mod)}
-        >
-          Install
-        </Button>
-      )}
     </Card>
   );
 }
