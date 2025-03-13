@@ -6,3 +6,15 @@
 .plainLink:hover {
   text-decoration: underline;
 }
+
+.modCard {
+  border-radius: 0;
+  border: 1px solid rgb(66, 64, 53);
+  /* cursor: pointer; */
+}
+
+.modCard:hover {
+  box-shadow: var(--mantine-shadow-lg);
+  background-color: var(--mantine-color-dark-5);
+  border-color: rgb(83, 80, 61);
+}

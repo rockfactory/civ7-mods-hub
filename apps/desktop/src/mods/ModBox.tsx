@@ -34,6 +34,7 @@ import {
 import { useState } from 'react';
 import { modals } from '@mantine/modals';
 import styles from './ModBox.module.css';
+import { ModBoxVersions } from './ModBoxVersions';
 
 export interface IModBoxProps {
   mod: FetchedMod;
@@ -128,17 +129,17 @@ export function ModBox(props: IModBoxProps) {
     }
   };
 
+  const [isSelected, setSelected] = useState(false);
+
   return (
     <Card
       key={mod.id}
+      className={styles.modCard}
       shadow="sm"
       p="sm"
       mb="sm"
       pos="relative"
-      style={{
-        borderRadius: 0,
-        border: '1px solid rgb(66, 64, 53)',
-      }}
+      // onClick={() => setSelected(!isSelected)}
     >
       <LoadingOverlay visible={loading} />
       <Flex justify="space-between" align="flex-start">
@@ -240,6 +241,16 @@ export function ModBox(props: IModBoxProps) {
         {/* <IconUser size={12} /> {mod.author}{' '} */}
         {mod.short_description}
       </Text>
+
+      {isSelected && (
+        <Card.Section>
+          <ModBoxVersions
+            mod={mod}
+            installedVersion={installedVersion}
+            modInfo={installedModInfo}
+          />
+        </Card.Section>
+      )}
     </Card>
   );
 }
