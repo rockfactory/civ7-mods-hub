@@ -58,7 +58,7 @@ export default function ModsListPage() {
     }
 
     fetchMods();
-  }, []);
+  }, [localModsReloadIndex]);
 
   const filteredMods = useMemo(() => {
     const installedModIds = new Set(modsInfo.map((info) => info.modinfo_id));

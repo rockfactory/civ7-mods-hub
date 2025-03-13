@@ -48,7 +48,7 @@ async function getModsFromPage(url: string): Promise<SyncMod[]> {
     const modPageRelativeUrl = el.find('.structItem-title a').attr('href');
     const modPageUrl = baseUrl + modPageRelativeUrl;
     const modAuthor = el.find('.username').first().text().trim();
-    const iconUrl = el.find('structItem-cell--icon a img').attr('src');
+    const iconUrl = el.find('.structItem-cell--icon a img')?.attr('src');
     const ratingMatch = el
       .find('.ratingStarsRow .ratingStars')
       .attr('title')

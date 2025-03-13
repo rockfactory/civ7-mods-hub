@@ -5,6 +5,8 @@ import {
   Button,
   Text,
   LoadingOverlay,
+  Image,
+  Stack,
 } from '@mantine/core';
 import * as React from 'react';
 import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
@@ -14,7 +16,9 @@ import {
   IconCheck,
   IconChecklist,
   IconDownload,
+  IconFileDescription,
   IconTrash,
+  IconUser,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -84,20 +88,21 @@ export function ModBox(props: IModBoxProps) {
     <Card key={mod.id} shadow="sm" p="lg" mb="md" pos="relative">
       <LoadingOverlay visible={loading} />
       <Group justify="space-between" wrap="nowrap">
-        <Text fw={600}>{mod.name}</Text>
+        <Image width={40} height={40} src={mod.icon_url} alt={mod.name} />
+        <Stack gap="xs" align="flex-start">
+          <Text fw={600}>{mod.name}</Text>
+          <Text mt="xs" c="dimmed">
+            <IconUser size={12} /> {mod.author}{' '}
+            <IconFileDescription size={12} /> {mod.short_description}
+          </Text>
+          {latestVersion && (
+            <Badge mt="sm" variant="outline">
+              {latestVersion.name ?? 'N/A'}
+            </Badge>
+          )}
+        </Stack>
         {/* <Badge>{mod.rating} ★</Badge> */}
-        {latestVersion && (
-          <Badge mt="sm" variant="outline">
-            Latest: {latestVersion.name ?? 'N/A'}
-          </Badge>
-        )}
       </Group>
-
-      <Text size="sm" c="dimmed">
-        by {mod.author}
-      </Text>
-
-      <Text mt="xs">{mod.short_description}</Text>
 
       {installedModInfo ? (
         <Group grow>
