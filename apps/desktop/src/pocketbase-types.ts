@@ -13,6 +13,7 @@ export enum Collections {
 	Superusers = "_superusers",
 	ModVersions = "mod_versions",
 	Mods = "mods",
+	ScheduledTasks = "scheduled_tasks",
 	Users = "users",
 }
 
@@ -126,6 +127,14 @@ export type ModsRecord = {
 	versions?: RecordIdString[]
 }
 
+export type ScheduledTasksRecord = {
+	created?: IsoDateString
+	id: string
+	is_processed?: boolean
+	processed_at?: IsoDateString
+	updated?: IsoDateString
+}
+
 export type UsersRecord = {
 	avatar?: string
 	created?: IsoDateString
@@ -147,6 +156,7 @@ export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemF
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type ModVersionsResponse<Texpand = unknown> = Required<ModVersionsRecord> & BaseSystemFields<Texpand>
 export type ModsResponse<Texpand = unknown> = Required<ModsRecord> & BaseSystemFields<Texpand>
+export type ScheduledTasksResponse<Texpand = unknown> = Required<ScheduledTasksRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -159,6 +169,7 @@ export type CollectionRecords = {
 	_superusers: SuperusersRecord
 	mod_versions: ModVersionsRecord
 	mods: ModsRecord
+	scheduled_tasks: ScheduledTasksRecord
 	users: UsersRecord
 }
 
@@ -170,6 +181,7 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	mod_versions: ModVersionsResponse
 	mods: ModsResponse
+	scheduled_tasks: ScheduledTasksResponse
 	users: UsersResponse
 }
 
@@ -184,5 +196,6 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
 	collection(idOrName: 'mod_versions'): RecordService<ModVersionsResponse>
 	collection(idOrName: 'mods'): RecordService<ModsResponse>
+	collection(idOrName: 'scheduled_tasks'): RecordService<ScheduledTasksResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
 }
