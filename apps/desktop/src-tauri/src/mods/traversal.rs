@@ -66,7 +66,7 @@ fn extract_mod_id(modinfo_path: &str) -> Option<String> {
 }
 
 /// Finds the `.modinfo` file inside a given directory.
-fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
+pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
     for entry in WalkDir::new(directory)
         .into_iter()
         .filter_map(Result::ok)

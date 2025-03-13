@@ -19,6 +19,7 @@ import {
   IconChecklist,
   IconDownload,
   IconFileDescription,
+  IconSettings2,
   IconTrash,
   IconUser,
 } from '@tabler/icons-react';
@@ -87,15 +88,31 @@ export function ModBox(props: IModBoxProps) {
   };
 
   return (
-    <Card key={mod.id} shadow="sm" p="lg" mb="md" pos="relative">
+    <Card
+      key={mod.id}
+      shadow="sm"
+      p="lg"
+      mb="md"
+      pos="relative"
+      style={{
+        borderRadius: 0,
+        border: '1px solid rgb(66, 64, 53)',
+      }}
+    >
       <LoadingOverlay visible={loading} />
       <Group justify="normal" wrap="nowrap">
         {mod.icon_url ? (
-          <Image width={40} height={40} src={mod.icon_url} alt={mod.name} />
+          <Image
+            width={40}
+            height={40}
+            style={{ borderRadius: '4px' }}
+            src={mod.icon_url}
+            alt={mod.name}
+          />
         ) : (
-          <IconFileDescription size={40} />
+          <IconSettings2 size={40} />
         )}
-        <Flex justify="space-between" grow w="100%">
+        <Flex justify="space-between" w="100%">
           <Stack gap={0} align="flex-start">
             <Text fw={600}>{mod.name} </Text>
             <Text c="dimmed" fz={'0.85rem'}>
