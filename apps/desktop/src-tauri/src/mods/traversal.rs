@@ -76,6 +76,10 @@ fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
                     .extension()
                     .map(|ext| ext == "modinfo")
                     .unwrap_or(false)
+                && e.path()
+                    .file_name()
+                    .map(|name| !name.to_string_lossy().starts_with('.'))
+                    .unwrap_or(true) // Defaults to true if there's no filename
         })
     {
         let modinfo_path = entry.path().to_string_lossy().to_string();

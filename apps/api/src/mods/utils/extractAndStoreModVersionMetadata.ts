@@ -150,7 +150,10 @@ async function getFilesRecursively(directory: string): Promise<string[]> {
 // Utility: Recursively find .modinfo file
 async function findModInfoFile(directory: string): Promise<string | null> {
   const files = await getFilesRecursively(directory);
-  return files.find((file) => file.endsWith('.modinfo')) || null;
+  return (
+    files.find((file) => file.endsWith('.modinfo') && !file.startsWith('.')) ||
+    null
+  );
 }
 
 // Extract ZIP and 7z using `7zip-min`

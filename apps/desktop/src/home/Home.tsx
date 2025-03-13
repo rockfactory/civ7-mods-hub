@@ -2,34 +2,25 @@
 import {
   AppShell,
   Text,
-  Button,
   Checkbox,
   ScrollArea,
-  Card,
   Group,
-  Badge,
-  Space,
-  Flex,
   ActionIcon,
   Stack,
   TextInput,
 } from '@mantine/core';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import PocketBase from 'pocketbase';
 import { invoke } from '@tauri-apps/api/core';
 import { IconRefresh, IconSearch } from '@tabler/icons-react';
-import { getAllModsInfo } from '../mods/getAllModsInfo';
-import {
-  ModsResponse,
-  ModVersionsRecord,
-  TypedPocketBase,
-} from '../pocketbase-types';
-import { installMod } from '../mods/installMod';
+import { TypedPocketBase } from '../pocketbase-types';
 import { FetchedMod, ModBox } from '../mods/ModBox';
 import { ModInfo } from './IModInfo';
 
-/// <reference path="../../../../backend/pb_data/types.d.ts" />
-const pb = new PocketBase('http://localhost:8090') as TypedPocketBase;
+const pb = new PocketBase(
+  'https://backend.civmods.com'
+  /*'http://localhost:8090'*/
+) as TypedPocketBase;
 
 export default function ModsListPage() {
   const [mods, setMods] = useState<FetchedMod[]>([]);
