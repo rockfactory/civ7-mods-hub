@@ -1,5 +1,3 @@
-/// <reference path="../../../backend/pb_data/types.d.ts" />
-/// <reference path="../../../desktop/src/pocketbase-types.ts" />
 import { type TypedPocketBase } from '../../../desktop/src/pocketbase-types';
 import PocketBase from 'pocketbase/cjs';
 
