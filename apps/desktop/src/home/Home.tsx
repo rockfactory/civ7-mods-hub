@@ -23,76 +23,32 @@ import {
   IconRefresh,
   IconSearch,
 } from '@tabler/icons-react';
-import { TypedPocketBase } from '../pocketbase-types';
-import { FetchedMod, ModBox } from '../mods/ModBox';
-import { ModInfo } from './IModInfo';
-import { applyUpdates, checkUpdates } from '../mods/checkUpdates';
-import { sortVersionsByDate } from '../mods/fetchMods';
-
-const pb = new PocketBase(
-  'https://backend.civmods.com'
-  /*'http://localhost:8090'*/
-) as TypedPocketBase;
+import { ModBox } from '../mods/ModBox';
+import { useApplyUpdates } from '../mods/checkUpdates';
+import { useModsContext } from '../mods/ModsContext';
 
 export default function ModsListPage() {
-  const [mods, setMods] = useState<FetchedMod[]>([]);
-
-  const [modsInfo, setModsInfo] = useState<ModInfo[]>([]);
-
-  const [localModsReloadIndex, setLocalModsReloadIndex] = useState(0);
-
+  const { mods, triggerReload } = useModsContext();
   const [query, setQuery] = useState({ text: '', onlyInstalled: false });
 
-  useEffect(() => {
-    async function findMods() {
-      const folder = await invoke('get_mods_folder', {});
-      console.log('Mods folder:', folder);
-
-      const modsInfo = await invoke<ModInfo[]>('scan_civ_mods', {
-        modsFolderPath: folder,
-      });
-
-      setModsInfo(modsInfo);
-      console.log('Mods info:', modsInfo);
-    }
-
-    findMods().catch(console.error);
-  }, [localModsReloadIndex]);
-
-  useEffect(() => {
-    async function fetchMods() {
-      const records = await pb.collection('mods').getFullList<FetchedMod>({
-        expand: 'mod_versions_via_mod_id',
-      });
-
-      const data = records.map((record) => {
-        return {
-          ...record,
-          expand: {
-            ...record.expand,
-            mod_versions_via_mod_id: sortVersionsByDate(
-              record.expand?.mod_versions_via_mod_id ?? []
-            ),
-          },
-        };
-      });
-
-      console.log('Mods data:', data);
-      setMods(data);
-    }
-
-    fetchMods();
-  }, [localModsReloadIndex]);
-
   const filteredMods = useMemo(() => {
-    const installedModIds = new Set(modsInfo.map((info) => info.modinfo_id));
+    const installedModIds = new Set(
+      mods
+        .filter(({ local }) => local?.modinfo_id)
+        .map(({ local }) => local?.modinfo_id)
+    );
 
     return mods.filter((mod) => {
       let shouldInclude = true;
 
       if (query.text) {
         const searchText =
-          mod.name.toLocaleLowerCase() + ' ' + mod.id + ' ' + mod.author;
+          mod.fetched.name.toLocaleLowerCase() +
+          ' ' +
+          mod.local?.modinfo_id +
+          ' ' +
+          mod.fetched?.author.toLocaleLowerCase();
+
         shouldInclude =
           shouldInclude &&
           searchText
@@ -104,7 +60,7 @@ export default function ModsListPage() {
         shouldInclude =
           shouldInclude &&
           installedModIds.has(
-            mod.expand?.mod_versions_via_mod_id[0].modinfo_id
+            mod.fetched.expand?.mod_versions_via_mod_id[0].modinfo_id
           );
       }
 
@@ -112,19 +68,7 @@ export default function ModsListPage() {
     });
   }, [mods, query]);
 
-  const availableUpdates = useMemo(() => {
-    return checkUpdates(filteredMods, modsInfo).filter(
-      (u) => !u.isUnknown && u.installedVersion
-    );
-  }, [filteredMods, modsInfo]);
-
-  const [isUpdating, setIsUpdating] = useState(false);
-  const runApplyUpdates = useCallback(async () => {
-    setIsUpdating(true);
-    await applyUpdates(availableUpdates);
-    setIsUpdating(false);
-    setLocalModsReloadIndex((i) => i + 1);
-  }, [availableUpdates]);
+  const { availableUpdates, isUpdating, applyUpdates } = useApplyUpdates();
 
   return (
     <AppShell
@@ -137,10 +81,7 @@ export default function ModsListPage() {
           <Text fw={700} size="xl">
             Civ7 Mod Manager
           </Text>
-          <ActionIcon
-            variant="subtle"
-            onClick={() => setLocalModsReloadIndex((i) => i + 1)}
-          >
+          <ActionIcon variant="subtle" onClick={() => triggerReload()}>
             <IconRefresh size={16} />
           </ActionIcon>
         </Group>
@@ -190,9 +131,10 @@ export default function ModsListPage() {
                   <Stack gap="sm">
                     <Text fz="sm">Will update:</Text>
                     {availableUpdates.map((update) => (
-                      <Text fz="sm" key={update.mod.id}>
-                        {update.mod.name}: {update.installedVersion?.name} →{' '}
-                        {update.latestVersion.name}
+                      <Text fz="sm" key={update.mod.fetched.id}>
+                        {update.mod.fetched.name}:{' '}
+                        {update.mod.installedVersion?.name} →{' '}
+                        {update.targetVersion?.name}
                       </Text>
                     ))}
                   </Stack>
@@ -202,7 +144,7 @@ export default function ModsListPage() {
                   color="blue"
                   leftSection={<IconDownload size={16} />}
                   loading={isUpdating}
-                  onClick={runApplyUpdates}
+                  onClick={applyUpdates}
                 >
                   Update {availableUpdates.length} mods
                 </Button>
@@ -234,12 +176,7 @@ export default function ModsListPage() {
       <AppShell.Main>
         <ScrollArea>
           {filteredMods.map((mod) => (
-            <ModBox
-              key={mod.id}
-              mod={mod}
-              modsInfo={modsInfo}
-              onActionComplete={() => setLocalModsReloadIndex((i) => i + 1)}
-            />
+            <ModBox key={mod.fetched.id} mod={mod} />
           ))}
           {filteredMods.length === 0 && (
             <Box p="lg">

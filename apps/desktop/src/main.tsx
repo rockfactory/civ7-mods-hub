@@ -12,6 +12,7 @@ import { ModalsProvider } from '@mantine/modals';
 // core styles are required for all packages
 import '@mantine/core/styles.css';
 import Home from './home/Home';
+import { ModsContextProvider } from './mods/ModsContext';
 
 const pastelYellow: MantineColorsTuple = [
   '#fff7e8',
@@ -38,7 +39,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <ModalsProvider>
         <Notifications />
-        <Home />
+        <ModsContextProvider>
+          <Home />
+        </ModsContextProvider>
       </ModalsProvider>
     </MantineProvider>
   </React.StrictMode>

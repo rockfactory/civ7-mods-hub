@@ -30,7 +30,14 @@ function parseContentDisposition(contentDisposition: string | null): {
   return {};
 }
 
-export async function installMod(mod: ModVersionsRecord) {
+export interface InstallModOptions {
+  modsFolderPath: string;
+}
+
+export async function installMod(
+  mod: ModVersionsRecord,
+  options: InstallModOptions
+) {
   if (!mod.download_url) {
     throw new Error(`Mod ${mod.id} has no download URL`);
   }
@@ -49,7 +56,7 @@ export async function installMod(mod: ModVersionsRecord) {
     throw new Error('Failed to parse filename or extension');
   }
   console.log('Filename:', filename, 'Extension:', extension);
-  const modsFolderPath = await invoke<string>('get_mods_folder', {});
+  const modsFolderPath = options.modsFolderPath;
 
   console.log('Mods folder:', modsFolderPath);
   const tempArchivePath = await path.join(
@@ -81,9 +88,7 @@ export async function installMod(mod: ModVersionsRecord) {
   }
 }
 
-export async function uninstallMod(modInfo: ModInfo) {
-  const modsFolderPath = await invoke<string>('get_mods_folder', {});
-
+export async function uninstallMod(modInfo: ModInfo, modsFolderPath: string) {
   console.log('Mods folder:', modsFolderPath);
   const modPath = await path.join(modsFolderPath, modInfo.mod_name);
 

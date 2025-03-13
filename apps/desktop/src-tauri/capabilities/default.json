@@ -18,6 +18,7 @@
         }
       ]
     },
-    "shell:default"
+    "shell:default",
+    "store:default"
   ]
 }

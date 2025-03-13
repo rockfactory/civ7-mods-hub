@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import * as React from 'react';
 import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
-import { ModInfo } from '../home/IModInfo';
+import { ModData, ModInfo } from '../home/IModInfo';
 import { installMod, uninstallMod } from './installMod';
 import {
   IconCheck,
@@ -35,57 +35,36 @@ import { useState } from 'react';
 import { modals } from '@mantine/modals';
 import styles from './ModBox.module.css';
 import { ModBoxVersions } from './ModBoxVersions';
+import { useModsContext } from './ModsContext';
 
 export interface IModBoxProps {
-  mod: FetchedMod;
-  modsInfo: ModInfo[];
-  onActionComplete?: () => void;
+  mod: ModData;
 }
 
-export type FetchedMod = ModsResponse<{
-  mod_versions_via_mod_id: ModVersionsRecord[];
-}>;
-
 export function ModBox(props: IModBoxProps) {
-  const { mod, modsInfo } = props;
+  const { mod } = props;
+  const { local, fetched } = mod;
 
   const [loading, setLoading] = useState(false);
 
-  const installedModInfo = modsInfo.find(
-    (info) =>
-      info.modinfo_id === mod.expand?.mod_versions_via_mod_id[0].modinfo_id
-  );
+  const { install, uninstall } = useModsContext();
 
-  const isLatest =
-    installedModInfo?.folder_hash ===
-    mod.expand?.mod_versions_via_mod_id[0].hash;
+  const latestVersion = fetched.expand?.mod_versions_via_mod_id[0];
+  const isLatest = local?.folder_hash === latestVersion?.hash;
 
-  const latestVersion = mod.expand?.mod_versions_via_mod_id[0];
-  const installedVersion = mod.expand?.mod_versions_via_mod_id.find(
-    (version) => version.hash === installedModInfo?.folder_hash
-  );
-
-  const handleInstall = async (mod: FetchedMod, update: boolean = false) => {
-    const version = mod.expand?.mod_versions_via_mod_id[0];
-    if (!version?.download_url) {
-      throw new Error(`Mod ${mod.id} has no download URL`);
-    }
-
-    try {
+  const handleInstall = async (version: ModVersionsRecord) => {
+    const handleBaseInstall = async () => {
       setLoading(true);
-      if (update) {
-        await uninstallMod(installedModInfo!);
-      }
-      await installMod(version);
-      props.onActionComplete?.();
-    } catch (error) {
-      console.error('Failed to install mod:', error);
-    } finally {
+      await install(mod, version);
       setLoading(false);
-    }
-  };
+    };
 
-  const handleUnknownUpdate = async (mod: FetchedMod) => {
+    // When the version is known, we can just install it
+    if (!mod.isUnknown) {
+      await handleBaseInstall();
+      return;
+    }
+
     modals.openConfirmModal({
       title: 'Update mod with unknown version',
       children: (
@@ -93,7 +72,7 @@ export function ModBox(props: IModBoxProps) {
           <Text size="sm">
             You are about to update the mod{' '}
             <Text fw={600} span>
-              {mod.name}
+              {mod.fetched.name}
             </Text>
             .
           </Text>
@@ -112,45 +91,38 @@ export function ModBox(props: IModBoxProps) {
         cancel: 'Do not update',
       },
       confirmProps: { color: 'red' },
-      onConfirm: () => handleInstall(mod),
+      onConfirm: () => handleBaseInstall(),
     });
   };
 
-  const handleUninstall = async (mod: FetchedMod) => {
-    console.log('Uninstalling mod:', mod);
-    try {
-      setLoading(true);
-      await uninstallMod(installedModInfo!);
-      props.onActionComplete?.();
-    } catch (error) {
-      console.error('Failed to uninstall mod:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleUninstall = async () => {
+    setLoading(true);
+    await uninstall(mod);
+    setLoading(false);
   };
 
   const [isSelected, setSelected] = useState(false);
 
   return (
     <Card
-      key={mod.id}
+      key={fetched.id}
       className={styles.modCard}
       shadow="sm"
       p="sm"
       mb="sm"
       pos="relative"
-      // onClick={() => setSelected(!isSelected)}
+      onClick={() => setSelected(!isSelected)}
     >
       <LoadingOverlay visible={loading} />
       <Flex justify="space-between" align="flex-start">
         <Group justify="normal" wrap="nowrap" w="100%">
-          {mod.icon_url ? (
+          {fetched.icon_url ? (
             <Image
               width={40}
               height={40}
               style={{ borderRadius: '4px' }}
-              src={mod.icon_url}
-              alt={mod.name}
+              src={fetched.icon_url}
+              alt={fetched.name}
             />
           ) : (
             <IconSettings size={40} />
@@ -158,8 +130,12 @@ export function ModBox(props: IModBoxProps) {
           <Flex justify="space-between" w="100%">
             <Stack gap={0} align="flex-start">
               <Text fw={600}>
-                <a className={styles.plainLink} href={mod.url} target="_blank">
-                  {mod.name}
+                <a
+                  className={styles.plainLink}
+                  href={fetched.url}
+                  target="_blank"
+                >
+                  {fetched.name}
                   {latestVersion?.name && (
                     <Text span c="dimmed">
                       {' '}
@@ -170,7 +146,7 @@ export function ModBox(props: IModBoxProps) {
                 </a>
               </Text>
               <Text c="dimmed" fz={'0.85rem'}>
-                <IconUser size={12} /> {mod.author}
+                <IconUser size={12} /> {fetched.author}
               </Text>
             </Stack>
             {/* {latestVersion && (
@@ -185,13 +161,13 @@ export function ModBox(props: IModBoxProps) {
         </Group>
         <Box flex="0 0 80px" w="100%">
           <Flex align="flex-end" justify="flex-end">
-            {installedModInfo ? (
+            {local ? (
               <Group gap={4} align="flex-end">
                 <ActionIcon
                   mt="sm"
                   variant="light"
                   color="red"
-                  onClick={() => handleUninstall(mod)}
+                  onClick={() => handleUninstall()}
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
@@ -199,16 +175,16 @@ export function ModBox(props: IModBoxProps) {
                   <ActionIcon variant="filled" color="green">
                     <IconCircleCheckFilled size={16} />
                   </ActionIcon>
-                ) : installedVersion ? (
+                ) : mod.installedVersion ? (
                   <Tooltip
                     label={`Update to ${
                       latestVersion?.name ?? 'latest'
-                    }, installed ${installedVersion.name}`}
+                    }, installed ${mod.installedVersion.name}`}
                   >
                     <ActionIcon
                       variant="filled"
                       color="blue"
-                      onClick={() => handleInstall(mod, true)}
+                      onClick={() => handleInstall(latestVersion!)}
                     >
                       <IconDownload size={16} />
                     </ActionIcon>
@@ -217,7 +193,7 @@ export function ModBox(props: IModBoxProps) {
                   <Tooltip label="Install latest version, current version unknown">
                     <ActionIcon
                       color="grape"
-                      onClick={() => handleUnknownUpdate(mod)}
+                      onClick={() => handleInstall(latestVersion!)}
                     >
                       <IconTransitionBottom size={16} />
                     </ActionIcon>
@@ -228,7 +204,7 @@ export function ModBox(props: IModBoxProps) {
               <ActionIcon
                 mt="md"
                 variant="light"
-                onClick={() => handleInstall(mod)}
+                onClick={() => handleInstall(latestVersion!)}
               >
                 <IconDownload size={16} />
               </ActionIcon>
@@ -237,18 +213,11 @@ export function ModBox(props: IModBoxProps) {
         </Box>
       </Flex>
 
-      <Text c="dimmed">
-        {/* <IconUser size={12} /> {mod.author}{' '} */}
-        {mod.short_description}
-      </Text>
+      <Text c="dimmed">{fetched.short_description}</Text>
 
       {isSelected && (
         <Card.Section>
-          <ModBoxVersions
-            mod={mod}
-            installedVersion={installedVersion}
-            modInfo={installedModInfo}
-          />
+          <ModBoxVersions mod={mod} onInstall={handleInstall} />
         </Card.Section>
       )}
     </Card>

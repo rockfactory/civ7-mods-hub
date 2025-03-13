@@ -1,19 +1,18 @@
 import * as React from 'react';
-import { FetchedMod } from './ModBox';
-import { ModInfo } from '../home/IModInfo';
+import { ModData, ModInfo } from '../home/IModInfo';
 import { ModVersionsRecord } from '../pocketbase-types';
 import { ActionIcon, Box, Table, Text } from '@mantine/core';
 import { IconCircleCheckFilled, IconDownload } from '@tabler/icons-react';
+import { DateFormatter } from '../ui/DateFormatter';
 
 export interface IModBoxVersionsProps {
-  mod: FetchedMod;
-  installedVersion?: ModVersionsRecord;
-  modInfo: ModInfo | undefined;
+  mod: ModData;
+  onInstall: (version: ModVersionsRecord) => void;
 }
 
 export function ModBoxVersions(props: IModBoxVersionsProps) {
-  const { mod, installedVersion, modInfo } = props;
-  const modVersions = mod.expand?.mod_versions_via_mod_id;
+  const { mod } = props;
+  const modVersions = mod.fetched.expand?.mod_versions_via_mod_id;
   return (
     <Box>
       <Table>
@@ -28,14 +27,19 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
           {modVersions?.map((version) => (
             <Table.Tr key={version.hash}>
               <Table.Td>{version.name}</Table.Td>
-              <Table.Td>{version.released}</Table.Td>
               <Table.Td>
-                {installedVersion?.hash == version.hash ? (
+                {DateFormatter.format(new Date(version.released || ''))}
+              </Table.Td>
+              <Table.Td align="right">
+                {mod.local?.folder_hash == version.hash ? (
                   <ActionIcon color="green">
                     <IconCircleCheckFilled size={16} />
                   </ActionIcon>
                 ) : (
-                  <ActionIcon color="blue">
+                  <ActionIcon
+                    color={mod.isUnknown ? 'grape' : 'blue'}
+                    onClick={() => props.onInstall(version)}
+                  >
                     <IconDownload size={16} />
                   </ActionIcon>
                 )}
