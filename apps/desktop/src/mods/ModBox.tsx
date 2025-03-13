@@ -157,16 +157,25 @@ export function ModBox(props: IModBoxProps) {
                   <ActionIcon variant="filled" color="green">
                     <IconChecklist size={16} />
                   </ActionIcon>
-                ) : (
+                ) : installedVersion ? (
                   <Tooltip
                     label={`Update to ${
                       latestVersion?.name ?? 'latest'
-                    }, installed ${installedVersion?.name}`}
+                    }, installed ${installedVersion.name}`}
                   >
                     <ActionIcon
                       variant="filled"
                       color="blue"
                       onClick={() => handleInstall(mod, true)}
+                    >
+                      <IconDownload size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                ) : (
+                  <Tooltip label="Install latest version, current version unknown">
+                    <ActionIcon
+                      color="grape"
+                      onClick={() => handleInstall(mod)}
                     >
                       <IconDownload size={16} />
                     </ActionIcon>
