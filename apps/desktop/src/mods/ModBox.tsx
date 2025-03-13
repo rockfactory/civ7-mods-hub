@@ -7,6 +7,8 @@ import {
   LoadingOverlay,
   Image,
   Stack,
+  Box,
+  Flex,
 } from '@mantine/core';
 import * as React from 'react';
 import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
@@ -87,19 +89,27 @@ export function ModBox(props: IModBoxProps) {
   return (
     <Card key={mod.id} shadow="sm" p="lg" mb="md" pos="relative">
       <LoadingOverlay visible={loading} />
-      <Group justify="space-between" wrap="nowrap">
-        {/* <Image width={40} height={40} src={mod.icon_url} alt={mod.name} /> */}
-        <Stack gap={0} align="flex-start">
-          <Text fw={600}>{mod.name} </Text>
-          <Text c="dimmed" fz={'0.85rem'}>
-            <IconUser size={12} /> {mod.author}
-          </Text>
-        </Stack>
-        {latestVersion && (
-          <Badge mt="sm" variant="outline">
-            {latestVersion.name ?? 'N/A'}
-          </Badge>
+      <Group justify="normal" wrap="nowrap">
+        {mod.icon_url ? (
+          <Image width={40} height={40} src={mod.icon_url} alt={mod.name} />
+        ) : (
+          <IconFileDescription size={40} />
         )}
+        <Flex justify="space-between" grow w="100%">
+          <Stack gap={0} align="flex-start">
+            <Text fw={600}>{mod.name} </Text>
+            <Text c="dimmed" fz={'0.85rem'}>
+              <IconUser size={12} /> {mod.author}
+            </Text>
+          </Stack>
+          {latestVersion && (
+            <Box flex="0 0 auto">
+              <Badge mt="sm" variant="outline">
+                {latestVersion.name ?? 'N/A'}
+              </Badge>
+            </Box>
+          )}
+        </Flex>
         {/* <Badge>{mod.rating} ★</Badge> */}
       </Group>
 
