@@ -3,6 +3,7 @@ import { ModData, ModInfo } from '../home/IModInfo';
 import { ModVersionsRecord } from '../pocketbase-types';
 import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
+import { isSameVersion } from './isSameVersion';
 
 export interface IModUpdate {
   mod: ModData;
@@ -28,7 +29,7 @@ export function checkUpdates(mods: ModData[]) {
       continue;
     }
 
-    if (latestVersion?.hash !== installedMod.local!.folder_hash) {
+    if (!isSameVersion(latestVersion, installedMod.local)) {
       needUpdates.push({
         mod: installedMod,
         targetVersion: latestVersion,

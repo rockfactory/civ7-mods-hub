@@ -700,6 +700,7 @@ dependencies = [
  "dirs 5.0.1",
  "flate2",
  "fs_extra",
+ "log",
  "quick-xml 0.37.2",
  "serde",
  "serde_json",

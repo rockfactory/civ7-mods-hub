@@ -16,6 +16,7 @@ import { useAppStore } from '../store/store';
 import { installMod, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
 import { open } from '@tauri-apps/plugin-dialog';
+import { isSameVersion } from './isSameVersion';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -137,7 +138,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       );
 
       const installedVersion = fetchedMod.expand?.mod_versions_via_mod_id.find(
-        (version) => version.hash === local?.folder_hash
+        (version) => isSameVersion(version, local)
       );
 
       return {

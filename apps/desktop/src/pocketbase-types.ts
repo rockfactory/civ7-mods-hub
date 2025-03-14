@@ -96,6 +96,7 @@ export type ModVersionsRecord = {
 	download_error?: boolean
 	download_url?: string
 	hash?: string
+	hash_stable?: string
 	id: string
 	is_external_download?: boolean
 	is_processing?: boolean

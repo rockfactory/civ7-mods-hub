@@ -137,6 +137,7 @@ export interface ScrapeModsOptions {
   stopAfterFirstMod?: boolean;
   skipSaveToDatabase?: boolean;
   skipExtractAndStore?: boolean;
+  forceExtractAndStore?: boolean;
 }
 
 export async function scrapeMods(

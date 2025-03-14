@@ -1,3 +1,5 @@
+use fs_extra::file;
+use log::debug;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs::File;
@@ -5,11 +7,10 @@ use std::fs::{self};
 use std::io::Read;
 use std::path::Path;
 use walkdir::WalkDir;
-
 #[derive(Serialize)]
 pub struct ModInfo {
     mod_name: String,
-    modinfo_path: Option<String>,
+    modinfo_path: String,
     modinfo_id: Option<String>, // Extracted from XML <Mod id="...">
     folder_hash: String,
     folder_name: String,
@@ -23,15 +24,36 @@ struct ModXml {
     id: Option<String>,
 }
 
+// Make sure this is aligned with the ignore list in the backend in Node.js
+fn is_entry_hidden(entry: &walkdir::DirEntry) -> bool {
+    let file_name = entry.file_name().to_string_lossy();
+    return file_name.starts_with(".")
+        || file_name.eq_ignore_ascii_case("__MACOSX")
+        || file_name.eq_ignore_ascii_case("thumbs.db");
+}
+
 /// Computes SHA-256 hash of all files inside a directory,
 /// including the filename and relative path in the hash.
 fn compute_folder_hash(directory: &Path) -> Result<String, String> {
     let mut hasher = Sha256::new();
 
-    for entry in WalkDir::new(directory).into_iter().filter_map(Result::ok) {
-        if entry.file_type().is_file() {
-            // Skipping file name for now.
+    log::info!("Computing hash for: {}", directory.to_str().unwrap());
+    let iter = WalkDir::new(directory)
+        .sort_by(|a, b| {
+            a.file_name()
+                .to_string_lossy()
+                .to_lowercase()
+                .cmp(&b.file_name().to_string_lossy().to_lowercase())
+        })
+        .into_iter()
+        .filter_entry(|e| !is_entry_hidden(e))
+        .filter_map(Result::ok);
 
+    for entry in iter {
+        if entry.file_type().is_file() {
+            println!(" -> Hashing: {}", entry.path().display());
+
+            // Skipping file name for now.
             // Get relative path (relative to the given directory)
             // let relative_path = entry
             //     .path()
@@ -49,6 +71,7 @@ fn compute_folder_hash(directory: &Path) -> Result<String, String> {
             let mut buffer = Vec::new();
             file.read_to_end(&mut buffer)
                 .map_err(|e| format!("Failed to read file: {}", e))?;
+
             hasher.update(&buffer);
         }
     }
@@ -67,10 +90,10 @@ fn extract_mod_id(modinfo_path: &str) -> Option<String> {
 
 /// Finds the `.modinfo` file inside a given directory.
 pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
-    for entry in WalkDir::new(directory)
+    if let Some(entry) = WalkDir::new(directory)
         .into_iter()
         .filter_map(Result::ok)
-        .filter(|e| {
+        .find(|e| {
             e.file_type().is_file()
                 && e.path()
                     .extension()
@@ -111,20 +134,30 @@ pub async fn scan_civ_mods(mods_folder_path: String) -> Result<Vec<ModInfo>, Str
                 .into_string()
                 .unwrap_or_else(|_| "Unknown Mod".to_string());
             let (modinfo_path, modinfo_id) = find_modinfo_file(&mod_dir);
-            let modinfo_path_str = modinfo_path.as_deref().ok_or("Modinfo not found")?;
+
+            // Skip mod if modinfo file is not found
+            let modinfo_path_str = match modinfo_path.as_deref() {
+                Some(path) => path,
+                None => {
+                    log::info!("Skipping mod folder without modinfo: {}", mod_name);
+                    continue;
+                }
+            };
+
             let modinfo_folder = Path::new(modinfo_path_str)
                 .parent()
                 .ok_or("Invalid modinfo path")?;
 
-            let folder_hash = compute_folder_hash(&modinfo_folder)
-                .unwrap_or_else(|_| "Error computing hash".to_string());
+            let folder_hash = compute_folder_hash(modinfo_folder)
+                .unwrap_or_else(|_| "<unable to compute folder hash>".to_string());
 
             mods_list.push(ModInfo {
                 mod_name,
-                modinfo_path,
+                modinfo_path: modinfo_path_str.to_string(),
                 modinfo_id,
                 folder_hash,
                 // Only the folder name without the full path
+                // Should be the same as mod_name for now
                 folder_name: mod_dir.file_name().unwrap().to_string_lossy().to_string(),
             });
         }
