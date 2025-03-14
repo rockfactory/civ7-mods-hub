@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "civmods",
+  "productName": "CivMods",
   "version": "../package.json",
   "identifier": "com.civmods.desktop",
   "build": {
