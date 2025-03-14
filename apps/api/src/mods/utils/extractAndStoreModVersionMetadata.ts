@@ -135,12 +135,16 @@ async function getFilesRecursively(directory: string): Promise<string[]> {
   let files: string[] = [];
   const entries = await fs.readdir(directory, { withFileTypes: true });
   const orderedEntries = entries.sort((a, b) => {
-    return a.name.localeCompare(b.name);
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
   });
 
-  for (const entry of entries) {
+  for (const entry of orderedEntries) {
     const entryPath = path.join(directory, entry.name);
+
+    // Make sure this is aligned with the ignore list in the frontend in rust
     if (entry.name.startsWith('.')) continue;
+    if (entry.name.toLowerCase() === 'thumbs.db') continue;
+    if (entry.name.toLowerCase() === '__MACOSX') continue;
 
     if (entry.isDirectory()) {
       files = files.concat(await getFilesRecursively(entryPath));
