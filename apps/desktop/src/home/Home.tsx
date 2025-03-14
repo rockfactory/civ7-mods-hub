@@ -20,6 +20,7 @@ import {
   IconChecks,
   IconDownload,
   IconEyeQuestion,
+  IconFolder,
   IconRefresh,
   IconSearch,
 } from '@tabler/icons-react';
@@ -28,7 +29,7 @@ import { useApplyUpdates } from '../mods/checkUpdates';
 import { useModsContext } from '../mods/ModsContext';
 
 export default function ModsListPage() {
-  const { mods, triggerReload } = useModsContext();
+  const { mods, triggerReload, chooseModFolder } = useModsContext();
   const [query, setQuery] = useState({ text: '', onlyInstalled: false });
 
   const filteredMods = useMemo(() => {
@@ -84,6 +85,8 @@ export default function ModsListPage() {
           <ActionIcon variant="subtle" onClick={() => triggerReload()}>
             <IconRefresh size={16} />
           </ActionIcon>
+          <ActionIcon variant="subtle" onClick={() => chooseModFolder()}>
+            <IconFolder size={16} />
         </Group>
       </AppShell.Header>
 

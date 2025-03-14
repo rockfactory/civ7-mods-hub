@@ -15,6 +15,7 @@ import PocketBase from 'pocketbase';
 import { useAppStore } from '../store/store';
 import { installMod, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
+import { open } from '@tauri-apps/plugin-dialog';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -26,6 +27,7 @@ export type ModsContextType = {
   uninstall: (mod: ModData) => Promise<void>;
   install: (mod: ModData, version: ModVersionsRecord) => Promise<void>;
   triggerReload: () => void;
+  chooseModFolder: () => Promise<void>;
 };
 
 export const ModsContext = createContext({} as ModsContextType);
@@ -108,7 +110,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         fetched: fetchedMod,
         local,
         installedVersion,
-        isUnknown: !installedVersion,
+        isUnknown: !installedVersion && local != null,
       } as ModData;
     });
   }, [fetchedMods, modsInfo]);
@@ -170,9 +172,40 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
     [triggerReload, getModsFolder]
   );
 
+  const chooseModFolder = useCallback(async () => {
+    try {
+      const selectedFolder = await open({
+        directory: true, // Enables folder selection
+        multiple: false, // Allows only a single folder selection
+        defaultPath: await invoke<string>('get_mods_folder', {}),
+      });
+
+      if (selectedFolder) {
+        console.log('Selected folder:', selectedFolder);
+        useAppStore.setState({ modFolder: selectedFolder });
+        triggerReload();
+      } else {
+        console.log('No folder selected');
+      }
+    } catch (error) {
+      console.error('Error selecting folder:', error);
+      notifications.show({
+        color: 'red',
+        title: 'Failed to select Mods folder',
+        message: String(error),
+      });
+    }
+  }, []);
+
   const value = useMemo(
-    () => ({ mods, install, uninstall, triggerReload }),
-    [mods, install, uninstall, triggerReload]
+    () => ({
+      mods,
+      install,
+      uninstall,
+      triggerReload,
+      chooseModFolder,
+    }),
+    [mods, install, uninstall, triggerReload, chooseModFolder]
   );
 
   return (

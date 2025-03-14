@@ -17,9 +17,9 @@ import {
   Loader,
 } from '@mantine/core';
 import * as React from 'react';
-import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
+import { ModVersionsRecord } from '../pocketbase-types';
 import { ModData, ModInfo } from '../home/IModInfo';
-import { installMod, uninstallMod } from './installMod';
+import { open } from '@tauri-apps/plugin-shell';
 import {
   IconCheck,
   IconChecklist,
@@ -28,6 +28,7 @@ import {
   IconDownload,
   IconExternalLink,
   IconFileDescription,
+  IconFolder,
   IconLink,
   IconSettings,
   IconSettings2,
@@ -41,6 +42,7 @@ import { modals } from '@mantine/modals';
 import styles from './ModBox.module.css';
 import { ModBoxVersions } from './ModBoxVersions';
 import { useModsContext } from './ModsContext';
+import { resolve } from '@tauri-apps/api/path';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -234,6 +236,14 @@ export function ModBox(props: IModBoxProps) {
                     onClick={() => setChoosingVersion(true)}
                   >
                     Choose version...
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconFolder size={16} />}
+                    onClick={async () =>
+                      open(await resolve(local?.modinfo_path ?? '', '..'))
+                    }
+                  >
+                    Open mod folder
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
