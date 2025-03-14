@@ -1,11 +1,25 @@
-import { Button, Code, Drawer, Space, Text, Title } from '@mantine/core';
+import {
+  Button,
+  Code,
+  Drawer,
+  Group,
+  Space,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { useDisclosure, useToggle } from '@mantine/hooks';
-import { IconSettings } from '@tabler/icons-react';
+import {
+  IconExternalLink,
+  IconFolder,
+  IconLogs,
+  IconSettings,
+} from '@tabler/icons-react';
 import * as React from 'react';
 import { useModsContext } from '../mods/ModsContext';
 import { useEffect, useMemo, useState } from 'react';
 import { open } from '@tauri-apps/plugin-shell';
-import { appLogDir } from '@tauri-apps/api/path';
+import { appLogDir, resolve } from '@tauri-apps/api/path';
 
 export interface ISettingsDrawerProps {}
 
@@ -13,10 +27,19 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
   const [opened, handlers] = useDisclosure();
   const { chooseModFolder, getModsFolder, mods } = useModsContext();
 
-  const [displayedFolder, setDisplayedFolder] = useState<string | null>(null);
+  const [displayedFolders, setDisplayedFolders] = useState<{
+    mods: string | null;
+    logs: string | null;
+  }>({
+    mods: null,
+    logs: null,
+  });
   useEffect(() => {
-    getModsFolder().then((folder) => {
-      setDisplayedFolder(folder);
+    getModsFolder().then(async (folder) => {
+      setDisplayedFolders({
+        mods: folder,
+        logs: await resolve(folder, '..', 'Logs'),
+      });
     });
   }, [open, getModsFolder, mods]);
 
@@ -39,28 +62,59 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
         <Title order={3}>Civ7 Settings</Title>
 
         <Space h="md" />
-        <Button onClick={chooseModFolder} color="blue">
-          Choose mods folder
-        </Button>
+        <Group w="100%" gap={'xs'}>
+          <Button
+            style={{ flex: '1 1 auto' }}
+            leftSection={<IconFolder size={16} />}
+            onClick={chooseModFolder}
+            color="blue"
+          >
+            Choose mods folder
+          </Button>
+          <Button
+            leftSection={<IconExternalLink size={16} />}
+            color="blue"
+            variant="light"
+            onClick={() => open(displayedFolders.mods || '')}
+          >
+            Open
+          </Button>
+        </Group>
         <Text c="dimmed" size="sm" mt="xs">
           Current mods folder:
           <br />
-          <Code>{displayedFolder}</Code>
+          <Code>{displayedFolders.mods}</Code>{' '}
         </Text>
 
         <Title order={3} mt="lg">
           Debug
         </Title>
         <Space h="md" />
-        <Button
-          variant="outline"
-          color="blue"
-          onClick={async () => {
-            open(await appLogDir());
-          }}
-        >
-          Open CivMods logs folder
-        </Button>
+        <Stack gap="xs">
+          <Button
+            variant="light"
+            leftSection={<IconLogs size={12} />}
+            size="xs"
+            color="blue"
+            onClick={async () => {
+              open(await appLogDir());
+            }}
+          >
+            Open CivMods (this app) logs folder
+          </Button>
+          <Button
+            variant="light"
+            leftSection={<IconLogs size={12} />}
+            size="xs"
+            color="blue"
+            disabled={!displayedFolders.logs}
+            onClick={async () => {
+              open(displayedFolders.logs || '');
+            }}
+          >
+            Open Civilization7 logs folder
+          </Button>
+        </Stack>
       </Drawer>
     </>
   );
