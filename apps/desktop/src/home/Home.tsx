@@ -226,7 +226,10 @@ export default function ModsListPage() {
               <Stack gap={'xs'} align="center">
                 <IconEyeQuestion size={40} />
                 <Text>No mods found</Text>
-                <Text c="dimmed">Try changing your filters</Text>
+                <Text c="dimmed">
+                  Try changing your filters or open Settings and double check
+                  Mods folder
+                </Text>
               </Stack>
             </Box>
           )}

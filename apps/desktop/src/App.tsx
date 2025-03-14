@@ -1,50 +1,51 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import Home from './home/Home';
+import { ModsContextProvider } from './mods/ModsContext';
+import {
+  createTheme,
+  LoadingOverlay,
+  MantineColorsTuple,
+  MantineProvider,
+} from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import { ModalsProvider } from '@mantine/modals';
+
+import { useStore } from 'zustand';
+import { useAppStore } from './store/store';
+
+const pastelYellow: MantineColorsTuple = [
+  '#fff7e8',
+  '#f9edd5',
+  '#f2d9ab',
+  '#ebc57c',
+  '#e5b355',
+  '#e1a83c',
+  '#e0a22e',
+  '#c68d21',
+  '#b17d19',
+  '#996b0b',
+];
+
+const theme = createTheme({
+  colors: {
+    pastelYellow,
+  },
+  primaryColor: 'pastelYellow',
+});
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
+  const isHydrated = useAppStore((state) => state.hydrated);
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
+      <ModalsProvider>
+        <Notifications position="top-right" />
+        {isHydrated && (
+          <ModsContextProvider>
+            <Home />
+          </ModsContextProvider>
+        )}
+        {!isHydrated && <LoadingOverlay visible>Loading...</LoadingOverlay>}
+      </ModalsProvider>
+    </MantineProvider>
   );
 }
 
