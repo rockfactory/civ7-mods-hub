@@ -27,7 +27,7 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
         </Table.Thead>
         <Table.Tbody>
           {modVersions?.map((version) => (
-            <Table.Tr key={version.hash}>
+            <Table.Tr key={version.id}>
               <Table.Td>{version.name}</Table.Td>
               <Table.Td>
                 {DateFormatter.format(new Date(version.released || ''))}

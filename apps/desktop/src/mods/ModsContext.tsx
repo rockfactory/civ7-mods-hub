@@ -192,7 +192,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         notifications.show({
           color: 'green',
           title: 'Mod installed',
-          message: `${mod.fetched.name} v${version.name} installed successfully`,
+          message: `${mod.fetched.name} ${version.name} installed successfully`,
         });
       } catch (error) {
         console.error('Failed to install mod:', error);
