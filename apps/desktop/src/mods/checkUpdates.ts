@@ -1,7 +1,6 @@
 import { notifications } from '@mantine/notifications';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { ModVersionsRecord } from '../pocketbase-types';
-import { installMod, uninstallMod } from './installMod';
 import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
 

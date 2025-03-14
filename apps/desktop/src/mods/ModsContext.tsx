@@ -179,12 +179,11 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         );
       }
 
-      const isUpdate = mod.local !== null;
       const modsFolder = await getModsFolder();
 
       try {
-        if (isUpdate) {
-          await uninstallMod(mod.local!, modsFolder);
+        if (mod.local != null) {
+          await uninstallMod(mod.local, modsFolder);
         }
         await installMod(version, { modsFolderPath: modsFolder });
         triggerReload();
