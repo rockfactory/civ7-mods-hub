@@ -44,6 +44,7 @@ import { ModBoxVersions } from './ModBoxVersions';
 import { useModsContext } from './ModsContext';
 import { resolve } from '@tauri-apps/api/path';
 import { ModInstallButton } from './ModInstallButton';
+import { isSameVersion } from './isSameVersion';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -58,7 +59,7 @@ export function ModBox(props: IModBoxProps) {
   const { install, uninstall } = useModsContext();
 
   const latestVersion = fetched.expand?.mod_versions_via_mod_id[0];
-  const isLatest = local?.folder_hash === latestVersion?.hash;
+  const isLatest = isSameVersion(latestVersion, local);
 
   const handleInstall = async (version: ModVersionsRecord) => {
     const handleBaseInstall = async () => {

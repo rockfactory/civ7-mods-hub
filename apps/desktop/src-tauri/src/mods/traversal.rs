@@ -1,3 +1,5 @@
+use fs_extra::file;
+use log::debug;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs::File;
@@ -22,6 +24,14 @@ struct ModXml {
     id: Option<String>,
 }
 
+// Make sure this is aligned with the ignore list in the backend in Node.js
+fn is_entry_hidden(entry: &walkdir::DirEntry) -> bool {
+    let file_name = entry.file_name().to_string_lossy();
+    return file_name.starts_with(".")
+        || file_name.eq_ignore_ascii_case("__MACOSX")
+        || file_name.eq_ignore_ascii_case("thumbs.db");
+}
+
 /// Computes SHA-256 hash of all files inside a directory,
 /// including the filename and relative path in the hash.
 fn compute_folder_hash(directory: &Path) -> Result<String, String> {
@@ -29,27 +39,19 @@ fn compute_folder_hash(directory: &Path) -> Result<String, String> {
 
     log::info!("Computing hash for: {}", directory.to_str().unwrap());
     let iter = WalkDir::new(directory)
-        .sort_by_file_name()
+        .sort_by(|a, b| {
+            a.file_name()
+                .to_string_lossy()
+                .to_lowercase()
+                .cmp(&b.file_name().to_string_lossy().to_lowercase())
+        })
         .into_iter()
+        .filter_entry(|e| !is_entry_hidden(e))
         .filter_map(Result::ok);
 
     for entry in iter {
         if entry.file_type().is_file() {
-            log::info!(" -> Hashing: {}", entry.path().display());
-
-            // Make sure this is aligned with the ignore list in the backend in Node.js
-            if entry.file_name().to_string_lossy().starts_with(".")
-                || entry
-                    .file_name()
-                    .to_string_lossy()
-                    .eq_ignore_ascii_case("__MACOSX")
-                || entry
-                    .file_name()
-                    .to_string_lossy()
-                    .eq_ignore_ascii_case("thumbs.db")
-            {
-                continue;
-            }
+            println!(" -> Hashing: {}", entry.path().display());
 
             // Skipping file name for now.
             // Get relative path (relative to the given directory)

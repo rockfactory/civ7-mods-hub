@@ -13,7 +13,7 @@ import { ScrapeModsOptions, SyncModVersion } from './scrapeMods';
 import { pb } from '../../core/pocketbase';
 
 const ARCHIVE_DIR = './apps/api/data/archives/';
-const EXTRACTED_DIR = './apps/api/data/extracted/';
+export const EXTRACTED_DIR = './apps/api/data/extracted/';
 
 export async function extractAndStoreModVersionMetadata(
   options: ScrapeModsOptions,
@@ -77,7 +77,7 @@ export async function extractAndStoreModVersionMetadata(
     // Update PocketBase record
     await pb.collection('mod_versions').update(version.id, {
       archive_hash: archiveHash,
-      hash: folderHash,
+      hash_stable: folderHash,
       modinfo_url: modInfo?.Mod?.Properties?.URL || null,
       modinfo_version: modInfo?.Mod?.Properties?.Version || null,
       modinfo_id: modInfo?.Mod?.['@_id'] || null,
@@ -107,7 +107,7 @@ async function computeFileHash(filePath: string): Promise<string> {
  * @param folderPath - Path to the folder to hash
  * @returns SHA-256 hash as a hexadecimal string
  */
-async function computeFolderHash(folderPath: string): Promise<string> {
+export async function computeFolderHash(folderPath: string): Promise<string> {
   const files = await getFilesRecursively(folderPath);
   const hash = crypto.createHash('sha256');
   console.log(`Hashing folder: ${folderPath}`);
@@ -135,7 +135,11 @@ async function getFilesRecursively(directory: string): Promise<string[]> {
   let files: string[] = [];
   const entries = await fs.readdir(directory, { withFileTypes: true });
   const orderedEntries = entries.sort((a, b) => {
-    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    const aLower = a.name.toLowerCase();
+    const bLower = b.name.toLowerCase();
+    if (aLower < bLower) return -1;
+    if (aLower > bLower) return 1;
+    return 0;
   });
 
   for (const entry of orderedEntries) {
@@ -145,7 +149,6 @@ async function getFilesRecursively(directory: string): Promise<string[]> {
     if (entry.name.startsWith('.')) continue;
     if (entry.name.toLowerCase() === 'thumbs.db') continue;
     if (entry.name.toLowerCase() === '__MACOSX') continue;
-
     if (entry.isDirectory()) {
       files = files.concat(await getFilesRecursively(entryPath));
     } else {
@@ -157,7 +160,9 @@ async function getFilesRecursively(directory: string): Promise<string[]> {
 }
 
 // Utility: Recursively find .modinfo file
-async function findModInfoFile(directory: string): Promise<string | null> {
+export async function findModInfoFile(
+  directory: string
+): Promise<string | null> {
   const files = await getFilesRecursively(directory);
   return (
     files.find((file) => file.endsWith('.modinfo') && !file.startsWith('.')) ||
@@ -205,7 +210,15 @@ async function extractArchive(
   archivePath: string,
   extractTo: string
 ): Promise<void> {
-  if (archivePath.endsWith('.zip') || archivePath.endsWith('.7z')) {
+  if (
+    archivePath.endsWith('.zip') ||
+    archivePath.endsWith('.7z') ||
+    archivePath.endsWith('.tar.gz') ||
+    archivePath.endsWith('.tgz') ||
+    archivePath.endsWith('.tar') ||
+    archivePath.endsWith('.gz') ||
+    archivePath.endsWith('.bz2')
+  ) {
     await extract7ZipOrZip(archivePath, extractTo);
   } else if (archivePath.endsWith('.rar')) {
     await extractRar(archivePath, extractTo);

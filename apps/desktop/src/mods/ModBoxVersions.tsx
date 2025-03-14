@@ -4,6 +4,7 @@ import { ModVersionsRecord } from '../pocketbase-types';
 import { ActionIcon, Box, LoadingOverlay, Table, Text } from '@mantine/core';
 import { IconCircleCheckFilled, IconDownload } from '@tabler/icons-react';
 import { DateFormatter } from '../ui/DateFormatter';
+import { isSameVersion } from './isSameVersion';
 
 export interface IModBoxVersionsProps {
   mod: ModData;
@@ -33,7 +34,7 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
                 {DateFormatter.format(new Date(version.released || ''))}
               </Table.Td>
               <Table.Td align="right">
-                {mod.local?.folder_hash == version.hash ? (
+                {isSameVersion(version, mod.local) ? (
                   <ActionIcon color="green">
                     <IconCircleCheckFilled size={16} />
                   </ActionIcon>

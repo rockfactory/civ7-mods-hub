@@ -120,14 +120,18 @@ export async function saveModToDatabase(
         );
       }
 
-      if (version.is_processing) {
+      if (version.is_processing || options.forceExtractAndStore) {
         // Stuck
+        console.log(`Version is stuck, reprocessing: ${syncVersion.version}`);
         processableVersions.push(version);
       }
     }
   }
 
-  if (isNewVersionsAvailable && !options.skipExtractAndStore) {
+  if (
+    (isNewVersionsAvailable && !options.skipExtractAndStore) ||
+    options.forceExtractAndStore
+  ) {
     for (const version of processableVersions) {
       console.log(`[mod=${mod.name}] Processing new version: ${version.name}`);
       await extractAndStoreModVersionMetadata(options, mod, version);
