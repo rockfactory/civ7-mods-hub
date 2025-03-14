@@ -134,9 +134,14 @@ async function computeFolderHash(folderPath: string): Promise<string> {
 async function getFilesRecursively(directory: string): Promise<string[]> {
   let files: string[] = [];
   const entries = await fs.readdir(directory, { withFileTypes: true });
+  const orderedEntries = entries.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  });
 
   for (const entry of entries) {
     const entryPath = path.join(directory, entry.name);
+    if (entry.name.startsWith('.')) continue;
+
     if (entry.isDirectory()) {
       files = files.concat(await getFilesRecursively(entryPath));
     } else {

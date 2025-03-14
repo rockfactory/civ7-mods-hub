@@ -5,7 +5,6 @@ use std::fs::{self};
 use std::io::Read;
 use std::path::Path;
 use walkdir::WalkDir;
-
 #[derive(Serialize)]
 pub struct ModInfo {
     mod_name: String,
@@ -28,9 +27,20 @@ struct ModXml {
 fn compute_folder_hash(directory: &Path) -> Result<String, String> {
     let mut hasher = Sha256::new();
 
-    for entry in WalkDir::new(directory).into_iter().filter_map(Result::ok) {
+    log::info!("Computing hash for: {}", directory.to_str().unwrap());
+    let iter = WalkDir::new(directory)
+        .sort_by_file_name()
+        .into_iter()
+        .filter_map(Result::ok);
+
+    for entry in iter {
         if entry.file_type().is_file() {
+            log::info!(" -> Hashing: {}", entry.path().display());
             // Skipping file name for now.
+
+            if entry.file_name().to_string_lossy().starts_with(".") {
+                continue;
+            }
 
             // Get relative path (relative to the given directory)
             // let relative_path = entry
