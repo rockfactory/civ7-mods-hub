@@ -33,6 +33,8 @@ sha2 = "0.10"
 walkdir = "2"
 quick-xml = { version = "0.37.2", features = ["serialize"] } # XML parsing
 fs_extra = "1.3.0"
+tar = "0.4"
+flate2 = "*"
 tauri-plugin-shell = "2"
 tauri-plugin-store = "2"
 tauri-plugin-dialog = "2"

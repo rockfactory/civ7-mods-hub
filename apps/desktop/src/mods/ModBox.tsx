@@ -43,6 +43,7 @@ import styles from './ModBox.module.css';
 import { ModBoxVersions } from './ModBoxVersions';
 import { useModsContext } from './ModsContext';
 import { resolve } from '@tauri-apps/api/path';
+import { ModInstallButton } from './ModInstallButton';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -194,8 +195,8 @@ export function ModBox(props: IModBoxProps) {
           </Group>
           <Box flex="0 0 100px" w="100%">
             <Flex align="flex-end" justify="flex-end">
-              {local ? (
-                <Group gap={4} align="flex-end">
+              <Group gap={4} align="flex-end">
+                {mod.local && (
                   <ActionIcon
                     mt="sm"
                     variant="light"
@@ -204,44 +205,13 @@ export function ModBox(props: IModBoxProps) {
                   >
                     <IconTrash size={16} />
                   </ActionIcon>
-                  {isLatest ? (
-                    <ActionIcon variant="filled" color="green">
-                      <IconCircleCheckFilled size={16} />
-                    </ActionIcon>
-                  ) : mod.installedVersion ? (
-                    <Tooltip
-                      label={`Update to ${
-                        latestVersion?.name ?? 'latest'
-                      }, installed ${mod.installedVersion.name}`}
-                    >
-                      <ActionIcon
-                        variant="filled"
-                        color="blue"
-                        onClick={() => handleInstall(latestVersion!)}
-                      >
-                        <IconDownload size={16} />
-                      </ActionIcon>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip label="Install latest version, current version unknown">
-                      <ActionIcon
-                        color="grape"
-                        onClick={() => handleInstall(latestVersion!)}
-                      >
-                        <IconTransitionBottom size={16} />
-                      </ActionIcon>
-                    </Tooltip>
-                  )}
-                </Group>
-              ) : (
-                <ActionIcon
-                  mt="md"
-                  variant="light"
-                  onClick={() => handleInstall(latestVersion!)}
-                >
-                  <IconDownload size={16} />
-                </ActionIcon>
-              )}
+                )}
+                <ModInstallButton
+                  mod={mod}
+                  version={latestVersion}
+                  onInstall={handleInstall}
+                />
+              </Group>
               <Menu
                 shadow="md"
                 width={200}

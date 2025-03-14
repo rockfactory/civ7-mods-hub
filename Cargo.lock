@@ -698,12 +698,14 @@ name = "civmods"
 version = "0.1.0"
 dependencies = [
  "dirs 5.0.1",
+ "flate2",
  "fs_extra",
  "quick-xml 0.37.2",
  "serde",
  "serde_json",
  "sevenz-rust",
  "sha2",
+ "tar",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",

@@ -34,6 +34,19 @@ export interface InstallModOptions {
   modsFolderPath: string;
 }
 
+/**
+ * Converts a Google Drive file URL into a direct download link.
+ * @param url - The original Google Drive file URL
+ * @returns Direct download URL or null if invalid
+ */
+function getGoogleDriveDirectDownloadUrl(url: string): string | null {
+  const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  if (match && match[1]) {
+    return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+  }
+  return null;
+}
+
 export async function installMod(
   mod: ModVersionsRecord,
   options: InstallModOptions
@@ -43,9 +56,33 @@ export async function installMod(
   }
 
   console.log('Downloading mod from:', mod.download_url);
-  const response = await fetch(mod.download_url);
+  let response = await fetch(mod.download_url);
   if (!response.ok) {
     throw new Error(`Failed to download mod: ${response.statusText}`);
+  }
+
+  console.log('Downloaded mod:', response.url);
+
+  if (response.redirected) console.log('Redirected to:', response.url);
+
+  if (
+    response.url.includes('//drive.google.com/') &&
+    !response.url.includes('export')
+  ) {
+    console.log('Redirected to Google Drive, getting direct download link..');
+    const updatedUrl = getGoogleDriveDirectDownloadUrl(response.url);
+    if (!updatedUrl) {
+      console.warn(`Failed to get direct download link for ${response.url}`);
+      throw new Error(
+        'Failed to download mod: redirect link provider is not supported'
+      );
+    }
+
+    response = await fetch(updatedUrl);
+    if (!response.ok)
+      throw new Error(
+        `Failed to download Google Drive link. Please download it manually. ${updatedUrl}`
+      );
   }
 
   const contentDisposition = response.headers.get('content-disposition');
@@ -73,7 +110,7 @@ export async function installMod(
 
     const extractPath = await path.join(
       modsFolderPath,
-      `civmod-${mod.modinfo_id!}-${mod.cf_id}`
+      `civmod-${mod.modinfo_id ?? mod.mod_id}-${mod.cf_id}`
     );
     console.log('Extracting mod to:', extractPath);
     const result = await invoke<string>('extract_mod_archive', {
@@ -92,6 +129,15 @@ export async function uninstallMod(modInfo: ModInfo, modsFolderPath: string) {
   console.log('Mods folder:', modsFolderPath);
   const modPath = await path.join(modsFolderPath, modInfo.mod_name);
 
+  if (!(await fs.exists(modPath))) {
+    console.warn('Mod not found:', modPath);
+    return;
+  }
+
   console.log('Removing mod:', modPath);
   await fs.remove(modPath, { recursive: true });
+}
+
+export function canInstallMod(mod: ModVersionsRecord): boolean {
+  return mod.download_url != null && !mod.skip_install;
 }

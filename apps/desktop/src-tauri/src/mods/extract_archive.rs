@@ -1,4 +1,5 @@
 use core::arch;
+use flate2::read::GzDecoder;
 use sevenz_rust::decompress_file;
 use std::fs::{self, File};
 use std::io::{self, BufReader, Write};
@@ -67,6 +68,26 @@ fn extract_rar(archive_path: &str, extract_to: &str) -> io::Result<()> {
     Ok(())
 }
 
+fn extract_tgz(archive_path: &str, extract_to: &str) -> io::Result<()> {
+    // Open the tar.gz file
+    let file = File::open(archive_path)?;
+
+    // Wrap it in a buffered reader for efficiency
+    let buf_reader = BufReader::new(file);
+
+    // Create a GzDecoder to decompress the gzip layer
+    let gz_decoder = GzDecoder::new(buf_reader);
+
+    // Create a tar Archive from the decompressed stream
+    let mut archive = tar::Archive::new(gz_decoder);
+
+    // Extract the archive to the output directory
+    archive.unpack(extract_to)?;
+
+    println!("Extracted '{}' to '{}'", archive_path, extract_to);
+    Ok(())
+}
+
 /// Extracts any archive format based on file extension
 pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<(), String> {
     let ext = Path::new(archive_path)
@@ -82,6 +103,8 @@ pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<(), Strin
         "zip" => extract_zip(archive_path, &temp_target).map_err(|e| e.to_string()),
         "7z" => extract_7z(archive_path, &temp_target).map_err(|e| e.to_string()),
         "rar" => extract_rar(archive_path, &temp_target).map_err(|e| e.to_string()),
+        // We should support `.tar.gz` but the extension algorithm doesn't support it right now
+        "tgz" | "gz" => extract_tgz(archive_path, &temp_target).map_err(|e| e.to_string()),
         _ => Err(format!("Unsupported file format: {}", ext)),
     };
 

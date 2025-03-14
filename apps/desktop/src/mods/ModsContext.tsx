@@ -164,8 +164,9 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
 
       const folder = await getModsFolder();
       await uninstallMod(mod.local, folder);
+      triggerReload();
     },
-    [getModsFolder]
+    [getModsFolder, triggerReload]
   );
 
   /**
