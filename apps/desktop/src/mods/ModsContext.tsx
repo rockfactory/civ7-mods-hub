@@ -11,7 +11,7 @@ import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
 import { invoke } from '@tauri-apps/api/core';
 import { sortVersionsByDate } from './fetchMods';
 import { TypedPocketBase } from '../pocketbase-types';
-import PocketBase from 'pocketbase';
+import PocketBase, { ClientResponseError } from 'pocketbase';
 import { useAppStore } from '../store/store';
 import { installMod, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
@@ -28,12 +28,18 @@ export type ModsContextType = {
   install: (mod: ModData, version: ModVersionsRecord) => Promise<void>;
   triggerReload: () => void;
   chooseModFolder: () => Promise<void>;
+  getModsFolder: () => Promise<string>;
+  isFetching: boolean;
+  isLoadingInstalled: boolean;
 };
 
 export const ModsContext = createContext({} as ModsContextType);
 
 export function ModsContextProvider(props: { children: React.ReactNode }) {
+  const [isFetching, setIsFetching] = useState(false);
   const [fetchedMods, setFetchedMods] = useState<FetchedMod[]>([]);
+
+  const [isLoadingInstalled, setIsLoadingInstalled] = useState(false);
   const [modsInfo, setModsInfo] = useState<ModInfo[]>([]);
   const [reloadIndex, setReloadIndex] = useState(0);
 
@@ -49,15 +55,26 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
    */
   useEffect(() => {
     async function findMods() {
+      setIsLoadingInstalled(true);
       const folder = await getModsFolder();
       console.log('Mods folder:', folder);
 
-      const modsInfo = await invoke<ModInfo[]>('scan_civ_mods', {
-        modsFolderPath: folder,
-      });
+      try {
+        const modsInfo = await invoke<ModInfo[]>('scan_civ_mods', {
+          modsFolderPath: folder,
+        });
 
-      setModsInfo(modsInfo);
-      console.log('Mods info:', modsInfo);
+        setModsInfo(modsInfo);
+        console.log('Mods info:', modsInfo);
+      } catch (error) {
+        console.error('Failed to scan mods:', error);
+        notifications.show({
+          color: 'red',
+          title: 'Failed to scan mods',
+          message: String(error),
+        });
+      }
+      setIsLoadingInstalled(false);
     }
 
     findMods().catch(console.error);
@@ -68,24 +85,41 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
    */
   useEffect(() => {
     async function fetchMods() {
-      const records = await pb.collection('mods').getFullList<FetchedMod>({
-        expand: 'mod_versions_via_mod_id',
-      });
+      setIsFetching(true);
+      try {
+        const records = await pb.collection('mods').getFullList<FetchedMod>({
+          expand: 'mod_versions_via_mod_id',
+          sort: '-mod_updated',
+        });
 
-      const data = records.map((record) => {
-        return {
-          ...record,
-          expand: {
-            ...record.expand,
-            mod_versions_via_mod_id: sortVersionsByDate(
-              record.expand?.mod_versions_via_mod_id ?? []
-            ),
-          },
-        };
-      });
+        const data = records.map((record) => {
+          return {
+            ...record,
+            expand: {
+              ...record.expand,
+              mod_versions_via_mod_id: sortVersionsByDate(
+                record.expand?.mod_versions_via_mod_id ?? []
+              ),
+            },
+          };
+        });
 
-      console.log('Mods data:', data);
-      setFetchedMods(data);
+        console.log('Mods data:', data);
+        setFetchedMods(data);
+      } catch (error) {
+        if (error instanceof ClientResponseError && error.isAbort) {
+          console.log('Request aborted');
+        } else {
+          console.error('Failed to fetch mods:', error);
+          notifications.show({
+            color: 'red',
+            title: 'Failed to fetch mods',
+            message: String(error),
+            autoClose: 10000,
+          });
+        }
+      }
+      setIsFetching(false);
     }
 
     fetchMods();
@@ -204,8 +238,20 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       uninstall,
       triggerReload,
       chooseModFolder,
+      isFetching,
+      isLoadingInstalled,
+      getModsFolder,
     }),
-    [mods, install, uninstall, triggerReload, chooseModFolder]
+    [
+      mods,
+      install,
+      uninstall,
+      triggerReload,
+      chooseModFolder,
+      isFetching,
+      isLoadingInstalled,
+      getModsFolder,
+    ]
   );
 
   return (

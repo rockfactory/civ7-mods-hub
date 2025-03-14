@@ -11,6 +11,7 @@ import { ModalsProvider } from '@mantine/modals';
 
 // core styles are required for all packages
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 import Home from './home/Home';
 import { ModsContextProvider } from './mods/ModsContext';
 
@@ -38,7 +39,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <ModalsProvider>
-        <Notifications />
+        <Notifications position="top-right" />
         <ModsContextProvider>
           <Home />
         </ModsContextProvider>

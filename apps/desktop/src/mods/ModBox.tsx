@@ -103,9 +103,31 @@ export function ModBox(props: IModBoxProps) {
   };
 
   const handleUninstall = async () => {
-    setLoading(true);
-    await uninstall(mod);
-    setLoading(false);
+    modals.openConfirmModal({
+      title: 'Uninstall mod',
+      children: (
+        <Stack>
+          <Text size="sm">
+            You are about to uninstall the mod{' '}
+            <Text fw={600} span>
+              {mod.fetched.name}
+            </Text>
+            .
+          </Text>
+          <Text size="sm">Are you sure you want to proceed?</Text>
+        </Stack>
+      ),
+      labels: {
+        confirm: 'Uninstall',
+        cancel: 'Cancel',
+      },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        setLoading(true);
+        await uninstall(mod);
+        setLoading(false);
+      },
+    });
   };
 
   const [isSelected, setSelected] = useState(false);
@@ -134,7 +156,9 @@ export function ModBox(props: IModBoxProps) {
                 alt={fetched.name}
               />
             ) : (
-              <IconSettings size={40} />
+              <div style={{ width: 40, height: 40 }}>
+                <IconSettings size={40} />
+              </div>
             )}
             <Flex justify="space-between" w="100%">
               <Stack gap={0} align="flex-start">

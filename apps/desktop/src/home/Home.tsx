@@ -12,6 +12,8 @@ import {
   Button,
   Tooltip,
   BackgroundImage,
+  LoadingOverlay,
+  SegmentedControl,
 } from '@mantine/core';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import PocketBase from 'pocketbase';
@@ -27,10 +29,20 @@ import {
 import { ModBox } from '../mods/ModBox';
 import { useApplyUpdates } from '../mods/checkUpdates';
 import { useModsContext } from '../mods/ModsContext';
+import { SettingsDrawer } from '../settings/SettingsDrawer';
 
 export default function ModsListPage() {
-  const { mods, triggerReload, chooseModFolder } = useModsContext();
-  const [query, setQuery] = useState({ text: '', onlyInstalled: false });
+  const {
+    mods,
+    triggerReload,
+    chooseModFolder,
+    isFetching,
+    isLoadingInstalled,
+  } = useModsContext();
+  const [query, setQuery] = useState({ text: '', onlyInstalled: true });
+
+  const isFirstLoading =
+    (isFetching || isLoadingInstalled) && mods.length === 0;
 
   const filteredMods = useMemo(() => {
     const installedModIds = new Set(
@@ -78,15 +90,52 @@ export default function ModsListPage() {
       header={{ height: 60 }}
     >
       <AppShell.Header p="xs">
-        <Group gap="sm">
-          <Text fw={700} size="xl">
-            Civ7 Mod Manager
-          </Text>
-          <ActionIcon variant="subtle" onClick={() => triggerReload()}>
-            <IconRefresh size={16} />
-          </ActionIcon>
-          <ActionIcon variant="subtle" onClick={() => chooseModFolder()}>
-            <IconFolder size={16} />
+        <Group justify="flex-start" align="center" gap={0}>
+          <Group gap="sm" w={300}>
+            <Text fw={700} size="xl">
+              Civ7 Mod Manager
+            </Text>
+            <Tooltip
+              label="Refresh installed mods list and check for updates"
+              color="dark.8"
+            >
+              <ActionIcon variant="subtle" onClick={() => triggerReload()}>
+                <IconRefresh size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+          <Group
+            justify="space-between"
+            align="center"
+            gap="sm"
+            flex="1 1 auto"
+          >
+            <Group gap="sm">
+              <SegmentedControl
+                value={query.onlyInstalled ? 'installed' : 'available'}
+                onChange={(value) =>
+                  setQuery((q) => ({
+                    ...q,
+                    onlyInstalled: value === 'installed',
+                  }))
+                }
+                size="sm"
+                data={[
+                  {
+                    label: 'Installed Mods',
+                    value: 'installed',
+                  },
+                  {
+                    label: 'Available Mods',
+                    value: 'available',
+                  },
+                ]}
+              />
+            </Group>
+            <Group gap="sm">
+              <SettingsDrawer />
+            </Group>
+          </Group>
         </Group>
       </AppShell.Header>
 
@@ -101,19 +150,9 @@ export default function ModsListPage() {
               placeholder="Search..."
               value={query.text}
               onChange={(event) =>
-                setQuery((q) => ({ ...query, text: event.currentTarget.value }))
+                setQuery((q) => ({ ...q, text: event.currentTarget.value }))
               }
               rightSection={<IconSearch size={16} />}
-            />
-            <Checkbox
-              label="Only Installed"
-              checked={query.onlyInstalled}
-              onChange={(event) =>
-                setQuery((q) => ({
-                  ...query,
-                  onlyInstalled: event.currentTarget.checked,
-                }))
-              }
             />
           </Stack>
 
@@ -131,7 +170,7 @@ export default function ModsListPage() {
                 }}
                 position="bottom-start"
                 label={
-                  <Stack gap="sm">
+                  <Stack gap={2}>
                     <Text fz="sm">Will update:</Text>
                     {availableUpdates.map((update) => (
                       <Text fz="sm" key={update.mod.fetched.id}>
@@ -177,6 +216,7 @@ export default function ModsListPage() {
       </AppShell.Navbar>
 
       <AppShell.Main>
+        <LoadingOverlay visible={isFirstLoading} />
         <ScrollArea scrollbars="y">
           {filteredMods.map((mod) => (
             <ModBox key={mod.fetched.id} mod={mod} />
