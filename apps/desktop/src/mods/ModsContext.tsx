@@ -66,7 +66,10 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         });
 
         setModsInfo(modsInfo);
-        console.log('Mods info:', modsInfo);
+        console.log(
+          'Mods info:',
+          modsInfo.map((m) => m.modinfo_id)
+        );
       } catch (error) {
         console.error('Failed to scan mods:', error);
         notifications.show({
@@ -105,7 +108,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
           };
         });
 
-        console.log('Mods data:', data);
+        console.log('Mods data:', data.length);
         setFetchedMods(data);
       } catch (error) {
         if (error instanceof ClientResponseError && error.isAbort) {
