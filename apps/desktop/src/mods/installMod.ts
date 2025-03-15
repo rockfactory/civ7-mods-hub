@@ -116,7 +116,7 @@ export async function installMod(
 
     const extractPath = await path.join(
       modsFolderPath,
-      `civmod-${mod.modinfo_id ?? mod.mod_id}-${mod.cf_id}`
+      `civmods-${mod.modinfo_id ?? mod.mod_id}-${mod.cf_id}`
     );
     console.log('Extracting mod to:', extractPath);
     const result = await invoke<string>('extract_mod_archive', {
