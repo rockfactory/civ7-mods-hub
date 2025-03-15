@@ -34,6 +34,24 @@ async fn extract_mod_archive(archive_path: &str, extract_to: &str) -> Result<(),
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            println!("a new app instance was opened with {argv:?} and the deep link event was already triggered");
+            // when defining deep link schemes at runtime, you must also check `argv` here
+            log::info!("argv: {:?}", argv);
+
+          let _ = app.get_webview_window("main")
+                       .expect("no main window")
+                       .set_focus();
+        }))
+        .plugin(tauri_plugin_deep_link::init())
+        .setup(|app| {
+            #[cfg(any(windows, target_os = "linux"))]
+            {
+                use tauri_plugin_deep_link::DeepLinkExt;
+                app.deep_link().register_all()?;
+            }
+            Ok(())
+        })
         .plugin(
             tauri_plugin_log::Builder::new()
                 .max_file_size(5_000_000) // 5MB in bytes

@@ -1,16 +1,44 @@
 <html lang='{{lang}}'>
-  <head>
-    <meta charset='utf-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <meta name='color-scheme' content='light dark' />
-    <link rel='stylesheet' href='/static/main.css' />
-    <link
-      rel='stylesheet'
-      href='https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css'
-    />
-    <title>Hello world!</title>
-  </head>
-  <body>
-    {{{body}}}
-  </body>
+
+<head>
+  <meta charset='utf-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <meta name='color-scheme' content='light dark' />
+  <link rel='stylesheet' href='/static/main.css' />
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.indigo.min.css' />
+  <title>{{title}} | CivMods</title>
+</head>
+
+<body>
+
+  <header class='container'>
+    <nav>
+      <ul>
+        <li>
+          <h1>CivMods</h1>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <a href="https://github.com/rockfactory/civ7-mods-hub">
+            GitHub
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/rockfactory/civ7-mods-hub/releases/latest">
+            Download
+          </a>
+        </li>
+        <li>
+          <a href="/modders">
+            For Modders
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  {{{body}}}
+</body>
+
 </html>

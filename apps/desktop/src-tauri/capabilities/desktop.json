@@ -12,6 +12,7 @@
     "updater:default",
     "store:default",
     "dialog:default",
-    "log:default"
+    "log:default",
+    "deep-link:default"
   ]
 }

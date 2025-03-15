@@ -7,7 +7,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 22rem;
+  height: 21rem;
   text-align: center;
 }
 
@@ -19,13 +19,19 @@
   text-wrap: balance;
 }
 
-.hero h1 {
+.hero h1,
+header h1 {
   font-size: 3.5rem;
   margin-bottom: 0.2rem;
   background: var(--civ-gradient);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .hero p:not(:last-child) {
@@ -37,9 +43,9 @@
 
 .downloads > div a {
   width: 100%;
-  background-color: #391c6c;
+  /* background-color: #391c6c; */
   /* background: linear-gradient(0deg, #1e4792, #2d8bce); */
-  border: none;
+  /* border: none; */
   /* font-weight: 500; */
 }
 
@@ -57,4 +63,16 @@ footer p {
   text-align: center;
   font-size: 0.8rem;
   color: var(--pico-muted-color);
+}
+
+main.mod {
+  padding: 4rem 0;
+}
+
+.hidden {
+  display: none;
+}
+
+article > header.mod-header {
+  background-color: #292c4c;
 }

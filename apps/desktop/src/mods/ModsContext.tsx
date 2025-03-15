@@ -17,6 +17,8 @@ import { installMod, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
 import { open } from '@tauri-apps/plugin-dialog';
 import { isSameVersion } from './isSameVersion';
+import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
+import { openConfirmModal } from '@mantine/modals';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'

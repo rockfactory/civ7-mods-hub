@@ -58,10 +58,15 @@ const theme = createTheme({
 
 function App() {
   const isHydrated = useAppStore((state) => state.hydrated);
+
+  // useEffect(() => {
+
+  //   }, []);
+
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <ModalsProvider>
-        <Notifications position="top-right" />
+        <Notifications position="top-right" limit={4} />
         {isHydrated && (
           <ModsContextProvider>
             <Home />

@@ -1,0 +1,52 @@
+<main class='container'>
+  <hgroup>
+    <h2>For Modders</h2>
+    <p>Utilities for modders to generate CivMods buttons.</p>
+  </hgroup>
+</main>
+
+<section class='container mod'>
+  <article>
+    <header>
+      Generate CivMods Button
+    </header>
+    <p class='download-help-first'>
+      Insert your CivFanatics mod page URL below to generate a "Install with CivMods" button.
+    </p>
+    <div role='group'>
+      <input type='text' id='mod-url' placeholder='https://forums.civfanatics.com/resources/your-mod.12345/' />
+      <button id='generate-button' role='button'>Generate</button>
+    </div>
+
+    <div id="button-container"></div>
+
+    <h4>Direct Link</h4>
+    <pre id="direct-link"></pre>
+
+    <h4>BB Code</h4>
+    <pre id="button-code"></pre>
+
+    <script>
+      document.getElementById('generate-button').addEventListener('click', function () {
+        const modUrl = document.getElementById('mod-url').value;
+        const modId = modUrl.match(/(\d+)\//)[1];
+        const origin = window.location.origin;
+        const deepLink = origin + `/install?modCfId=${modId}`;
+
+        // Generate a button with an image
+        const buttonContainer = document.getElementById('button-container');
+        buttonContainer.innerHTML = `
+          <a href='${deepLink}'>
+            <img src='${origin}/static/install-button@2x.png' alt='Install with CivMods' width='142' />
+          </a>
+        `;
+
+        pre = document.getElementById('button-code');
+        pre.innerText = `[URL='${deepLink}'][IMG]${origin}/static/install-button@2x.png[/IMG][/URL]`;
+
+        directLink = document.getElementById('direct-link');
+        directLink.innerText = deepLink;
+      });
+    </script>
+  </article>
+</section>

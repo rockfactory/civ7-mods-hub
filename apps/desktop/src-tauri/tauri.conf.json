@@ -44,6 +44,12 @@
       "endpoints": [
         "https://github.com/rockfactory/civ7-mods-hub/releases/latest/download/latest.json"
       ]
+    },
+    "deep-link": {
+      "mobile": [],
+      "desktop": {
+        "schemes": ["civmods"]
+      }
     }
   }
 }

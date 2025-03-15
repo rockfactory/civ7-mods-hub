@@ -1,0 +1,18 @@
+<main class="container">
+  <hgroup>
+    <h2>
+      {{#if title}}
+      {{title}}
+      {{else}}
+      An error occurred
+      {{/if}}
+    </h2>
+    <p>
+      {{#if error}}
+      {{error}}
+      {{else}}
+      Sorry about that! Something went wrong.
+      {{/if}}
+    </p>
+  </hgroup>
+</main>

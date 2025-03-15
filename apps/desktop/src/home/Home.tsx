@@ -31,6 +31,7 @@ import { useApplyUpdates } from '../mods/checkUpdates';
 import { useModsContext } from '../mods/ModsContext';
 import { SettingsDrawer } from '../settings/SettingsDrawer';
 import styles from './Home.module.css';
+import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
 
 export default function ModsListPage() {
   const {
@@ -41,6 +42,8 @@ export default function ModsListPage() {
     isLoadingInstalled,
   } = useModsContext();
   const [query, setQuery] = useState({ text: '', onlyInstalled: true });
+
+  useInstallDeepLink();
 
   const isFirstLoading =
     (isFetching || isLoadingInstalled) && mods.length === 0;
