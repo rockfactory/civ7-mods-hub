@@ -195,9 +195,6 @@ export function ModBox(props: IModBoxProps) {
                   </a>
                 </Text>
                 <Group gap={4} align="flex-start">
-                  <Text c="dimmed" fz={'0.85rem'}>
-                    <IconUser size={12} /> {fetched.author}
-                  </Text>
                   <Text
                     c="dimmed"
                     fz={'0.85rem'}
@@ -215,6 +212,9 @@ export function ModBox(props: IModBoxProps) {
                   >
                     <IconCopy size={12} />{' '}
                     {latestVersion?.modinfo_id ?? local?.modinfo_id}
+                  </Text>
+                  <Text c="dimmed" fz={'0.85rem'}>
+                    <IconUser size={12} /> {fetched.author}
                   </Text>
                 </Group>
               </Stack>

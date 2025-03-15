@@ -28,6 +28,30 @@ const pastelYellow: MantineColorsTuple = [
 const theme = createTheme({
   colors: {
     pastelYellow,
+    dark: [
+      '#d2d4db',
+      '#a2a6b5',
+      '#7e8499',
+      '#5a5f71',
+      '#434856',
+      '#2d303a',
+      '#252830',
+      '#191b20',
+      '#0a0b0d',
+      '#000001',
+    ],
+    // dark: [
+    //   '#d5d7e0',
+    //   '#acaebf',
+    //   '#8c8fa3',
+    //   '#666980',
+    //   '#4d4f66',
+    //   '#34354a',
+    //   '#2b2c3d',
+    //   '#1d1e30',
+    //   '#0c0d21',
+    //   '#01010a',
+    // ],
   },
   primaryColor: 'pastelYellow',
 });
