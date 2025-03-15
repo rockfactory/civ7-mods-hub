@@ -8,7 +8,19 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use('/static', express.static('public'));
-app.engine('handlebars', engine());
+app.engine(
+  'handlebars',
+  engine({
+    helpers: {
+      section: function (name: string, options: any) {
+        if (!this._sections) this._sections = {};
+        // @ts-ignore
+        this._sections[name] = options.fn(this);
+        return null;
+      },
+    },
+  })
+);
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 

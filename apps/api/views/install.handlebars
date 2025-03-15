@@ -1,9 +1,9 @@
-<main class='container mod'>
+<main class="container mod">
   <article id="not-installed" class="hidden">
-    <p class='download-help-first'>
-      It looks like you don't have CivMods installed, you can download it from the link below.
+    <p class="download-help-first">
+      If you don't have CivMods installed, you can download it from the link below.
     </p>
-    <p class='download-help'>
+    <p class="download-help">
       Once you have installed CivMods, click the button below to install the mod.
     </p>
     <a id="download-btn" role="button" href="https://github.com/rockfactory/civ7-mods-hub/releases/latest">
@@ -12,40 +12,51 @@
   </article>
 
   <article>
-    <header class='mod-header'>
+    <header class="mod-header">
       You're about to install the following mod
     </header>
     {{#if mod.icon_url}}
-    <img src='{{mod.icon_url}}' alt='{{mod.name}}' />
+    <img src="{{mod.icon_url}}" alt="{{mod.name}}" />
     {{/if}}
     <h2>{{mod.name}}</h2>
     <p>{{mod.short_description}}</p>
 
-    <a id='install-button' role='button' aria-busy="true" aria-label="Installing with CivMods..."
-      href='civmods://install/?modId={{mod.id}}'>
+    <a id="install-button" role="button" aria-busy="true" aria-label="Installing with CivMods..."
+      href="civmods://install/?modId={{mod.id}}">
       Installing with CivMods...
     </a>
     <footer>
-      <a href='{{mod.url}}' target='_blank' rel='noopener noreferrer'>
+      <a href="{{mod.url}}" target="_blank" rel="noopener noreferrer">
         Back to CivFanatics
       </a>
     </footer>
   </article>
-
-  <script type="text/javascript">
-    function openCivMods() {
-      const deepLink = "civmods://install?modId={{mod.id}}";
-
-      // Try to open the app
-      window.location.href = deepLink;
-
-      // If the app isn't installed, show the download button
-      setTimeout(function () {
-        document.querySelector("a#install-button").removeAttribute("aria-busy");
-        document.querySelector("a#install-button").innerText = "Install with CivMods";
-        document.getElementById("not-installed").classList.remove("hidden");
-      }, 2000);
-    }
-    openCivMods();
-  </script>
 </main>
+
+{{#section 'scripts'}}
+<script>
+  function openCivMods() {
+    const deepLink = "civmods://install?modId={{mod.id}}";
+
+    let timeout;
+    let hasFocus = true;
+
+    // Detect if the page loses focus (app opened successfully)
+    window.addEventListener("blur", function () {
+      hasFocus = false; // User switched away (likely opened the app)
+    });
+
+    // Try to open the app
+    window.location.href = deepLink;
+
+    // If the app isn't installed, show the download button
+    setTimeout(function () {
+      document.querySelector("a#install-button").removeAttribute("aria-busy");
+      document.querySelector("a#install-button").innerText = "Install with CivMods";
+      document.getElementById("not-installed").classList.remove("hidden");
+    }, 2000);
+
+  }
+  openCivMods();
+</script>
+{{/section}}
