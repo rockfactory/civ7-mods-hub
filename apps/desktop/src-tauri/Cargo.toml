@@ -1,6 +1,6 @@
 [package]
 name = "civmods"
-version = "0.2.1"
+version = "0.3.0"
 description = "Civ7 Mods Manager"
 authors = ["leonardfactory"]
 edition = "2021"
