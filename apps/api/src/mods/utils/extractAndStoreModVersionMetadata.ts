@@ -23,36 +23,34 @@ export async function extractAndStoreModVersionMetadata(
   await fs.mkdir(ARCHIVE_DIR, { recursive: true });
   await fs.mkdir(EXTRACTED_DIR, { recursive: true });
 
+  let archivePath: string | null = null;
+  const extractPath = path.join(EXTRACTED_DIR, version.id);
+
   try {
     if (!version.download_url || version.skip_install) return;
-
-    const extractPath = path.join(EXTRACTED_DIR, version.id);
 
     const isAlreadyDownloaded = await fs.stat(extractPath).catch(() => null);
 
     let archiveHash = undefined as string | undefined;
     if (!isAlreadyDownloaded?.isDirectory) {
       // Download archive
-      const archivePath = await downloadFile(version.download_url, version.id);
+      archivePath = await downloadFile(version.download_url, version.id);
       if (!archivePath) return;
 
       console.log(`Downloaded: ${archivePath}`);
 
       // Extract the archive
-      try {
-        await extractArchive(archivePath, extractPath);
-        console.log(`Extracted to: ${extractPath}`);
+      await extractArchive(archivePath, extractPath);
+      console.log(`Extracted to: ${extractPath}`);
 
-        // Compute archive hash
-        archiveHash = await computeFileHash(archivePath);
+      // Compute archive hash
+      archiveHash = await computeFileHash(archivePath);
 
-        const sleepTime = Math.floor(Math.random() * (2000 - 300 + 1)) + 1000; // Random sleep between 1-2 seconds
-        console.log(`Sleeping for ${sleepTime} ms`);
-        await sleep(sleepTime);
-      } catch (error) {
-        await fs.rm(extractPath, { recursive: true });
-      }
+      const sleepTime = Math.floor(Math.random() * (2000 - 300 + 1)) + 1000; // Random sleep between 1-2 seconds
+      console.log(`Sleeping for ${sleepTime} ms`);
+      await sleep(sleepTime);
     }
+
     // Find .modinfo file
     const modInfoPath = await findModInfoFile(extractPath);
     if (!modInfoPath) {
@@ -90,7 +88,16 @@ export async function extractAndStoreModVersionMetadata(
     console.log(`Updated PocketBase for: ${version.name}`);
   } catch (error) {
     console.error(`Failed to process ${version.name}: ${error}`);
+    console.error(error);
   } finally {
+    if (process.env.NODE_ENV !== 'development') {
+      try {
+        if (archivePath) await fs.rm(archivePath);
+        if (extractPath) await fs.rm(extractPath, { recursive: true });
+      } catch (error) {
+        console.error(`Failed to clean up: ${error}`);
+      }
+    }
   }
 
   // process.exit(0); // For testing, remove this line for full processing
