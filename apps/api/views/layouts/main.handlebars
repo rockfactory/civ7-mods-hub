@@ -2,11 +2,54 @@
 
 <head>
   <meta charset='utf-8' />
-  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <meta name="author" content="LeonardFactory">
+  <meta name="robots" content="index, follow"> <!-- Allows search engines to index and follow links -->
+  <meta name="description"
+    content="CivMods makes installing Civilization 7 mods easy. Browse, install, and manage mods in just a few clicks.">
+
+  <meta name="keywords" content="Civilization 7, CivMods, Civ 7 Mods, Mod Manager, Strategy Game Mods">
+  <link rel="canonical" href="https://civmods.com/">
+
+  <meta property="og:title" content="CivMods - Easily Install Civilization 7 Mods">
+  <meta property="og:description"
+    content="CivMods makes installing Civilization 7 mods easy. Browse, install, and manage mods in just a few clicks.">
+  <meta property="og:image" content="https://civmods.com/static/screen-background.png">
+  <meta property="og:url" content="https://civmods.com/">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CivMods - Easily Install Civilization 7 Mods">
+  <meta name="twitter:description"
+    content="CivMods makes installing Civilization 7 mods easy. Browse, install, and manage mods in just a few clicks.">
+  <meta name="twitter:image" content="https://civmods.com/static/screen-background.png">
+  <meta name="twitter:site" content="@leonardfactory">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CivMods",
+    "operatingSystem": "Windows, Mac, Linux",
+    "applicationCategory": "GameUtility",
+    "description": "Easily install Civilization 7 mods with CivMods.",
+    "image": "https://civmods.com/static/screen-background.png",
+    "url": "https://civmods.com/",
+  }
+  </script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
   <meta name='color-scheme' content='light dark' />
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+  <link rel="manifest" href="/static/site.webmanifest">
+
   <link rel='stylesheet' href='/static/main.css' />
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.indigo.min.css' />
-  <title>{{title}} | CivMods</title>
+  <title>{{title}} | CivMods - Easily Install Civilization 7 Mods</title>
 </head>
 
 <body>
@@ -14,18 +57,22 @@
   <header class='container'>
     <nav>
       <ul>
-        <li>
-          <h1>CivMods</h1>
+        <li class="logo-container">
+          <h1>
+            CivMods
+          </h1>
+          <img src="/static/logo.png" alt="CivMods Logo" width="32" />
         </li>
       </ul>
       <ul>
         <li>
-          <a href="https://github.com/rockfactory/civ7-mods-hub">
-            GitHub
+          <a href="/">
+            Home
           </a>
         </li>
         <li>
-          <a href="https://github.com/rockfactory/civ7-mods-hub/releases/latest">
+          <a href="https://github.com/rockfactory/civ7-mods-hub/releases/latest" target="_blank"
+            rel="noopener noreferrer">
             Download
           </a>
         </li>
@@ -40,5 +87,12 @@
 
   {{{body}}}
 </body>
+
+<footer class='container'>
+  <p>
+    <a href="https://github.com/rockfactory/civ7-mods-hub">GitHub</a>
+  </p>
+  <p>&copy; 2025 CivMods.com</p>
+</footer>
 
 </html>

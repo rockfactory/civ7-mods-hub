@@ -13,6 +13,7 @@ import {
   IconExternalLink,
   IconFolder,
   IconLogs,
+  IconRefresh,
   IconSettings,
 } from '@tabler/icons-react';
 import * as React from 'react';
@@ -22,6 +23,7 @@ import { open } from '@tauri-apps/plugin-shell';
 import { appLogDir, resolve } from '@tauri-apps/api/path';
 import { getVersion } from '@tauri-apps/api/app';
 import styles from './SettingsDrawer.module.css';
+import { checkForAppUpdates } from './autoUpdater';
 
 export interface ISettingsDrawerProps {}
 
@@ -95,6 +97,22 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
         </Text>
 
         <Title order={3} mt="lg">
+          App Settings
+        </Title>
+        <Space h="md" />
+        <Button
+          onClick={() => {
+            checkForAppUpdates(true).catch((err) => {
+              console.error('[autoUpdater] Failed to check for updates:', err);
+            });
+          }}
+          leftSection={<IconRefresh size={16} />}
+          color="blue"
+        >
+          Check for CivMods updates
+        </Button>
+
+        <Title order={3} mt="lg">
           Debug
         </Title>
         <Space h="md" />
@@ -125,7 +143,10 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
         </Stack>
         <div className={styles.footer}>
           <Text c="dimmed" size="sm">
-            CivMods v{version} © 2025
+            CivMods v{version} © 2025 |{' '}
+            <a href="https://civmods.com" target="_blank">
+              civmods.com
+            </a>
           </Text>
         </div>
       </Drawer>

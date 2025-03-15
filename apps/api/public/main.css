@@ -54,7 +54,7 @@ header h1 {
   background-image: url('/static/screen-background.png');
   background-size: contain;
   background-position: top center;
-  height: 80vh;
+  height: 600px;
   /* // Colorful gradient as shadow */
   box-shadow: 0 0 10px 10px var(--civ-gradient);
 }
@@ -75,4 +75,14 @@ main.mod {
 
 article > header.mod-header {
   background-color: #292c4c;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-container img {
+  margin-left: 0.4rem;
 }
