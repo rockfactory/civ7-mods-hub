@@ -9,6 +9,7 @@ import * as fs from '@tauri-apps/plugin-fs';
 import { invoke } from '@tauri-apps/api/core';
 import * as path from '@tauri-apps/api/path';
 import { ModInfo } from '../home/IModInfo';
+import { useAppStore } from '../store/store';
 
 function parseContentDisposition(contentDisposition: string | null): {
   filename?: string;
@@ -45,6 +46,11 @@ function getGoogleDriveDirectDownloadUrl(url: string): string | null {
     return `https://drive.google.com/uc?export=download&id=${match[1]}`;
   }
   return null;
+}
+
+function isModLocked(mod: ModInfo) {
+  const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
+  return lockedModIds.has(mod.modinfo_id ?? '');
 }
 
 export async function installMod(
@@ -126,6 +132,12 @@ export async function installMod(
 }
 
 export async function uninstallMod(modInfo: ModInfo, modsFolderPath: string) {
+  const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
+  if (lockedModIds.has(modInfo.modinfo_id ?? '')) {
+    console.warn('Skipping locked mod:', modInfo.mod_name, modInfo.modinfo_id);
+    return;
+  }
+
   console.log('Mods folder:', modsFolderPath);
   const modPath = await path.join(modsFolderPath, modInfo.mod_name);
 

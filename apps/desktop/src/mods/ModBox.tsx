@@ -15,6 +15,7 @@ import {
   Menu,
   Modal,
   Loader,
+  CopyButton,
 } from '@mantine/core';
 import * as React from 'react';
 import { ModVersionsRecord } from '../pocketbase-types';
@@ -24,12 +25,15 @@ import {
   IconCheck,
   IconChecklist,
   IconCircleCheckFilled,
+  IconCode,
+  IconCopy,
   IconDots,
   IconDownload,
   IconExternalLink,
   IconFileDescription,
   IconFolder,
   IconLink,
+  IconLock,
   IconSettings,
   IconSettings2,
   IconSwitch,
@@ -45,6 +49,9 @@ import { useModsContext } from './ModsContext';
 import { resolve } from '@tauri-apps/api/path';
 import { ModInstallButton } from './ModInstallButton';
 import { isSameVersion } from './isSameVersion';
+import { ModLockActionItem } from './actions/ModLockActionItem';
+import { useAppStore } from '../store/store';
+import { notifications } from '@mantine/notifications';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -61,7 +68,13 @@ export function ModBox(props: IModBoxProps) {
   const latestVersion = fetched.expand?.mod_versions_via_mod_id[0];
   const isLatest = isSameVersion(latestVersion, local);
 
+  const isLocked = useAppStore((state) =>
+    state.lockedModIds?.includes(props.mod.local?.modinfo_id ?? '')
+  );
+
   const handleInstall = async (version: ModVersionsRecord) => {
+    if (isLocked) return;
+
     const handleBaseInstall = async () => {
       setLoading(true);
       await install(mod, version);
@@ -105,6 +118,7 @@ export function ModBox(props: IModBoxProps) {
   };
 
   const handleUninstall = async () => {
+    if (isLocked) return;
     modals.openConfirmModal({
       title: 'Uninstall mod',
       children: (
@@ -180,9 +194,29 @@ export function ModBox(props: IModBoxProps) {
                     <IconExternalLink size={12} />
                   </a>
                 </Text>
-                <Text c="dimmed" fz={'0.85rem'}>
-                  <IconUser size={12} /> {fetched.author}
-                </Text>
+                <Group gap={4} align="flex-start">
+                  <Text c="dimmed" fz={'0.85rem'}>
+                    <IconUser size={12} /> {fetched.author}
+                  </Text>
+                  <Text
+                    c="dimmed"
+                    fz={'0.85rem'}
+                    style={{ cursor: 'pointer' }}
+                    onClick={(e) => {
+                      const modinfo_id =
+                        latestVersion?.modinfo_id ?? local?.modinfo_id ?? 'N/A';
+                      navigator.clipboard.writeText(modinfo_id);
+                      notifications.show({
+                        title: 'Mod ID copied',
+                        message: modinfo_id,
+                        color: 'blue',
+                      });
+                    }}
+                  >
+                    <IconCopy size={12} />{' '}
+                    {latestVersion?.modinfo_id ?? local?.modinfo_id}
+                  </Text>
+                </Group>
               </Stack>
               {/* {latestVersion && (
               <Box flex="0 0 auto">
@@ -197,7 +231,7 @@ export function ModBox(props: IModBoxProps) {
           <Box flex="0 0 100px" w="100%">
             <Flex align="flex-end" justify="flex-end">
               <Group gap={4} align="flex-end">
-                {mod.local && (
+                {!isLocked && mod.local && (
                   <ActionIcon
                     mt="sm"
                     variant="light"
@@ -207,11 +241,23 @@ export function ModBox(props: IModBoxProps) {
                     <IconTrash size={16} />
                   </ActionIcon>
                 )}
-                <ModInstallButton
-                  mod={mod}
-                  version={latestVersion}
-                  onInstall={handleInstall}
-                />
+                {isLocked && (
+                  <Tooltip
+                    color="dark.8"
+                    label="Mod is locked. No updates will be applied. Open the three dots menu to unlock."
+                  >
+                    <ActionIcon color="pink">
+                      <IconLock size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+                {!isLocked && (
+                  <ModInstallButton
+                    mod={mod}
+                    version={latestVersion}
+                    onInstall={handleInstall}
+                  />
+                )}
               </Group>
               <Menu
                 shadow="md"
@@ -232,14 +278,17 @@ export function ModBox(props: IModBoxProps) {
                   >
                     Choose version...
                   </Menu.Item>
-                  <Menu.Item
-                    leftSection={<IconFolder size={16} />}
-                    onClick={async () =>
-                      open(await resolve(local?.modinfo_path ?? '', '..'))
-                    }
-                  >
-                    Open mod folder
-                  </Menu.Item>
+                  {local?.modinfo_path != null && (
+                    <Menu.Item
+                      leftSection={<IconFolder size={16} />}
+                      onClick={async () =>
+                        open(await resolve(local.modinfo_path!, '..'))
+                      }
+                    >
+                      Open mod folder
+                    </Menu.Item>
+                  )}
+                  <ModLockActionItem mod={mod} />
                 </Menu.Dropdown>
               </Menu>
             </Flex>

@@ -30,6 +30,12 @@ export type AppState = {
   setModFolder: (folder: string) => void;
   hydrated: boolean;
   setHydrated: (hydrated: boolean) => void;
+
+  /**
+   * Array of mod IDs (modinfo_id) that are locked and cannot be uninstalled / updated.
+   */
+  lockedModIds?: string[];
+  setModLock: (id: string, active?: boolean) => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -39,6 +45,19 @@ export const useAppStore = create<AppState>()(
       setModFolder: (folder: string) => set({ modFolder: folder }),
       hydrated: false,
       setHydrated: (hydrated: boolean) => set({ hydrated }),
+      lockedModIds: [],
+
+      setModLock: (id: string, active: boolean = true) => {
+        const lockedModIds = get().lockedModIds ?? [];
+
+        if (active) {
+          if (!lockedModIds.includes(id)) {
+            set({ lockedModIds: [...lockedModIds, id] });
+          }
+        } else {
+          set({ lockedModIds: lockedModIds.filter((i) => i !== id) });
+        }
+      },
     }),
     {
       name: 'civ-app-store',

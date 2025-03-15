@@ -4,18 +4,23 @@ import { ModVersionsRecord } from '../pocketbase-types';
 import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
 import { isSameVersion } from './isSameVersion';
+import { useAppStore } from '../store/store';
 
 export interface IModUpdate {
   mod: ModData;
   targetVersion?: ModVersionsRecord;
 }
 
-export function checkUpdates(mods: ModData[]) {
+export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
   let needUpdates: IModUpdate[] = [];
 
   const installedMods = mods.filter((m) => m.local != null);
 
   for (const installedMod of installedMods) {
+    if (lockedModIds.has(installedMod.local?.modinfo_id ?? '')) {
+      continue;
+    }
+
     const latestVersion =
       installedMod.fetched.expand?.mod_versions_via_mod_id[0];
 
@@ -45,17 +50,26 @@ export function useApplyUpdates() {
 
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const lockedModIds = useAppStore((state) => state.lockedModIds);
+
   const availableUpdates = useMemo(() => {
-    return checkUpdates(mods);
-  }, [mods]);
+    return checkUpdates(mods, new Set(lockedModIds ?? []));
+  }, [mods, lockedModIds]);
 
   const applyUpdates = useCallback(async () => {
     setIsUpdating(true);
+
+    const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
 
     let errors = [];
     for (const update of availableUpdates) {
       console.log('Applying update:', update.mod.fetched.id);
       try {
+        if (lockedModIds.has(update.mod.local?.modinfo_id ?? '')) {
+          console.warn('Skipping locked mod:', update.mod.fetched.name, update.mod.local?.modinfo_id); // prettier-ignore
+          continue;
+        }
+
         if (update.mod.local) {
           await uninstall(update.mod);
         }

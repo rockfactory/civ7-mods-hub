@@ -20,6 +20,8 @@ import { useModsContext } from '../mods/ModsContext';
 import { useEffect, useMemo, useState } from 'react';
 import { open } from '@tauri-apps/plugin-shell';
 import { appLogDir, resolve } from '@tauri-apps/api/path';
+import { getVersion } from '@tauri-apps/api/app';
+import styles from './SettingsDrawer.module.css';
 
 export interface ISettingsDrawerProps {}
 
@@ -43,10 +45,16 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
     });
   }, [open, getModsFolder, mods]);
 
+  const [version, setVersion] = useState<string | null>(null);
+  useEffect(() => {
+    getVersion().then(setVersion);
+  }, []);
+
   return (
     <>
       <Button
         color="gray"
+        variant="light"
         leftSection={<IconSettings size={16} />}
         onClick={handlers.toggle}
       >
@@ -115,6 +123,11 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             Open Civilization7 logs folder
           </Button>
         </Stack>
+        <div className={styles.footer}>
+          <Text c="dimmed" size="sm">
+            CivMods v{version} © 2025
+          </Text>
+        </div>
       </Drawer>
     </>
   );

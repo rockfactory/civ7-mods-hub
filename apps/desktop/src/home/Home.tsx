@@ -30,6 +30,7 @@ import { ModBox } from '../mods/ModBox';
 import { useApplyUpdates } from '../mods/checkUpdates';
 import { useModsContext } from '../mods/ModsContext';
 import { SettingsDrawer } from '../settings/SettingsDrawer';
+import styles from './Home.module.css';
 
 export default function ModsListPage() {
   const {
@@ -89,7 +90,7 @@ export default function ModsListPage() {
       navbar={{ width: 300, breakpoint: 'sm' }}
       header={{ height: 60 }}
     >
-      <AppShell.Header p="xs">
+      <AppShell.Header p="xs" className={styles.header}>
         <Group justify="flex-start" align="center" gap={0}>
           <Group gap="sm" w={300}>
             <Text fw={700} size="xl">

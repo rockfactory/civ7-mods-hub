@@ -1,0 +1,5 @@
+.header {
+  /** Header flicker fix */
+  transition-duration: 0s !important;
+  transition: left, top;
+}
