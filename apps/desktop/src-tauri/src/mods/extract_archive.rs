@@ -118,6 +118,9 @@ pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<(), Strin
 
     println!("Modinfo directory: {:?}", modinfo_dir);
 
+    recursively_grant_write_permissions(modinfo_dir)
+        .map_err(|e| format!("Failed to grant write permissions: {}", e))?;
+
     // Copy the modinfo_dir directory to the target directory
     let _ = fs::create_dir_all(extract_to);
 
@@ -132,5 +135,20 @@ pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<(), Strin
     fs::remove_dir_all(&temp_target)
         .map_err(|e| format!("Failed to remove temp directory: {}", e))?;
 
+    Ok(())
+}
+
+fn recursively_grant_write_permissions(root: &Path) -> io::Result<()> {
+    let mut files = vec![root.to_path_buf()];
+    while let Some(file) = files.pop() {
+        let mut permissions = fs::metadata(&file)?.permissions();
+        permissions.set_readonly(false);
+        fs::set_permissions(&file, permissions)?;
+        if file.is_dir() {
+            for entry in fs::read_dir(file)? {
+                files.push(entry?.path());
+            }
+        }
+    }
     Ok(())
 }
