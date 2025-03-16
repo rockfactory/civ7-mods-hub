@@ -137,3 +137,4 @@ pocketbase.exe
 /apps/backend/pb_data
 /target
 /apps/api/data
+/apps/api/apps/api/data
