@@ -1,6 +1,4 @@
-use fs_extra::file;
-use log::debug;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::fs::{self};
@@ -14,14 +12,6 @@ pub struct ModInfo {
     modinfo_id: Option<String>, // Extracted from XML <Mod id="...">
     folder_hash: String,
     folder_name: String,
-}
-
-/// XML struct for parsing .modinfo using serde
-#[derive(Debug, Deserialize)]
-#[serde(rename = "Mod")]
-struct ModXml {
-    #[serde(rename = "@id")]
-    id: Option<String>,
 }
 
 // Make sure this is aligned with the ignore list in the backend in Node.js
@@ -82,10 +72,32 @@ fn compute_folder_hash(directory: &Path) -> Result<String, String> {
 
 /// Parses the .modinfo XML and extracts the `id` attribute
 fn extract_mod_id(modinfo_path: &str) -> Option<String> {
-    let xml_content = fs::read_to_string(modinfo_path).ok()?;
-    let parsed: Result<ModXml, _> = quick_xml::de::from_str(&xml_content);
+    use quick_xml::{events::Event, Reader};
 
-    parsed.ok()?.id
+    let mut reader = Reader::from_file(modinfo_path).ok()?;
+    let reader_config = reader.config_mut();
+    reader_config.check_end_names = false;
+    reader_config.allow_unmatched_ends = true;
+
+    let mut buf = Vec::new();
+    loop {
+        match reader.read_event_into(&mut buf).ok()? {
+            Event::Eof => break None,
+            Event::Start(tag) if tag.name().as_ref().to_ascii_lowercase() == b"mod" => {
+                break tag.attributes().find_map(|attr| {
+                    attr.ok().and_then(|attr| {
+                        if attr.key.as_ref().to_ascii_lowercase() == b"id" {
+                            Some(String::from_utf8_lossy(&attr.value).to_string())
+                        } else {
+                            None
+                        }
+                    })
+                });
+            }
+            _ => {}
+        }
+        buf.clear();
+    }
 }
 
 /// Finds the `.modinfo` file inside a given directory.

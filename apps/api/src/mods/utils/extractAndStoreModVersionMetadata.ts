@@ -249,6 +249,26 @@ async function extractArchive(
   } else {
     throw new Error(`Unsupported archive format: ${archivePath}`);
   }
+
+  // Ensure all files have sufficient permissions
+  try {
+    await recursivelyGrantReadWritePermissions(extractTo);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function recursivelyGrantReadWritePermissions(directory: string): Promise<void> {
+  const entries = [path.resolve(directory)];
+  while (entries.length > 0) {
+    const entry = entries.pop()!;
+    const stat = await fs.stat(entry);
+    await fs.chmod(entry, stat.mode | fs.constants.O_RDWR);
+    if (stat.isDirectory()) {
+      const subEntries = (await fs.readdir(entry)).map((subEntry) => path.join(entry, subEntry));
+      entries.push(...subEntries);
+    }
+  }
 }
 
 /**

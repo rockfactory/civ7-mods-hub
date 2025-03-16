@@ -129,6 +129,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# MacOS
+.DS_Store
 
 pocketbase
 pocketbase.exe

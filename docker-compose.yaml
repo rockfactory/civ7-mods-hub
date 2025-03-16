@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  pocketbase:
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
+    ports:
+      - '8090:5000'
+    environment:
+      - PORT=5000
