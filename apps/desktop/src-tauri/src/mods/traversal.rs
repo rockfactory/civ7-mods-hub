@@ -1,5 +1,3 @@
-use fs_extra::file;
-use log::debug;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs::File;

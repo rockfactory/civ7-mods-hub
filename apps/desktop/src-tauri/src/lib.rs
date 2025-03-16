@@ -1,6 +1,5 @@
 use mods::{extract_archive, traversal::scan_civ_mods};
-use std::path::PathBuf;
-use tauri::{plugin::TauriPlugin, Manager};
+use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
 mod mods;
@@ -33,7 +32,7 @@ async fn extract_mod_archive(archive_path: &str, extract_to: &str) -> Result<(),
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()        
+    tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             println!("a new app instance was opened with {argv:?} and the deep link event was already triggered");
             // when defining deep link schemes at runtime, you must also check `argv` here
@@ -44,11 +43,11 @@ pub fn run() {
                        .set_focus();
         }))
         .plugin(tauri_plugin_deep_link::init())
-        .setup(|app| {
+        .setup(|_app| { // prefix with _ to avoid unused variable warning in MacOS
             #[cfg(any(windows, target_os = "linux"))]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
-                app.deep_link().register_all()?;
+                _app.deep_link().register_all()?;
             }
             Ok(())
         })

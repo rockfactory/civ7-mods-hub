@@ -1,9 +1,8 @@
-use core::arch;
 use flate2::read::GzDecoder;
 use sevenz_rust::decompress_file;
 use std::fs::{self, File};
-use std::io::{self, BufReader, Write};
-use std::path::{Path, PathBuf};
+use std::io::{self, BufReader};
+use std::path::Path;
 use unrar::Archive;
 use zip::ZipArchive;
 
