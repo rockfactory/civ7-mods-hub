@@ -29,3 +29,8 @@ To update PocketBase Typescript types:
 ```bash
 npx pocketbase-typegen --db ./apps/backend/pb_data/data.db --out ./apps/desktop/src/pocketbase-types.ts
 ```
+
+## Contributors
+
+- [leonardfactory](https://github.com/rockfactory)
+- [haruleekim](https://github.com/haruleekim)
