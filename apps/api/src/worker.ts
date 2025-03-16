@@ -55,7 +55,14 @@ async function checkForManualScheduledTasks() {
         ? (scheduleTask.options.maxPages as number)
         : 1;
 
-    await scrapeMods({ firstPage, maxPages });
+    const stopAfterLastModVersion =
+      typeof scheduleTask.options === 'object' &&
+      scheduleTask.options !== null &&
+      'stopAfterLastModVersion' in scheduleTask.options
+        ? (scheduleTask.options.stopAfterLastModVersion as boolean)
+        : false;
+
+    await scrapeMods({ firstPage, maxPages, stopAfterLastModVersion });
     await pb.collection('scheduled_tasks').update(scheduledTasks.items[0].id, {
       is_processed: true,
       processed_at: new Date().toISOString(),
@@ -68,6 +75,10 @@ async function checkForManualScheduledTasks() {
   }
 }
 
+/**
+ * Main cron job for updating mods. Processes the latest two pages of mods.
+ * Doesn't stop after the first updated mod found.
+ */
 cron.schedule('*/30 * * * *', () => {
   if (isRunning) {
     console.log('Previous job is still running, skipping this run');
@@ -86,5 +97,29 @@ cron.schedule('*/30 * * * *', () => {
     .finally(() => {
       isRunning = false;
       console.log('\n\n=== Finished mods updating cron job ===\n\n');
+    });
+});
+
+/**
+ * "Fast" cron job for updating mods; stops after the first updated mod found.
+ * This is useful for quickly updating the latest mods.
+ */
+cron.schedule('*/5 * * * *', () => {
+  if (isRunning) {
+    console.log('Previous job is still running, skipping this run');
+    return;
+  }
+
+  isRunning = true;
+
+  console.log('\n\n=== Running [FAST] mods updating cron job ===\n\n');
+  scrapeMods({ firstPage: 1, maxPages: 1, stopAfterLastModVersion: true })
+    .then((mods) => {
+      console.log(`[FAST] Scraped ${mods.length} mods`);
+    })
+    .catch((err) => console.error(err))
+    .finally(() => {
+      isRunning = false;
+      console.log('\n\n=== Finished [FAST] mods updating cron job ===\n\n');
     });
 });

@@ -137,4 +137,13 @@ export async function saveModToDatabase(
       await extractAndStoreModVersionMetadata(options, mod, version);
     }
   }
+
+  // If no new versions were added, and we're not forcing extraction,
+  // we can skip the rest of the process
+  let shouldStopProcessing =
+    !isNewVersionsAvailable &&
+    options.stopAfterLastModVersion &&
+    !options.forceExtractAndStore;
+
+  return shouldStopProcessing;
 }

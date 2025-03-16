@@ -183,7 +183,10 @@ export async function scrapeMods(
       }
 
       // Save mod
-      await saveModToDatabase(options, mod);
+      const shouldStop = await saveModToDatabase(options, mod);
+      if (shouldStop) {
+        return mods;
+      }
 
       const sleepTime = Math.floor(Math.random() * (200 + 1)) + 100; // Random sleep 100-300 ms
       console.log(`Sleeping for ${sleepTime} ms`);
