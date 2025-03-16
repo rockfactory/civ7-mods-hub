@@ -252,13 +252,13 @@ async function extractArchive(
 
   // Ensure all files have sufficient permissions
   try {
-    await recursivelyEnsureReadWritePermissions(extractTo);
+    await recursivelyGrantReadWritePermissions(extractTo);
   } catch (error) {
     console.error(error);
   }
 }
 
-async function recursivelyEnsureReadWritePermissions(directory: string): Promise<void> {
+async function recursivelyGrantReadWritePermissions(directory: string): Promise<void> {
   const entries = [path.resolve(directory)];
   while (entries.length > 0) {
     const entry = entries.pop()!;
