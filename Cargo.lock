@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "CivMods"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "dirs 5.0.1",
  "flate2",
