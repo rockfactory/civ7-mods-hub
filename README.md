@@ -1,6 +1,8 @@
-# civ7-mods-hub
+# CivMods
 
 Unofficial Civ7 Mods Manager
+
+![CivMods](./apps/api/public/screen-background.png)
 
 ## Develop
 
@@ -8,6 +10,12 @@ Download and Start Pocketbase v0.25.9 in `./apps/backend`:
 
 ```bash
 ./apps/backend/pocketbase.exe serve
+```
+
+Start the server
+
+```bash
+npm run -w @civmods/api dev
 ```
 
 Start the Desktop App in `./apps/desktop`:
