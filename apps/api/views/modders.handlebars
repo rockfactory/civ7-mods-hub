@@ -8,7 +8,7 @@
 <section class='container mod'>
   <article>
     <header>
-      Generate CivMods Button
+      <h3>Generate CivMods Button</h3>
     </header>
     <p class='download-help-first'>
       Insert your CivFanatics mod page URL below to generate a "Install with CivMods" button.
@@ -18,13 +18,25 @@
       <button id='generate-button' role='button'>Generate</button>
     </div>
 
-    <div id="button-container"></div>
+    <div class="hidden" id="generate-result">
+      <h6>Button preview</h6>
+      <div id="button-container"></div>
 
-    <h4>Direct Link</h4>
-    <pre id="direct-link"></pre>
+      <h6>Direct link</h6>
+      <div class="code">
+        <button class="copy-button">Copy</button>
+        <code id="direct-link"></code>
+      </div>
 
-    <h4>BB Code</h4>
-    <pre id="button-code"></pre>
+      <h6>BB Code</h6>
+      <div class="code">
+        <button class="copy-button">Copy</button>
+        <code id="button-code"></code>
+      </div>
+      <p>
+        Copy the BB code above and paste it into your CivFanatics mod page.
+      </p>
+    </div>
 
     <script>
       document.getElementById('generate-button').addEventListener('click', function () {
@@ -32,6 +44,9 @@
         const modId = modUrl.match(/(\d+)\//)[1];
         const origin = window.location.origin;
         const deepLink = origin + `/install?modCfId=${modId}`;
+
+        // Show the result container
+        document.getElementById('generate-result').classList.remove('hidden');
 
         // Generate a button with an image
         const buttonContainer = document.getElementById('button-container');
@@ -42,10 +57,17 @@
         `;
 
         pre = document.getElementById('button-code');
-        pre.innerText = `[URL='${deepLink}'][IMG]${origin}/static/install-button@2x.png[/IMG][/URL]`;
+        pre.innerText = `[URL='${deepLink}'][IMG width="142px"]${origin}/static/install-button@2x.png[/IMG][/URL]`;
 
         directLink = document.getElementById('direct-link');
         directLink.innerText = deepLink;
+      });
+
+      document.querySelectorAll('.copy-button').forEach(function (button) {
+        button.addEventListener('click', function () {
+          const code = button.nextElementSibling;
+          navigator.clipboard.writeText(code.innerText);
+        });
       });
     </script>
   </article>

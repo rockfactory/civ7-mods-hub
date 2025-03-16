@@ -86,3 +86,31 @@ article > header.mod-header {
 .logo-container img {
   margin-left: 0.4rem;
 }
+
+.code {
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.4rem;
+  position: relative;
+  background-color: #0f1115;
+}
+
+.code > pre,
+.code > code {
+  background-color: transparent;
+}
+
+.copy-button {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  background-color: #292c4c;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+}
+
+#generate-result h6 {
+  margin-top: 1rem;
+}
