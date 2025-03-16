@@ -70,7 +70,22 @@ export async function extractAndStoreModVersionMetadata(
     // Parse .modinfo XML file
     const modInfoXML = await fs.readFile(modInfoPath, 'utf8');
     const parser = new XMLParser({ ignoreAttributes: false });
-    const modInfo = parser.parse(modInfoXML);
+    let modInfo: any;
+
+    try {
+      modInfo = parser.parse(modInfoXML);
+    } catch (error) {
+      console.error(
+        `Failed to parse .modinfo XML for ${version.name}: ${error}`
+      );
+      await pb
+        .collection('mod_versions')
+        .update<ModVersionsRecord>(version.id, {
+          skip_install: true,
+          is_processing: false,
+        } as Partial<ModVersionsRecord>);
+      return;
+    }
 
     // Update PocketBase record
     await pb.collection('mod_versions').update(version.id, {
@@ -79,7 +94,9 @@ export async function extractAndStoreModVersionMetadata(
       modinfo_url: modInfo?.Mod?.Properties?.URL || null,
       modinfo_version: modInfo?.Mod?.Properties?.Version || null,
       modinfo_id: modInfo?.Mod?.['@_id'] || null,
-      affect_saves: modInfo?.Mod?.Properties?.AffectsSavedGames == 1,
+      affect_saves:
+        modInfo?.Mod?.Properties?.AffectsSavedGames == 1 ||
+        modInfo?.Mod?.Properties?.AffectsSavedGames == null,
       skip_install: false,
       download_error: false,
       is_processing: false,
