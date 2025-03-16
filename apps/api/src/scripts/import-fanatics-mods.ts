@@ -1,12 +1,12 @@
 import { scrapeMods } from '../mods/utils/scrapeMods';
 
-const forceExtractAndStore = false;
+const forceExtractAndStore = true;
 const maxPages = 1; // 15 full
-const stopAfterLastModVersion = true;
+const stopAfterLastModVersion = false;
 
 // Main entry point
 scrapeMods({
-  firstPage: 1,
+  firstPage: 9,
   maxPages,
   forceExtractAndStore,
   stopAfterLastModVersion,

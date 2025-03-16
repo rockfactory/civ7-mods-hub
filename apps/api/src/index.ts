@@ -3,6 +3,10 @@ import fs from 'fs/promises';
 import { engine } from 'express-handlebars';
 import { pb } from './core/pocketbase.js';
 import { safeAsync } from './core/async.js';
+import {
+  getCachedLatestDownloadLinks,
+  getLatestDownloadLinks,
+} from './download/downloadLinks.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,9 +28,14 @@ app.engine(
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
-app.get('/', (req, res) => {
-  res.render('index', { title: 'Home', lang: 'en' });
-});
+app.get(
+  '/',
+  safeAsync(async (req, res) => {
+    const downloads = await getCachedLatestDownloadLinks();
+
+    res.render('index', { title: 'Home', lang: 'en', downloads });
+  })
+);
 
 app.get(
   '/install',

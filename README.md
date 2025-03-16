@@ -30,6 +30,16 @@ To update PocketBase Typescript types:
 npx pocketbase-typegen --db ./apps/backend/pb_data/data.db --out ./apps/desktop/src/pocketbase-types.ts
 ```
 
+### Local Import
+
+To update local pocketbase and test the import script. Make sure to configure
+the `POCKETBASE_TOKEN` variable in the .env file and to set the parameters in the
+script.
+
+```bash
+npx tsx --env-file=.env ./apps/api/src/scripts/import-fanatics-mods.ts
+```
+
 ## Contributors
 
 - [leonardfactory](https://github.com/rockfactory)

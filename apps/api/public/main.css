@@ -41,8 +41,54 @@ header h1 {
   margin-bottom: 2.5rem;
 }
 
+.download-card {
+  display: none;
+}
+
+.download-card.active {
+  display: block;
+}
+
+.downloads,
+.downloads-help {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.downloads .download-card {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.downloads-help {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.downloads-other-platform {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.downloads-other-platform a {
+  margin-left: 1rem;
+}
+
+.downloads-help a,
+.downloads-other-platform a {
+  color: #9098a8;
+  text-decoration-color: #9098a8;
+}
+
+.downloads button.secondary {
+  background-color: transparent;
+  border: none;
+  margin-left: 1rem;
+}
+
 .downloads > div a {
-  width: 100%;
   /* background-color: #391c6c; */
   /* background: linear-gradient(0deg, #1e4792, #2d8bce); */
   /* border: none; */
