@@ -31,7 +31,7 @@ export type ModsContextType = {
   install: (mod: ModData, version: ModVersionsRecord) => Promise<void>;
   triggerReload: () => void;
   chooseModFolder: () => Promise<void>;
-  getModsFolder: () => Promise<string>;
+  getModsFolder: () => Promise<string | null>;
   isFetching: boolean;
   isLoadingInstalled: boolean;
 };
@@ -49,7 +49,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
   const getModsFolder = useCallback(async () => {
     return (
       useAppStore.getState().modFolder ||
-      (await invoke<string>('get_mods_folder', {}))
+      (await invoke<string | null>('get_mods_folder', {}))
     );
   }, []);
 
@@ -217,7 +217,8 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       const selectedFolder = await open({
         directory: true, // Enables folder selection
         multiple: false, // Allows only a single folder selection
-        defaultPath: await invoke<string>('get_mods_folder', {}),
+        defaultPath:
+          (await invoke<string | null>('get_mods_folder', {})) ?? undefined,
       });
 
       if (selectedFolder) {

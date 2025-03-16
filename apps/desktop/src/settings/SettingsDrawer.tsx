@@ -42,7 +42,7 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
     getModsFolder().then(async (folder) => {
       setDisplayedFolders({
         mods: folder,
-        logs: await resolve(folder, '..', 'Logs'),
+        logs: folder ? await resolve(folder, '..', 'Logs') : '',
       });
     });
   }, [open, getModsFolder, mods]);

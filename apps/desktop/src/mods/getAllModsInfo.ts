@@ -23,9 +23,16 @@ async function findModInfoRecursive(
   return null;
 }
 
-// Main function
+/**
+ * @deprecated Use rust version instead
+ */
 export async function getAllModsInfo() {
-  const modsFolderPath = await invoke<string>('get_mods_folder');
+  const modsFolderPath = await invoke<string | null>('get_mods_folder');
+  if (!modsFolderPath) {
+    console.error('No mods folder found');
+    return [];
+  }
+
   const modDirs = (await readDir(modsFolderPath)).filter(
     (entry) => entry.isDirectory
   );

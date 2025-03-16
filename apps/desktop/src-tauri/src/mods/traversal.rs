@@ -126,8 +126,12 @@ pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
 
 /// Scans the Civ7 Mods directory and returns a list of `ModInfo`.
 #[tauri::command]
-pub async fn scan_civ_mods(mods_folder_path: String) -> Result<Vec<ModInfo>, String> {
-    let mods_folder = Path::new(&mods_folder_path);
+pub async fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModInfo>, String> {
+    if mods_folder_path.is_none() {
+        return Err("Mods folder path is missing. Set it in the Settings".to_string());
+    }
+
+    let mods_folder = Path::new(mods_folder_path.as_ref().unwrap());
     if !mods_folder.exists() || !mods_folder.is_dir() {
         return Err("Invalid Mods folder path".to_string());
     }

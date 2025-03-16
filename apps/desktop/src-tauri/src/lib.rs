@@ -12,16 +12,18 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-async fn get_mods_folder(app_handle: tauri::AppHandle) -> Result<String, String> {
-    let mods_folder = get_civ_mods_folder::get_civ7_mods_folder().ok_or("Mods folder not found")?;
+async fn get_mods_folder(app_handle: tauri::AppHandle) -> Result<Option<String>, String> {
+    let mods_folder = get_civ_mods_folder::get_civ7_mods_folder();
 
     // Dynamically grant read/write permission
-    app_handle
-        .fs_scope()
-        .allow_directory(&mods_folder, true)
-        .map_err(|e| format!("Failed to grant permission: {}", e))?;
+    if mods_folder.is_some() {
+        app_handle
+            .fs_scope()
+            .allow_directory(&mods_folder.as_ref().unwrap(), true)
+            .map_err(|e| format!("Failed to grant permission: {}", e))?;
+    }
 
-    Ok(mods_folder.to_string_lossy().to_string())
+    Ok(mods_folder.map(|p| p.to_string_lossy().to_string()))
 }
 
 #[tauri::command]

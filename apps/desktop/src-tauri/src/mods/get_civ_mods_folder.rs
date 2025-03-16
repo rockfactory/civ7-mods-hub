@@ -18,9 +18,8 @@ pub fn get_civ7_mods_folder() -> Option<PathBuf> {
             .join("Civilization VII")
             .join("Mods"),
         "linux" => home
-            .join(".local")
-            .join("share")
-            .join("CivilizationVII")
+            .join("My Games")
+            .join("Sid Meier's Civilization VII")
             .join("Mods"),
         _ => return None,
     };

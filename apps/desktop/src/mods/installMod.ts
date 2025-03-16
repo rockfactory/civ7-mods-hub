@@ -32,7 +32,7 @@ function parseContentDisposition(contentDisposition: string | null): {
 }
 
 export interface InstallModOptions {
-  modsFolderPath: string;
+  modsFolderPath: string | null;
 }
 
 /**
@@ -59,6 +59,10 @@ export async function installMod(
 ) {
   if (!mod.download_url) {
     throw new Error(`Mod ${mod.id} has no download URL`);
+  }
+
+  if (!options.modsFolderPath) {
+    throw new Error('No mods folder provided. Please set it in the settings.');
   }
 
   console.log('Downloading mod from:', mod.download_url);
@@ -131,7 +135,14 @@ export async function installMod(
   }
 }
 
-export async function uninstallMod(modInfo: ModInfo, modsFolderPath: string) {
+export async function uninstallMod(
+  modInfo: ModInfo,
+  modsFolderPath: string | null
+) {
+  if (!modsFolderPath) {
+    throw new Error('No mods folder provided. Please set it in the settings.');
+  }
+
   const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
   if (lockedModIds.has(modInfo.modinfo_id ?? '')) {
     console.warn('Skipping locked mod:', modInfo.mod_name, modInfo.modinfo_id);
