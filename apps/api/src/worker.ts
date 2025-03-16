@@ -62,7 +62,19 @@ async function checkForManualScheduledTasks() {
         ? (scheduleTask.options.stopAfterLastModVersion as boolean)
         : false;
 
-    await scrapeMods({ firstPage, maxPages, stopAfterLastModVersion });
+    const forceExtractAndStore =
+      typeof scheduleTask.options === 'object' &&
+      scheduleTask.options !== null &&
+      'forceExtractAndStore' in scheduleTask.options
+        ? (scheduleTask.options.forceExtractAndStore as boolean)
+        : false;
+
+    await scrapeMods({
+      firstPage,
+      maxPages,
+      stopAfterLastModVersion,
+      forceExtractAndStore,
+    });
     await pb.collection('scheduled_tasks').update(scheduledTasks.items[0].id, {
       is_processed: true,
       processed_at: new Date().toISOString(),
