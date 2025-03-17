@@ -40,9 +40,6 @@ app.get(
 app.get(
   '/install',
   safeAsync(async (req, res) => {
-    // if (!req.query?.modUrl) {
-    //   return res.status(400).send('Missing modUrl query parameter');
-    // }
     let filter = null;
     if (req.query?.modId) {
       filter = pb.filter('id = {:id}', { id: req.query.modId });
@@ -56,9 +53,6 @@ app.get(
         error: 'Missing modUrl, modId or modCfId query parameter',
       });
     }
-
-    const modUrl = req.query.modUrl as string;
-    const modId = req.query.modId as string;
 
     try {
       const mod = await pb.collection('mods').getFirstListItem(filter);
@@ -75,8 +69,6 @@ app.get(
 app.get('/modders', async (req, res) => {
   res.render('modders', { title: 'Modders' });
 });
-
-app.post('/mods/import', async (req, res) => {});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

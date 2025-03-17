@@ -1,3 +1,5 @@
+import { octokit } from './github';
+
 // File patterns based on the latest naming convention
 const PLATFORM_PATTERNS = {
   windows: /CivMods_.*_x64.*\.msi$/,
@@ -45,18 +47,23 @@ export async function getLatestDownloadLinks(): Promise<DownloadLinks | null> {
   }/releases/latest`;
 
   try {
-    // Fetch the latest release metadata
-    const response = await fetch(apiUrl, {
-      headers: process.env.GITHUB_API_TOKEN
-        ? { Authorization: `Bearer ${process.env.GITHUB_API_TOKEN}` }
-        : {},
-    });
+    // // Fetch the latest release metadata
+    // const response = await fetch(apiUrl, {
+    //   headers: process.env.GITHUB_API_TOKEN
+    //     ? { Authorization: `Bearer ${process.env.GITHUB_API_TOKEN}` }
+    //     : {},
+    // });
 
-    if (!response.ok) {
+    const response = await octokit.rest.repos.getLatestRelease({
+      owner: 'rockfactory',
+      repo: 'civ7-mods-hub',
+    });
+    if (response.status !== 200) {
       throw new Error(`GitHub API error: ${response.status}`);
     }
 
-    const releaseData = await response.json();
+    const releaseData = response.data;
+
     console.log('Latest release data:', JSON.stringify(releaseData, null, 2));
     const assets = releaseData.assets || [];
 
