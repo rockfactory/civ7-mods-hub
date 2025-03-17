@@ -289,12 +289,14 @@ export function ModBox(props: IModBoxProps) {
                 </Menu.Target>
                 <Menu.Dropdown>
                   <Menu.Label>Mod Actions</Menu.Label>
-                  <Menu.Item
-                    leftSection={<IconSwitch size={16} />}
-                    onClick={() => setChoosingVersion(true)}
-                  >
-                    Choose version...
-                  </Menu.Item>
+                  {!isLocked && (
+                    <Menu.Item
+                      leftSection={<IconSwitch size={16} />}
+                      onClick={() => setChoosingVersion(true)}
+                    >
+                      Choose version...
+                    </Menu.Item>
+                  )}
                   {local?.modinfo_path != null && (
                     <Menu.Item
                       leftSection={<IconFolder size={16} />}
