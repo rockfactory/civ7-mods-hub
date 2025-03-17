@@ -1,0 +1,44 @@
+<main class='container'>
+  <hgroup>
+    <h2>{{title}}</h2>
+    <p>Released on {{release.date_formatted}}. See full release on <a href="{{release.release_url}}">GitHub</a></p>
+  </hgroup>
+</main>
+
+<section class="container release">
+  <article>
+    <header>
+      <h6>Release Notes</h6>
+    </header>
+    <p>{{{markdown release.body}}}</p>
+  </article>
+</section>
+
+<section class="container">
+  <div class='downloads'>
+    <div id="download-windows" class="download-card" data-platform="windows">
+      <a href="{{release.downloads.windows}}" role="button">
+        {{{icon 'filled/brand-windows' 24}}}
+        Download for Windows
+      </a>
+    </div>
+    <div id="download-macos_intel" class="download-card" data-platform="macos">
+      <a href="{{release.downloads.macos_intel}}" role="button">
+        {{{icon 'outline/brand-finder' 24}}}
+        Download for macOS <small>(Intel)</small>
+      </a>
+    </div>
+    <div id="download-macos_arm" class="download-card" data-platform="macos">
+      <a href="{{release.downloads.macos_arm}}" role="button">
+        {{{icon 'outline/brand-finder' 24}}}
+        Download for macOS <small>(Apple Silicon)</small>
+      </a>
+    </div>
+    <div id="download-linux" class="download-card" data-platform="linux">
+      <a href="{{release.downloads.linux}}" role="button">
+        {{{icon 'outline/brand-ubuntu' 32}}}
+        Download for Linux
+      </a>
+    </div>
+  </div>
+</section>

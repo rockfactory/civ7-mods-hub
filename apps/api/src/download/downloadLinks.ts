@@ -6,9 +6,12 @@ const PLATFORM_PATTERNS = {
   linux: /CivMods_.*_amd64\.AppImage$/,
 };
 
-interface DownloadLinks {
+export interface Release {
   version: string;
+  title: string;
   release_url: string;
+  date_formatted?: string;
+  body: string;
   downloads: {
     windows?: string;
     macos_intel?: string;
@@ -17,32 +20,53 @@ interface DownloadLinks {
   };
 }
 
-let cachedDownloadLinksAt: number = 0;
-let cachedDownloadLinks: DownloadLinks | null = null;
+let cachedReleases: {
+  [key: string]: {
+    data: Release;
+    expiresAt: number;
+  };
+};
 
 /**
  * Keep a cached in-memory copy of the latest download links for 5 minutes.
  */
-export async function getCachedLatestDownloadLinks(): Promise<DownloadLinks | null> {
+export async function getCachedGithubRelease(
+  tag: 'latest' | string = 'latest'
+): Promise<Release | null> {
   const now = Date.now();
 
-  if (now - cachedDownloadLinksAt < 300000 && cachedDownloadLinks) {
-    return cachedDownloadLinks;
+  // Check if we have a cached copy
+  if (cachedReleases?.[tag] && cachedReleases[tag].expiresAt > now) {
+    return cachedReleases[tag].data;
   }
 
-  const downloadLinks = await getLatestDownloadLinks();
-  if (downloadLinks) {
-    cachedDownloadLinks = downloadLinks;
-    cachedDownloadLinksAt = now;
+  // Fetch the latest download links
+  const release = await getGithubRelease(tag);
+  if (release) {
+    // Cache the result
+    cachedReleases = {
+      ...cachedReleases,
+      [tag]: {
+        data: release,
+        expiresAt: now + 300000, // 5 minutes
+      },
+    };
   }
 
-  return downloadLinks;
+  return release;
 }
 
-export async function getLatestDownloadLinks(): Promise<DownloadLinks | null> {
+export async function getGithubRelease(
+  tag: 'latest' | string = 'latest'
+): Promise<Release | null> {
+  // tag should be latest or app-vx.x.x
+  if (tag !== 'latest' && !/^app-v\d+\.\d+\.\d+$/.test(tag)) {
+    throw new Error('Invalid version tag format');
+  }
+
   const apiUrl = `https://api.github.com/repos/${
     process.env.GITHUB_REPO || 'rockfactory/civ7-mods-hub'
-  }/releases/latest`;
+  }/releases/${tag === 'latest' ? 'latest' : `tags/${tag}`}`;
 
   try {
     // Fetch the latest release metadata
@@ -57,14 +81,17 @@ export async function getLatestDownloadLinks(): Promise<DownloadLinks | null> {
     }
 
     const releaseData = await response.json();
-    console.log('Latest release data:', JSON.stringify(releaseData, null, 2));
+    console.log('Release data:', JSON.stringify(releaseData, null, 2));
     const assets = releaseData.assets || [];
 
     // Prepare the result object
-    const downloads: DownloadLinks = {
+    const release: Release = {
       version: releaseData.tag_name,
+      title: releaseData.name,
       release_url: releaseData.html_url,
+      date_formatted: new Date(releaseData.published_at).toLocaleDateString(),
       downloads: {},
+      body: releaseData.body,
     };
 
     // Iterate over assets and match them using our regex patterns
@@ -73,17 +100,17 @@ export async function getLatestDownloadLinks(): Promise<DownloadLinks | null> {
       const downloadUrl = asset.browser_download_url;
 
       if (PLATFORM_PATTERNS.windows.test(fileName)) {
-        downloads.downloads.windows = downloadUrl;
+        release.downloads.windows = downloadUrl;
       } else if (PLATFORM_PATTERNS.macos_intel.test(fileName)) {
-        downloads.downloads.macos_intel = downloadUrl;
+        release.downloads.macos_intel = downloadUrl;
       } else if (PLATFORM_PATTERNS.macos_arm.test(fileName)) {
-        downloads.downloads.macos_arm = downloadUrl;
+        release.downloads.macos_arm = downloadUrl;
       } else if (PLATFORM_PATTERNS.linux.test(fileName)) {
-        downloads.downloads.linux = downloadUrl;
+        release.downloads.linux = downloadUrl;
       }
     }
 
-    return downloads;
+    return release;
   } catch (error) {
     console.error('Error fetching latest download links:', error);
     return null;

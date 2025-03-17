@@ -41,7 +41,7 @@ header h1 {
   margin-bottom: 2.5rem;
 }
 
-.download-card {
+.detect-platform .download-card {
   display: none;
 }
 
@@ -159,4 +159,9 @@ article > header.mod-header {
 
 #generate-result h6 {
   margin-top: 1rem;
+}
+
+/** Release notes */
+.release article header h6 {
+  margin-bottom: 0;
 }
