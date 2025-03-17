@@ -27,6 +27,7 @@ import {
   IconCircleCheckFilled,
   IconCode,
   IconCopy,
+  IconDeviceFloppy,
   IconDots,
   IconDownload,
   IconExternalLink,
@@ -216,6 +217,22 @@ export function ModBox(props: IModBoxProps) {
                   <Text c="dimmed" fz={'0.85rem'}>
                     <IconUser size={12} /> {fetched.author}
                   </Text>
+                  {latestVersion?.affect_saves && (
+                    <Tooltip
+                      color="dark.8"
+                      multiline
+                      w={320}
+                      label="This mod affects save files: it means that you shouldn't remove it in the middle of the game."
+                    >
+                      <Text
+                        c="orange.1"
+                        fz={'0.85rem'}
+                        className={styles.descriptionBlock}
+                      >
+                        <IconDeviceFloppy size={12} /> Save file
+                      </Text>
+                    </Tooltip>
+                  )}
                 </Group>
               </Stack>
               {/* {latestVersion && (
