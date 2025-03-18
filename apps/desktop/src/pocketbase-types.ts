@@ -91,6 +91,7 @@ export type SuperusersRecord = {
 export type ModVersionsRecord = {
 	affect_saves?: boolean
 	archive_hash?: string
+	archive_size?: number
 	cf_id?: string
 	created?: IsoDateString
 	download_error?: boolean
@@ -113,11 +114,13 @@ export type ModVersionsRecord = {
 
 export type ModsRecord = {
 	author?: string
+	category?: string
 	cf_id?: string
 	created?: IsoDateString
 	downloads_count?: number
 	icon_url?: string
 	id: string
+	mod_released?: IsoDateString
 	mod_updated?: IsoDateString
 	modinfo_id?: string
 	name?: string

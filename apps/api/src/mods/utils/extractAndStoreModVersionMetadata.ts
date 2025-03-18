@@ -24,6 +24,7 @@ export async function extractAndStoreModVersionMetadata(
   await fs.mkdir(EXTRACTED_DIR, { recursive: true });
 
   let archivePath: string | null = null;
+  let archiveSize = 0;
   const extractPath = path.join(EXTRACTED_DIR, version.id);
 
   try {
@@ -38,6 +39,8 @@ export async function extractAndStoreModVersionMetadata(
       if (!archivePath) return;
 
       console.log(`Downloaded: ${archivePath}`);
+      archiveSize = (await fs.stat(archivePath)).size;
+      console.log(`Archive size: ${archiveSize / 1024 / 1024} MB`);
 
       // Extract the archive
       await extractArchive(archivePath, extractPath);
@@ -97,6 +100,7 @@ export async function extractAndStoreModVersionMetadata(
       affect_saves:
         modInfo?.Mod?.Properties?.AffectsSavedGames == 1 ||
         modInfo?.Mod?.Properties?.AffectsSavedGames == null,
+      archive_size: archiveSize,
       skip_install: false,
       download_error: false,
       is_processing: false,
@@ -258,14 +262,18 @@ async function extractArchive(
   }
 }
 
-async function recursivelyGrantReadWritePermissions(directory: string): Promise<void> {
+async function recursivelyGrantReadWritePermissions(
+  directory: string
+): Promise<void> {
   const entries = [path.resolve(directory)];
   while (entries.length > 0) {
     const entry = entries.pop()!;
     const stat = await fs.stat(entry);
     await fs.chmod(entry, stat.mode | fs.constants.O_RDWR);
     if (stat.isDirectory()) {
-      const subEntries = (await fs.readdir(entry)).map((subEntry) => path.join(entry, subEntry));
+      const subEntries = (await fs.readdir(entry)).map((subEntry) =>
+        path.join(entry, subEntry)
+      );
       entries.push(...subEntries);
     }
   }

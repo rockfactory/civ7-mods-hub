@@ -17,6 +17,8 @@ function syncModToModRecord(syncMod: SyncMod): Partial<ModsRecord> {
     short_description: syncMod.shortDescription,
     downloads_count: parseInt(syncMod.downloadsCount, 10),
     mod_updated: syncMod.updatedAt ? syncMod.updatedAt : undefined,
+    mod_released: syncMod.releasedAt ? syncMod.releasedAt : undefined,
+    category: syncMod.category,
     icon_url: syncMod.iconUrl,
     cf_id: getModIdFromUrl(syncMod.modPageUrl),
   };

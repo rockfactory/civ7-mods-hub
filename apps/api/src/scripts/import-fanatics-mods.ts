@@ -6,7 +6,7 @@ const stopAfterLastModVersion = false;
 
 // Main entry point
 scrapeMods({
-  firstPage: 9,
+  firstPage: 1,
   maxPages,
   forceExtractAndStore,
   stopAfterLastModVersion,

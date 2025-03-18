@@ -27,6 +27,8 @@ export interface SyncMod {
   shortDescription?: string;
   iconUrl?: string;
   versions?: SyncModVersion[];
+  releasedAt?: string;
+  category?: string;
 }
 
 async function getModsFromPage(url: string): Promise<SyncMod[]> {
@@ -66,6 +68,13 @@ async function getModsFromPage(url: string): Promise<SyncMod[]> {
       .find('.structItem-metaItem--downloads dd')
       .text()
       .trim();
+    const releasedAt = el.find('.structItem-startDate time').attr('datetime');
+    const category = el
+      .find(
+        ".structItem-minor .structItem-parts li a[href^='/resources/categories/']"
+      )
+      ?.text()
+      .trim();
 
     mods.push({
       modName,
@@ -76,6 +85,8 @@ async function getModsFromPage(url: string): Promise<SyncMod[]> {
       updatedAt,
       downloadsCount,
       iconUrl,
+      releasedAt,
+      category,
     });
   });
 
