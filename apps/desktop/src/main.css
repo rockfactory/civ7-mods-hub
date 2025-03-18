@@ -1,14 +1,19 @@
 html {
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  /* overflow: hidden; */
 }
 
 body {
-  height: 100%;
+  /* height: 100%; */
   padding: 0;
   overflow-y: auto;
   margin: 0;
   -webkit-overflow-scrolling: touch;
   overflow-scrolling: touch;
+}
+
+.main {
+  overflow: hidden;
 }

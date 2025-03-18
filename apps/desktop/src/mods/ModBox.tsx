@@ -154,13 +154,12 @@ export function ModBox(props: IModBoxProps) {
   const [isChoosingVersion, setChoosingVersion] = useState(false);
 
   return (
-    <>
+    <Box pb="sm">
       <Card
         key={fetched.id}
         className={styles.modCard}
         shadow="sm"
         p="sm"
-        mb="sm"
         pos="relative"
         onClick={() => setSelected(!isSelected)}
       >
@@ -347,6 +346,6 @@ export function ModBox(props: IModBoxProps) {
           />
         </Modal>
       )}
-    </>
+    </Box>
   );
 }

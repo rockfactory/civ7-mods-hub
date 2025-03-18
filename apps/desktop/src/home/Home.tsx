@@ -11,22 +11,13 @@ import {
   Box,
   Button,
   Tooltip,
-  BackgroundImage,
   LoadingOverlay,
   SegmentedControl,
   Select,
   Space,
   Loader,
 } from '@mantine/core';
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useTransition,
-} from 'react';
-import PocketBase from 'pocketbase';
-import { invoke } from '@tauri-apps/api/core';
+import { useState, useEffect, useMemo } from 'react';
 import {
   IconChecks,
   IconDownload,
@@ -44,6 +35,7 @@ import styles from './Home.module.css';
 import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
 import { cleanCategoryName } from '../mods/modCategory';
 import { useModsQuery } from './ModsQuery';
+import { Virtuoso } from 'react-virtuoso';
 
 export default function ModsListPage() {
   const {
@@ -274,23 +266,31 @@ export default function ModsListPage() {
 
       <AppShell.Main className="main">
         <LoadingOverlay visible={isFirstLoading} />
-        <ScrollArea scrollbars="y" className="scroll-area">
-          {filteredMods.map((mod) => (
-            <ModBox key={mod.fetched.id} mod={mod} />
-          ))}
-          {filteredMods.length === 0 && (
-            <Box p="lg">
-              <Stack gap={'xs'} align="center">
-                <IconEyeQuestion size={40} />
-                <Text>No mods found</Text>
-                <Text c="dimmed">
-                  Try changing your filters or open Settings and double check
-                  Mods folder
-                </Text>
-              </Stack>
-            </Box>
+        <Virtuoso
+          useWindowScroll
+          totalCount={filteredMods.length}
+          itemContent={(index) => (
+            <ModBox
+              key={filteredMods[index].fetched.id}
+              mod={filteredMods[index]}
+            />
           )}
-        </ScrollArea>
+        />
+        {/* {filteredMods.map((mod) => (
+            <ModBox key={mod.fetched.id} mod={mod} />
+          ))} */}
+        {filteredMods.length === 0 && (
+          <Box p="lg">
+            <Stack gap={'xs'} align="center">
+              <IconEyeQuestion size={40} />
+              <Text>No mods found</Text>
+              <Text c="dimmed">
+                Try changing your filters or open Settings and double check Mods
+                folder
+              </Text>
+            </Stack>
+          </Box>
+        )}
       </AppShell.Main>
     </AppShell>
   );
