@@ -138,7 +138,7 @@ pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<(), Strin
     Ok(())
 }
 
-fn recursively_grant_write_permissions(root: &Path) -> io::Result<()> {
+pub(crate) fn recursively_grant_write_permissions(root: &Path) -> io::Result<()> {
     let mut files = vec![root.to_path_buf()];
     while let Some(file) = files.pop() {
         let mut permissions = fs::metadata(&file)?.permissions();

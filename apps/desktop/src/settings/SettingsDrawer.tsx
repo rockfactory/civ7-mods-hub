@@ -20,7 +20,7 @@ import * as React from 'react';
 import { useModsContext } from '../mods/ModsContext';
 import { useEffect, useMemo, useState } from 'react';
 import { open } from '@tauri-apps/plugin-shell';
-import { appLogDir, resolve } from '@tauri-apps/api/path';
+import { appDataDir, appLogDir, resolve } from '@tauri-apps/api/path';
 import { getVersion } from '@tauri-apps/api/app';
 import styles from './SettingsDrawer.module.css';
 import { checkForAppUpdates } from './autoUpdater';
@@ -127,6 +127,17 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             }}
           >
             Open CivMods (this app) logs folder
+          </Button>
+          <Button
+            variant="light"
+            leftSection={<IconLogs size={12} />}
+            size="xs"
+            color="blue"
+            onClick={async () => {
+              open(await appDataDir());
+            }}
+          >
+            Open CivMods (this app) profiles folder
           </Button>
           <Button
             variant="light"

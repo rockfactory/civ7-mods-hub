@@ -11,6 +11,7 @@ import { ModalsProvider } from '@mantine/modals';
 
 import { useStore } from 'zustand';
 import { useAppStore } from './store/store';
+import { ProfilesContextProvider } from './profiles/ProfilesContext';
 
 const pastelYellow: MantineColorsTuple = [
   '#fff7e8',
@@ -68,9 +69,11 @@ function App() {
       <ModalsProvider>
         <Notifications position="top-right" limit={4} />
         {isHydrated && (
-          <ModsContextProvider>
-            <Home />
-          </ModsContextProvider>
+          <ProfilesContextProvider>
+            <ModsContextProvider>
+              <Home />
+            </ModsContextProvider>
+          </ProfilesContextProvider>
         )}
         {!isHydrated && <LoadingOverlay visible>Loading...</LoadingOverlay>}
       </ModalsProvider>

@@ -41,7 +41,7 @@ fn compute_folder_hash(directory: &Path) -> Result<String, String> {
 
     for entry in iter {
         if entry.file_type().is_file() {
-            println!(" -> Hashing: {}", entry.path().display());
+            // println!(" -> Hashing: {}", entry.path().display());
 
             // Skipping file name for now.
             // Get relative path (relative to the given directory)
@@ -126,7 +126,7 @@ pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
 
 /// Scans the Civ7 Mods directory and returns a list of `ModInfo`.
 #[tauri::command]
-pub async fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModInfo>, String> {
+pub fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModInfo>, String> {
     if mods_folder_path.is_none() {
         return Err("Mods folder path is missing. Set it in the Settings".to_string());
     }
@@ -180,4 +180,28 @@ pub async fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModIn
     }
 
     Ok(mods_list)
+}
+
+#[tauri::command]
+pub fn get_unlocked_mod_folders(
+    mods_folder_path: Option<String>,
+    excluded_modinfo_ids: Vec<String>,
+) -> Result<Vec<String>, String> {
+    // Scan all mods in the given folder
+    let all_mods = scan_civ_mods(mods_folder_path.clone())?;
+
+    // Filter only mods that are NOT in the excluded list
+    let unlocked_mods: Vec<String> = all_mods
+        .into_iter()
+        .filter(|mod_info| {
+            // Only include mods that have a valid modinfo_id and are NOT in the exclude list
+            match &mod_info.modinfo_id {
+                Some(id) if excluded_modinfo_ids.contains(id) => false, // Exclude mod
+                _ => true,                                              // Include mod
+            }
+        })
+        .map(|mod_info| mod_info.folder_name) // Extract folder names
+        .collect();
+
+    Ok(unlocked_mods)
 }

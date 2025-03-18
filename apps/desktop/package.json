@@ -27,10 +27,13 @@
     "@tauri-apps/plugin-shell": "^2.2.0",
     "@tauri-apps/plugin-store": "^2.2.0",
     "@tauri-apps/plugin-updater": "^2.6.0",
+    "es-toolkit": "^1.33.0",
     "fast-xml-parser": "^5.0.8",
+    "i18next": "^24.2.3",
     "pocketbase": "^0.25.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^15.4.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

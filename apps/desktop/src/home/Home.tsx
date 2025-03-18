@@ -32,6 +32,7 @@ import { useModsContext } from '../mods/ModsContext';
 import { SettingsDrawer } from '../settings/SettingsDrawer';
 import styles from './Home.module.css';
 import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
+import { ProfileSwitcher } from '../profiles/ProfileSwitcher';
 
 export default function ModsListPage() {
   const {
@@ -135,6 +136,7 @@ export default function ModsListPage() {
                   },
                 ]}
               />
+              <ProfileSwitcher />
             </Group>
             <Group gap="sm">
               <SettingsDrawer />

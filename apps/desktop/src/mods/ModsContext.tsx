@@ -19,6 +19,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { isSameVersion } from './isSameVersion';
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { openConfirmModal } from '@mantine/modals';
+import { getActiveModsFolder } from './getModsFolder';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -47,11 +48,10 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
   const [reloadIndex, setReloadIndex] = useState(0);
 
   const getModsFolder = useCallback(async () => {
-    return (
-      useAppStore.getState().modFolder ||
-      (await invoke<string | null>('get_mods_folder', {}))
-    );
+    return await getActiveModsFolder();
   }, []);
+
+  const currentProfile = useAppStore((state) => state.currentProfile);
 
   /**
    * Update local mods list
@@ -84,7 +84,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
     }
 
     findMods().catch(console.error);
-  }, [reloadIndex]);
+  }, [reloadIndex, currentProfile]);
 
   /**
    * Update remote mods list
