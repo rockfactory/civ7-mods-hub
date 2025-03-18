@@ -2,6 +2,12 @@ name: 'publish'
 
 on:
   workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Is this a prerelease?'
+        type: 'boolean'
+        required: false
+        default: false
 
 jobs:
   publish-tauri:
@@ -11,10 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
-            args: '--target x86_64-apple-darwin'
+          - platform: 'macos-latest' # for Intel and Silicon based macs.
+            args: '--target universal-apple-darwin'
           - platform: 'ubuntu-22.04'
             args: ''
           - platform: 'windows-latest'
@@ -24,12 +28,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
-      - name: install Rust stable
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
@@ -40,18 +44,18 @@ jobs:
         with:
           workspaces: './apps/desktop/src-tauri -> target'
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
 
-      - name: install frontend dependencies
+      - name: Install frontend dependencies
         run: npm install
 
       - name: Import Apple Developer Certificate
-        if: matrix.platform == 'macos-latest' # This must match the platform value defined above.
+        if: matrix.platform == 'macos-latest'
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -67,14 +71,26 @@ jobs:
           security find-identity -v -p codesigning build.keychain
 
       - name: Verify Certificate
-        if: matrix.platform == 'macos-latest' # This must match the platform value defined above.
+        if: matrix.platform == 'macos-latest'
         run: |
           CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application")
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
           echo "Certificate imported."
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Install Azure Code Signing dependencies
+        if: matrix.platform == 'windows-latest'
+        shell: bash
+        env:
+          # replace Azure credentials before running
+          WINDOWS_SIGN_COMMAND: trusted-signing-cli -e https://weu.codesigning.azure.net/ -a ${{secrets.AZURE_CODE_SIGNING_NAME}} -c ${{secrets.AZURE_CERT_PROFILE_NAME}} -d CivMods %1
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          cat './src-tauri/tauri.conf.json' | jq '.bundle .windows += {"signCommand": env.WINDOWS_SIGN_COMMAND}' > './src-tauri/temp.json' && mv './src-tauri/temp.json' './src-tauri/tauri.conf.json'
+          cargo install trusted-signing-cli
+
+      - name: Build and publish with Tauri
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -85,12 +101,15 @@ jobs:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+          AZURE_TENANT_ID: ${{ matrix.platform == 'windows-latest' && secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ matrix.platform == 'windows-latest' && secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ matrix.platform == 'windows-latest' && secrets.AZURE_CLIENT_SECRET }}
         with:
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: 'App v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
-          prerelease: false
+          prerelease: ${{ github.event.inputs.prerelease }}
           args: ${{ matrix.args }}
           projectPath: ./apps/desktop
           tauriScript: npm run -w @civmods/desktop tauri
