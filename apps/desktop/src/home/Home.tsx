@@ -256,9 +256,9 @@ export default function ModsListPage() {
         </AppShell.Section>
       </AppShell.Navbar>
 
-      <AppShell.Main>
+      <AppShell.Main className="main">
         <LoadingOverlay visible={isFirstLoading} />
-        <ScrollArea scrollbars="y">
+        <ScrollArea scrollbars="y" className="scroll-area">
           {filteredMods.map((mod) => (
             <ModBox key={mod.fetched.id} mod={mod} />
           ))}
