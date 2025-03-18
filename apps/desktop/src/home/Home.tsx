@@ -15,14 +15,23 @@ import {
   LoadingOverlay,
   SegmentedControl,
   Select,
+  Space,
+  Loader,
 } from '@mantine/core';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useTransition,
+} from 'react';
 import PocketBase from 'pocketbase';
 import { invoke } from '@tauri-apps/api/core';
 import {
   IconChecks,
   IconDownload,
   IconEyeQuestion,
+  IconFilterOff,
   IconFolder,
   IconRefresh,
   IconSearch,
@@ -34,6 +43,7 @@ import { SettingsDrawer } from '../settings/SettingsDrawer';
 import styles from './Home.module.css';
 import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
 import { cleanCategoryName } from '../mods/modCategory';
+import { useModsQuery } from './ModsQuery';
 
 export default function ModsListPage() {
   const {
@@ -43,11 +53,9 @@ export default function ModsListPage() {
     isFetching,
     isLoadingInstalled,
   } = useModsContext();
-  const [query, setQuery] = useState({
-    text: '',
-    category: '',
-    onlyInstalled: true,
-  });
+
+  const { query, isQueryPending, hasFilters, setQuery, resetQuery } =
+    useModsQuery();
 
   useInstallDeepLink();
 
@@ -135,6 +143,8 @@ export default function ModsListPage() {
                 <IconRefresh size={16} />
               </ActionIcon>
             </Tooltip>
+            <Space w={20} />
+            {isQueryPending && <Loader size={20} />}
           </Group>
           <Group
             justify="space-between"
@@ -146,10 +156,9 @@ export default function ModsListPage() {
               <SegmentedControl
                 value={query.onlyInstalled ? 'installed' : 'available'}
                 onChange={(value) =>
-                  setQuery((q) => ({
-                    ...q,
+                  setQuery({
                     onlyInstalled: value === 'installed',
-                  }))
+                  })
                 }
                 size="sm"
                 data={[
@@ -182,7 +191,7 @@ export default function ModsListPage() {
               placeholder="Search..."
               value={query.text}
               onChange={(event) =>
-                setQuery((q) => ({ ...q, text: event.currentTarget.value }))
+                setQuery({ text: event.currentTarget.value })
               }
               rightSection={<IconSearch size={16} />}
             />
@@ -191,10 +200,17 @@ export default function ModsListPage() {
               size="sm"
               searchable
               data={categories}
-              onChange={(value) =>
-                setQuery((q) => ({ ...q, category: value ?? '' }))
-              }
+              onChange={(value) => setQuery({ category: value ?? '' })}
             />
+            {hasFilters && (
+              <Button
+                variant="light"
+                leftSection={<IconFilterOff size={16} />}
+                onClick={resetQuery}
+              >
+                Reset Filters
+              </Button>
+            )}
           </Stack>
 
           {/* <Button mt="md" onClick={applyFilters}>
