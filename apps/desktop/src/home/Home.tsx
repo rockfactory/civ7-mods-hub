@@ -14,6 +14,7 @@ import {
   BackgroundImage,
   LoadingOverlay,
   SegmentedControl,
+  Select,
 } from '@mantine/core';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import PocketBase from 'pocketbase';
@@ -32,6 +33,7 @@ import { useModsContext } from '../mods/ModsContext';
 import { SettingsDrawer } from '../settings/SettingsDrawer';
 import styles from './Home.module.css';
 import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
+import { cleanCategoryName } from '../mods/modCategory';
 
 export default function ModsListPage() {
   const {
@@ -41,7 +43,11 @@ export default function ModsListPage() {
     isFetching,
     isLoadingInstalled,
   } = useModsContext();
-  const [query, setQuery] = useState({ text: '', onlyInstalled: true });
+  const [query, setQuery] = useState({
+    text: '',
+    category: '',
+    onlyInstalled: true,
+  });
 
   useInstallDeepLink();
 
@@ -73,6 +79,11 @@ export default function ModsListPage() {
             .includes(query.text.toLocaleLowerCase());
       }
 
+      if (query.category) {
+        shouldInclude =
+          shouldInclude && mod.fetched.category === query.category;
+      }
+
       if (query.onlyInstalled) {
         shouldInclude =
           shouldInclude &&
@@ -84,6 +95,23 @@ export default function ModsListPage() {
       return shouldInclude;
     });
   }, [mods, query]);
+
+  const categories = useMemo(() => {
+    const categories = new Map<string, string>();
+    mods.forEach((mod) => {
+      if (mod.fetched.category && !categories.has(mod.fetched.category)) {
+        categories.set(
+          mod.fetched.category,
+          cleanCategoryName(mod.fetched.category)
+        );
+      }
+    });
+
+    return Array.from(categories.entries()).map(([key, value]) => ({
+      value: key,
+      label: value,
+    }));
+  }, [mods]);
 
   const { availableUpdates, isUpdating, applyUpdates } = useApplyUpdates();
 
@@ -157,6 +185,15 @@ export default function ModsListPage() {
                 setQuery((q) => ({ ...q, text: event.currentTarget.value }))
               }
               rightSection={<IconSearch size={16} />}
+            />
+            <Select
+              placeholder="Filter by category.."
+              size="sm"
+              searchable
+              data={categories}
+              onChange={(value) =>
+                setQuery((q) => ({ ...q, category: value ?? '' }))
+              }
             />
           </Stack>
 

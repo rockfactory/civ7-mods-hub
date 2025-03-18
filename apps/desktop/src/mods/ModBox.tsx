@@ -22,6 +22,7 @@ import { ModVersionsRecord } from '../pocketbase-types';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { open } from '@tauri-apps/plugin-shell';
 import {
+  IconCategory,
   IconCheck,
   IconChecklist,
   IconCircleCheckFilled,
@@ -38,6 +39,7 @@ import {
   IconSettings,
   IconSettings2,
   IconSwitch,
+  IconTag,
   IconTransitionBottom,
   IconTrash,
   IconUser,
@@ -53,6 +55,7 @@ import { isSameVersion } from './isSameVersion';
 import { ModLockActionItem } from './actions/ModLockActionItem';
 import { useAppStore } from '../store/store';
 import { notifications } from '@mantine/notifications';
+import { cleanCategoryName } from './modCategory';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -217,6 +220,12 @@ export function ModBox(props: IModBoxProps) {
                   <Text c="dimmed" fz={'0.85rem'}>
                     <IconUser size={12} /> {fetched.author}
                   </Text>
+                  {mod.fetched?.category && (
+                    <Text c="dimmed" fz={'0.85rem'}>
+                      <IconTag size={12} />{' '}
+                      {cleanCategoryName(mod.fetched.category)}
+                    </Text>
+                  )}
                   {latestVersion?.affect_saves && (
                     <Tooltip
                       color="dark.8"
