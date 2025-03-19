@@ -182,7 +182,7 @@ export default function ModsListPage() {
 
           <Stack>
             <TextInput
-              placeholder="Search..."
+              placeholder="Search name, author..."
               value={query.text}
               onChange={(event) =>
                 setQuery({ text: event.currentTarget.value })
@@ -292,6 +292,7 @@ export default function ModsListPage() {
             <ModBox
               key={filteredMods[index].fetched.id}
               mod={filteredMods[index]}
+              setQuery={setQuery}
             />
           )}
         />

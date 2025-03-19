@@ -12,6 +12,8 @@ const defaultQuery: ModsQuery = {
   onlyInstalled: true,
 };
 
+export type SetModsQueryFn = (query: Partial<ModsQuery>) => void;
+
 export function useModsQuery() {
   const [query, setQuery] = useState<ModsQuery>({
     ...defaultQuery,
