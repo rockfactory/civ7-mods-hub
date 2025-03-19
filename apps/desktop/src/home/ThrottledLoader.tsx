@@ -8,7 +8,7 @@ interface ThrottledLoaderProps {
 
 const ThrottledLoader: React.FC<ThrottledLoaderProps> = ({
   loading,
-  delay = 500,
+  delay = 50,
 }) => {
   const [showLoader, setShowLoader] = useState(false);
   const [loadingTimeout, setLoadingTimeout] = useState<NodeJS.Timeout | null>(

@@ -2,7 +2,14 @@ html {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: scroll;
+
   /* overflow: hidden; */
+}
+
+body.civmods[data-scroll-locked] {
+  --removed-body-scroll-bar-size: 0px !important;
+  margin-right: 0 !important;
 }
 
 body {

@@ -284,6 +284,8 @@ export default function ModsListPage() {
       <AppShell.Main className="main">
         <LoadingOverlay visible={isFirstLoading} />
         <Virtuoso
+          // Too slow
+          // customScrollParent={document.body}
           useWindowScroll
           totalCount={filteredMods.length}
           itemContent={(index) => (
