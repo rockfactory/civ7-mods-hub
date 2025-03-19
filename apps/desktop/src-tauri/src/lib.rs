@@ -1,4 +1,4 @@
-use mods::{extract_archive, profiles::list_profiles, traversal::scan_civ_mods};
+use mods::{extract_archive, profiles::{delete_profile, list_profiles}, traversal::scan_civ_mods};
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
@@ -77,6 +77,7 @@ pub fn run() {
             list_profiles,
             restore_mods_from_profile,
             copy_mods_to_profile,
+            delete_profile
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

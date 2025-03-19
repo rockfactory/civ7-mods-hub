@@ -67,11 +67,6 @@ export function DuplicateProfileModal(props: IDuplicateProfileModalProps) {
                 .then(() => {
                   close();
                   props.onClose();
-                  notifications.show({
-                    title: 'Profile duplicated',
-                    message: 'Profile has been duplicated successfully',
-                    color: 'blue',
-                  });
                 })
                 .catch((error) => {
                   notifications.show({

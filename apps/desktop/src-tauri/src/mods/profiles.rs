@@ -193,3 +193,33 @@ pub async fn restore_mods_from_profile(
 
     Ok(())
 }
+
+/// Deletes a profile folder and all its contents.
+/// This is a destructive operation and cannot be undone.
+#[tauri::command]
+pub async fn delete_profile(app: AppHandle, profile_folder_name: String) -> Result<(), String> {
+    // Get the app_data directory
+    let app_data = app
+        .path()
+        .app_data_dir()
+        .map_err(|_e| "Failed to get appData directory")?;
+
+    // Define the target profile directory
+    let profile_dir = app_data.join("profiles").join(&profile_folder_name);
+
+    // Ensure the profile directory exists
+    if !profile_dir.exists() || !profile_dir.is_dir() {
+        return Err(format!(
+            "Profile folder '{}' does not exist or is not a directory",
+            profile_folder_name
+        ));
+    }
+
+    log::info!("Deleting profile folder: {:?}", profile_dir);
+
+    async_fs::remove_dir_all(&profile_dir)
+        .await
+        .map_err(|e| format!("Failed to delete profile folder: {}", e))?;
+
+    Ok(())
+}

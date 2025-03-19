@@ -18,13 +18,14 @@ import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { modals, openConfirmModal } from '@mantine/modals';
 import {
   copyModsToProfile,
+  invokeDeleteProfile,
   listProfiles,
   restoreModsFromProfile,
 } from './profileRustBindings';
 import { getActiveModsFolder } from '../mods/getModsFolder';
 import { ModProfile } from './ModProfile';
 import { kebabCase, snakeCase } from 'es-toolkit';
-import { Center, Loader } from '@mantine/core';
+import { Center, Loader, Text } from '@mantine/core';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -34,6 +35,7 @@ const pb = new PocketBase(
 export type ProfilesContextType = {
   switchProfile: (profile: ModProfile) => Promise<void>;
   duplicateProfile: (profile: ModProfile, title: string) => Promise<void>;
+  deleteProfile: (profile: ModProfile) => Promise<void>;
 };
 
 export const ProfilesContext = createContext({} as ProfilesContextType);
@@ -82,7 +84,7 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
     findProfiles().catch((e) => {
       console.error(e);
       notifications.show({
-        withBorder: true,
+        withBorder: false,
         title: 'Error',
         message: 'Failed to list profiles',
         color: 'red',
@@ -98,7 +100,7 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
 
     if (!previous) {
       notifications.show({
-        withBorder: true,
+        withBorder: false,
         title: 'Error',
         message: 'Failed to get previous profile',
         color: 'red',
@@ -109,7 +111,7 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
     const modsFolder = await getActiveModsFolder();
     if (modsFolder == null) {
       notifications.show({
-        withBorder: true,
+        withBorder: false,
         title: 'Error',
         message: 'Failed to get active mods folder',
         color: 'red',
@@ -145,7 +147,7 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
     } catch (e) {
       console.error(e);
       notifications.show({
-        withBorder: true,
+        withBorder: false,
         title: 'Failed to switch profile',
         message: String(e),
         color: 'red',
@@ -160,7 +162,7 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
       const modsFolder = await getActiveModsFolder();
       if (modsFolder == null) {
         notifications.show({
-          withBorder: true,
+          withBorder: false,
           title: 'Error',
           message: 'Failed to get active mods folder',
           color: 'red',
@@ -176,7 +178,7 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
         .profiles?.find((p) => p.folderName === folderName);
       if (existing) {
         notifications.show({
-          withBorder: true,
+          withBorder: false,
           title: 'Error',
           message: `Cannot create profile "${title}", found folder with similar name "${folderName}"`,
           color: 'red',
@@ -194,13 +196,80 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
       useAppStore.getState().setCurrentProfile(folderName);
 
       setReloadIndex((i) => i + 1);
+
+      notifications.show({
+        withBorder: false,
+        title: 'Profile duplicated',
+        message: 'Profile has been duplicated successfully',
+        color: 'green',
+      });
     },
     []
   );
 
+  const deleteProfile = useCallback(
+    async (profile: ModProfile) => {
+      if (useAppStore.getState().currentProfile === profile.folderName) {
+        console.error('Cannot delete current profile', profile.folderName);
+        notifications.show({
+          withBorder: false,
+          title: 'Error',
+          message: 'Cannot delete current profile',
+          color: 'red',
+        });
+        return;
+      }
+
+      openConfirmModal({
+        title: 'Delete profile',
+        children: (
+          <Text>
+            Are you sure you want to delete profile <b>{profile.title}</b>?
+          </Text>
+        ),
+        labels: {
+          cancel: 'Cancel',
+          confirm: 'Delete profile',
+        },
+        onConfirm: async () => {
+          try {
+            await invokeDeleteProfile(profile.folderName);
+            useAppStore
+              .getState()
+              .setProfiles(
+                useAppStore
+                  .getState()
+                  .profiles?.filter(
+                    (p) => p.folderName !== profile.folderName
+                  ) ?? []
+              );
+          } catch (e) {
+            console.error(e);
+            notifications.show({
+              withBorder: false,
+              title: 'Failed to delete profile',
+              message: String(e),
+              color: 'red',
+            });
+            return;
+          } finally {
+            setReloadIndex((i) => i + 1);
+          }
+
+          notifications.show({
+            title: 'Profile deleted',
+            message: 'Profile has been deleted successfully',
+            color: 'green',
+          });
+        },
+      });
+    },
+    [setReloadIndex]
+  );
+
   const value = useMemo(
-    () => ({ switchProfile, duplicateProfile }),
-    [switchProfile, duplicateProfile]
+    () => ({ switchProfile, duplicateProfile, deleteProfile }),
+    [switchProfile, duplicateProfile, deleteProfile]
   );
 
   return (

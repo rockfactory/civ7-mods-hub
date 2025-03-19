@@ -36,3 +36,9 @@ export async function restoreModsFromProfile(
     dryRun,
   });
 }
+
+export async function invokeDeleteProfile(
+  profileFolderName: string
+): Promise<void> {
+  return await invoke('delete_profile', { profileFolderName });
+}
