@@ -1,9 +1,10 @@
-use mods::{extract_archive, traversal::scan_civ_mods};
+use mods::{extract_archive, profiles::{delete_profile, list_profiles}, traversal::scan_civ_mods};
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
 mod mods;
 use crate::mods::get_civ_mods_folder;
+use mods::profiles::{copy_mods_to_profile, restore_mods_from_profile};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -72,7 +73,11 @@ pub fn run() {
             greet,
             get_mods_folder,
             extract_mod_archive,
-            scan_civ_mods
+            scan_civ_mods,
+            list_profiles,
+            restore_mods_from_profile,
+            copy_mods_to_profile,
+            delete_profile
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

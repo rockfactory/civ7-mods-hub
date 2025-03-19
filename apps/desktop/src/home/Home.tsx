@@ -34,6 +34,7 @@ import { useModsContext } from '../mods/ModsContext';
 import { SettingsDrawer } from '../settings/SettingsDrawer';
 import styles from './Home.module.css';
 import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
+import { ProfileSwitcher } from '../profiles/ProfileSwitcher';
 import { cleanCategoryName } from '../mods/modCategory';
 import { useModsQuery } from './ModsQuery';
 import { Virtuoso } from 'react-virtuoso';
@@ -142,11 +143,11 @@ export default function ModsListPage() {
   return (
     <AppShell
       padding="sm"
-      navbar={{ width: 300, breakpoint: 'sm' }}
+      navbar={{ width: 300, breakpoint: 'xs' }}
       header={{ height: 60 }}
     >
       <AppShell.Header p="xs" className={styles.header}>
-        <Group justify="flex-start" align="center" gap={0}>
+        <Group justify="flex-start" align="center" gap={0} wrap="nowrap">
           <Group gap="sm" w={300}>
             <Text fw={700} size="xl">
               Civ7 Mod Manager
@@ -160,15 +161,16 @@ export default function ModsListPage() {
               </ActionIcon>
             </Tooltip>
             <Space w={20} />
-            <ThrottledLoader loading={isQueryPending} />
+            <ThrottledLoader loading={isQueryPending || isLoadingInstalled} />
           </Group>
           <Group
             justify="space-between"
             align="center"
             gap="sm"
             flex="1 1 auto"
+            wrap="nowrap"
           >
-            <Group gap="sm">
+            <Group gap="sm" wrap="nowrap">
               <SegmentedControl
                 value={query.onlyInstalled ? 'installed' : 'available'}
                 onChange={(value) =>
@@ -188,6 +190,7 @@ export default function ModsListPage() {
                   },
                 ]}
               />
+              <ProfileSwitcher />
             </Group>
             <Group gap="sm">
               <SettingsDrawer />

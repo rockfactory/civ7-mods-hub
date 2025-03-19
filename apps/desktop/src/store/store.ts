@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { LazyStore, Store } from '@tauri-apps/plugin-store';
 import { resolve, appDataDir } from '@tauri-apps/api/path';
+import { ModProfile } from '../profiles/ModProfile';
 
 const persistStore = new LazyStore('civStorage.json', { autoSave: true });
 console.log();
@@ -36,6 +37,16 @@ export type AppState = {
    */
   lockedModIds?: string[];
   setModLock: (id: string, active?: boolean) => void;
+
+  /**
+   * Array of profiles that are stored
+   */
+  profiles?: ModProfile[];
+  currentProfile?: string;
+  setCurrentProfile: (profile: string) => void;
+  setProfiles: (profiles: ModProfile[]) => void;
+  addProfile: (profile: ModProfile) => void;
+  updateProfile: (profileIndex: number, update: Partial<ModProfile>) => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -45,8 +56,8 @@ export const useAppStore = create<AppState>()(
       setModFolder: (folder: string) => set({ modFolder: folder }),
       hydrated: false,
       setHydrated: (hydrated: boolean) => set({ hydrated }),
-      lockedModIds: [],
 
+      lockedModIds: [],
       setModLock: (id: string, active: boolean = true) => {
         const lockedModIds = get().lockedModIds ?? [];
 
@@ -57,6 +68,28 @@ export const useAppStore = create<AppState>()(
         } else {
           set({ lockedModIds: lockedModIds.filter((i) => i !== id) });
         }
+      },
+
+      profiles: [],
+      setProfiles: (profiles: ModProfile[]) => set({ profiles }),
+      setCurrentProfile: (profile: string) => {
+        set({ currentProfile: profile });
+      },
+      addProfile: (profile: ModProfile) => {
+        set({ profiles: [...(get().profiles ?? []), profile] });
+      },
+      updateProfile: (profileIndex: number, update: Partial<ModProfile>) => {
+        const profiles = get().profiles ?? [];
+        const profile = profiles[profileIndex];
+        if (!profile) return;
+
+        set({
+          profiles: [
+            ...profiles.slice(0, profileIndex),
+            { ...profile, ...update },
+            ...profiles.slice(profileIndex + 1),
+          ],
+        });
       },
     }),
     {

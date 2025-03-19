@@ -8,6 +8,7 @@
     "opener:default",
     "fs:default",
     "fs:write-all",
+    "fs:scope-appdata-recursive",
     {
       "identifier": "http:default",
       "allow": [
