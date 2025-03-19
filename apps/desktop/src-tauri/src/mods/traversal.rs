@@ -1,10 +1,10 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::fs::File;
-use std::fs::{self};
-use std::io::Read;
+use std::fs::{self, File};
+use std::io::{BufReader, Read, Write};
 use std::path::Path;
 use walkdir::WalkDir;
+
 #[derive(Serialize)]
 pub struct ModInfo {
     mod_name: String,
@@ -12,6 +12,14 @@ pub struct ModInfo {
     modinfo_id: Option<String>, // Extracted from XML <Mod id="...">
     folder_hash: String,
     folder_name: String,
+}
+
+/// XML struct for parsing .modinfo using serde
+#[derive(Debug, Deserialize)]
+#[serde(rename = "Mod")]
+struct ModXml {
+    #[serde(rename = "@id")]
+    id: Option<String>,
 }
 
 // Make sure this is aligned with the ignore list in the backend in Node.js
@@ -72,31 +80,44 @@ fn compute_folder_hash(directory: &Path) -> Result<String, String> {
 
 /// Parses the .modinfo XML and extracts the `id` attribute
 fn extract_mod_id(modinfo_path: &str) -> Option<String> {
-    use quick_xml::{events::Event, Reader};
+    let mut buffer = vec![];
+    sanitize_xml(File::open(modinfo_path).ok()?, &mut buffer).ok()?;
+    let sanitized = String::from_utf8_lossy(&buffer).to_string();
+    let mod_xml: ModXml = quick_xml::de::from_str(&sanitized).ok()?;
+    mod_xml.id
+}
 
-    let mut reader = Reader::from_file(modinfo_path).ok()?;
-    let reader_config = reader.config_mut();
-    reader_config.check_end_names = false;
-    reader_config.allow_unmatched_ends = true;
+fn sanitize_xml(reader: impl Read, writer: impl Write) -> quick_xml::Result<()> {
+    use quick_xml::{
+        errors::{Error, IllFormedError},
+        events::{BytesEnd, Event},
+        Reader, Writer,
+    };
 
-    let mut buf = Vec::new();
+    let mut reader = Reader::from_reader(BufReader::new(reader));
+    let mut writer = Writer::new(writer);
+
+    let mut buffer = Vec::new();
     loop {
-        match reader.read_event_into(&mut buf).ok()? {
-            Event::Eof => break None,
-            Event::Start(tag) if tag.name().as_ref().to_ascii_lowercase() == b"mod" => {
-                break tag.attributes().find_map(|attr| {
-                    attr.ok().and_then(|attr| {
-                        if attr.key.as_ref().to_ascii_lowercase() == b"id" {
-                            Some(String::from_utf8_lossy(&attr.value).to_string())
-                        } else {
-                            None
-                        }
-                    })
-                });
+        let event = match reader.read_event_into(&mut buffer) {
+            Ok(Event::Eof) => return Ok(()),
+            Ok(event) => event,
+            Err(Error::IllFormed(IllFormedError::MismatchedEndTag { expected, found })) => {
+                log::warn!("Mismatched end tag: expected: {expected:?}, found: {found:?}");
+                Event::End(BytesEnd::new(expected))
             }
-            _ => {}
-        }
-        buf.clear();
+            Err(Error::IllFormed(IllFormedError::MissingEndTag(tag))) => {
+                log::warn!("Missing end tag: {tag:?}");
+                Event::End(BytesEnd::new(tag))
+            }
+            Err(Error::IllFormed(IllFormedError::UnmatchedEndTag(tag))) => {
+                log::warn!("Unmatched end tag: {tag:?}");
+                Event::End(BytesEnd::new(tag))
+            }
+            Err(err) => return Err(err),
+        };
+        writer.write_event(event)?;
+        buffer.clear();
     }
 }
 
@@ -204,4 +225,33 @@ pub fn get_unlocked_mod_folders(
         .collect();
 
     Ok(unlocked_mods)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_xml() {
+        let xml = r#"<Item>ui/shell/extras/screen-extras.js</item>"#;
+        let mut output = vec![];
+        sanitize_xml(xml.as_bytes(), &mut output).unwrap();
+        assert_eq!(
+            String::from_utf8_lossy(&output),
+            r#"<Item>ui/shell/extras/screen-extras.js</Item>"#,
+        );
+    }
+
+    #[test]
+    fn test_parse_mod_xml() {
+        // NOTE: This is not a valid ModInfo XML
+        let xml = r#"<Mod id="a_mod"><Item>ui/shell/extras/screen-extras.js</item></Mod>"#;
+
+        let mut buffer = vec![];
+        sanitize_xml(xml.as_bytes(), &mut buffer).unwrap();
+        let sanitized = String::from_utf8_lossy(&buffer).to_string();
+
+        let mod_xml: ModXml = quick_xml::de::from_str(&sanitized).unwrap();
+        assert_eq!(mod_xml.id, Some("a_mod".to_string()));
+    }
 }
