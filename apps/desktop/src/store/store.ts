@@ -46,6 +46,7 @@ export type AppState = {
   setCurrentProfile: (profile: string) => void;
   setProfiles: (profiles: ModProfile[]) => void;
   addProfile: (profile: ModProfile) => void;
+  updateProfile: (profileIndex: number, update: Partial<ModProfile>) => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -76,6 +77,19 @@ export const useAppStore = create<AppState>()(
       },
       addProfile: (profile: ModProfile) => {
         set({ profiles: [...(get().profiles ?? []), profile] });
+      },
+      updateProfile: (profileIndex: number, update: Partial<ModProfile>) => {
+        const profiles = get().profiles ?? [];
+        const profile = profiles[profileIndex];
+        if (!profile) return;
+
+        set({
+          profiles: [
+            ...profiles.slice(0, profileIndex),
+            { ...profile, ...update },
+            ...profiles.slice(profileIndex + 1),
+          ],
+        });
       },
     }),
     {

@@ -24,7 +24,7 @@ import {
 import { getActiveModsFolder } from '../mods/getModsFolder';
 import { ModProfile } from './ModProfile';
 import { kebabCase, snakeCase } from 'es-toolkit';
-import { Loader } from '@mantine/core';
+import { Center, Loader } from '@mantine/core';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -47,7 +47,7 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
 
       const available = await listProfiles();
       console.log('Available profiles:', available);
-      const saved = currentState.profiles || [];
+      const saved = currentState.profiles ? [...currentState.profiles] : [];
       let next = saved; /*.filter((profile) =>
         available.includes(profile.folderName)
       );*/
@@ -119,7 +119,12 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
 
     let loadingId = modals.open({
       title: 'Switching profile...',
-      children: <Loader children="Analyzing profile..." />,
+      size: 'sm',
+      children: (
+        <Center>
+          <Loader />
+        </Center>
+      ),
     });
 
     try {
