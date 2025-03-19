@@ -28,3 +28,12 @@
 .descriptionBlock .tabler-icon {
   margin-top: 0.1rem;
 }
+
+.textAction {
+  cursor: pointer;
+  font-size: 0.85rem !important;
+}
+
+.textAction:hover {
+  color: var(--mantine-color-text-1) !important;
+}

@@ -70,6 +70,13 @@ export async function installMod(
   if (!response.ok) {
     throw new Error(`Failed to download mod: ${response.statusText}`);
   }
+  if (!response.url) {
+    console.error(
+      `Headers of failed download:`,
+      JSON.stringify(Object.fromEntries(response.headers.entries()))
+    );
+    throw new Error('Failed to download mod: no URL provided');
+  }
 
   console.log('Downloaded mod:', response.url);
 

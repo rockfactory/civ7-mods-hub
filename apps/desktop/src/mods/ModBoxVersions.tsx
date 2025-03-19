@@ -12,9 +12,20 @@ export interface IModBoxVersionsProps {
   loading?: boolean;
 }
 
+function humanizeSize(size: number) {
+  if (size < 1024) {
+    return `${size} B`;
+  } else if (size < 1024 * 1024) {
+    return `${(size / 1024).toFixed(2)} KB`;
+  } else {
+    return `${(size / 1024 / 1024).toFixed(2)} MB`;
+  }
+}
+
 export function ModBoxVersions(props: IModBoxVersionsProps) {
   const { mod } = props;
   const modVersions = mod.fetched.expand?.mod_versions_via_mod_id;
+
   return (
     <Box mt="sm" pos="relative">
       <LoadingOverlay visible={props.loading} />
@@ -23,7 +34,8 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
           <Table.Tr>
             <Table.Th>Version</Table.Th>
             <Table.Th>Release date</Table.Th>
-            <Table.Th>Actions</Table.Th>
+            <Table.Th>Size</Table.Th>
+            <Table.Th align="right">Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -32,6 +44,11 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
               <Table.Td>{version.name}</Table.Td>
               <Table.Td>
                 {DateFormatter.format(new Date(version.released || ''))}
+              </Table.Td>
+              <Table.Td>
+                {version.archive_size
+                  ? humanizeSize(version.archive_size)
+                  : 'N/A'}
               </Table.Td>
               <Table.Td align="right">
                 {isSameVersion(version, mod.local) ? (

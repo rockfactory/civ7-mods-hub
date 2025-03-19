@@ -22,6 +22,7 @@ import { ModVersionsRecord } from '../pocketbase-types';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { open } from '@tauri-apps/plugin-shell';
 import {
+  IconCategory,
   IconCheck,
   IconChecklist,
   IconCircleCheckFilled,
@@ -38,6 +39,7 @@ import {
   IconSettings,
   IconSettings2,
   IconSwitch,
+  IconTag,
   IconTransitionBottom,
   IconTrash,
   IconUser,
@@ -53,13 +55,16 @@ import { isSameVersion } from './isSameVersion';
 import { ModLockActionItem } from './actions/ModLockActionItem';
 import { useAppStore } from '../store/store';
 import { notifications } from '@mantine/notifications';
+import { cleanCategoryName } from './modCategory';
+import { SetModsQueryFn } from '../home/ModsQuery';
 
 export interface IModBoxProps {
   mod: ModData;
+  setQuery: SetModsQueryFn;
 }
 
 export function ModBox(props: IModBoxProps) {
-  const { mod } = props;
+  const { mod, setQuery } = props;
   const { local, fetched } = mod;
 
   const [loading, setLoading] = useState(false);
@@ -151,13 +156,12 @@ export function ModBox(props: IModBoxProps) {
   const [isChoosingVersion, setChoosingVersion] = useState(false);
 
   return (
-    <>
+    <Box pb="sm">
       <Card
         key={fetched.id}
         className={styles.modCard}
         shadow="sm"
         p="sm"
-        mb="sm"
         pos="relative"
         onClick={() => setSelected(!isSelected)}
       >
@@ -198,8 +202,7 @@ export function ModBox(props: IModBoxProps) {
                 <Group gap={4} align="flex-start">
                   <Text
                     c="dimmed"
-                    fz={'0.85rem'}
-                    style={{ cursor: 'pointer' }}
+                    className={styles.textAction}
                     onClick={(e) => {
                       const modinfo_id =
                         latestVersion?.modinfo_id ?? local?.modinfo_id ?? 'N/A';
@@ -214,9 +217,27 @@ export function ModBox(props: IModBoxProps) {
                     <IconCopy size={12} />{' '}
                     {latestVersion?.modinfo_id ?? local?.modinfo_id}
                   </Text>
-                  <Text c="dimmed" fz={'0.85rem'}>
+                  <Text
+                    c="dimmed"
+                    className={styles.textAction}
+                    onClick={() => {
+                      setQuery({ text: fetched.author });
+                    }}
+                  >
                     <IconUser size={12} /> {fetched.author}
                   </Text>
+                  {mod.fetched?.category && (
+                    <Text
+                      c="dimmed"
+                      className={styles.textAction}
+                      onClick={() => {
+                        setQuery({ category: mod.fetched.category });
+                      }}
+                    >
+                      <IconTag size={12} />{' '}
+                      {cleanCategoryName(mod.fetched.category)}
+                    </Text>
+                  )}
                   {latestVersion?.affect_saves && (
                     <Tooltip
                       color="dark.8"
@@ -338,6 +359,6 @@ export function ModBox(props: IModBoxProps) {
           />
         </Modal>
       )}
-    </>
+    </Box>
   );
 }

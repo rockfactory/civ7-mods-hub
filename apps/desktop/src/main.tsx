@@ -7,6 +7,8 @@ import './log/forwardLogs';
 // core styles are required for all packages
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import './main.css';
+
 import { registerDeepLink } from './mods/deep-links/registerDeepLink';
 import { checkForAppUpdates } from './settings/autoUpdater';
 
