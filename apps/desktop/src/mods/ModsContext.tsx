@@ -94,6 +94,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       setIsFetching(true);
       try {
         const records = await pb.collection('mods').getFullList<FetchedMod>({
+          filter: 'cf_id != "32088"',
           expand: 'mod_versions_via_mod_id',
           sort: '-mod_updated',
         });
