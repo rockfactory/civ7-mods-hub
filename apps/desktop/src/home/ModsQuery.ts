@@ -4,12 +4,14 @@ export interface ModsQuery {
   text: string;
   category: string;
   onlyInstalled: boolean;
+  state: '' | 'needsUpdate' | 'locked' | 'uninstalled';
 }
 
 const defaultQuery: ModsQuery = {
   text: '',
   category: '',
   onlyInstalled: true,
+  state: '',
 };
 
 export type SetModsQueryFn = (query: Partial<ModsQuery>) => void;
@@ -28,6 +30,7 @@ export function useModsQuery() {
       startTransition(() => {
         setQuery((q) => ({
           ...q,
+          ...(newQuery.state === 'uninstalled' ? { onlyInstalled: false } : {}),
           ...newQuery,
         }));
       });

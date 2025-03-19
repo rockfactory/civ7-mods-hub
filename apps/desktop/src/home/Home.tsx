@@ -38,6 +38,8 @@ import { cleanCategoryName } from '../mods/modCategory';
 import { useModsQuery } from './ModsQuery';
 import { Virtuoso } from 'react-virtuoso';
 import ThrottledLoader from './ThrottledLoader';
+import { isSameVersion } from '../mods/isSameVersion';
+import { useAppStore } from '../store/store';
 
 export default function ModsListPage() {
   const {
@@ -62,6 +64,8 @@ export default function ModsListPage() {
         .filter(({ local }) => local?.modinfo_id)
         .map(({ local }) => local?.modinfo_id)
     );
+
+    const lockedModIds = new Set(useAppStore.getState().lockedModIds);
 
     return mods.filter((mod) => {
       let shouldInclude = true;
@@ -92,6 +96,24 @@ export default function ModsListPage() {
           installedModIds.has(
             mod.fetched.expand?.mod_versions_via_mod_id[0].modinfo_id
           );
+      }
+
+      if (query.state === 'needsUpdate') {
+        shouldInclude =
+          shouldInclude &&
+          mod.local?.modinfo_id != null &&
+          !isSameVersion(
+            mod.fetched.expand?.mod_versions_via_mod_id[0],
+            mod.local
+          ) &&
+          !lockedModIds.has(mod.local.modinfo_id);
+      } else if (query.state === 'locked') {
+        shouldInclude =
+          shouldInclude &&
+          mod.local?.modinfo_id != null &&
+          lockedModIds.has(mod.local.modinfo_id);
+      } else if (query.state === 'uninstalled') {
+        shouldInclude = shouldInclude && !mod.local;
       }
 
       return shouldInclude;
@@ -210,6 +232,18 @@ export default function ModsListPage() {
               value={query.category || null}
               clearable
               onChange={(value) => setQuery({ category: value ?? '' })}
+            />
+            <Select
+              size="sm"
+              placeholder="Filter by state..."
+              value={query.state || null}
+              clearable
+              onChange={(value) => setQuery({ state: (value as any) ?? '' })}
+              data={[
+                { label: 'Needs Update', value: 'needsUpdate' },
+                { label: 'Locked', value: 'locked' },
+                { label: 'Not Installed', value: 'uninstalled' },
+              ]}
             />
             {hasFilters && (
               <Button
