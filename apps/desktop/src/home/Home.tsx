@@ -11,22 +11,13 @@ import {
   Box,
   Button,
   Tooltip,
-  BackgroundImage,
   LoadingOverlay,
   SegmentedControl,
   Select,
   Space,
   Loader,
 } from '@mantine/core';
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useTransition,
-} from 'react';
-import PocketBase from 'pocketbase';
-import { invoke } from '@tauri-apps/api/core';
+import { useState, useEffect, useMemo } from 'react';
 import {
   IconChecks,
   IconDownload,
@@ -35,6 +26,7 @@ import {
   IconFolder,
   IconRefresh,
   IconSearch,
+  IconX,
 } from '@tabler/icons-react';
 import { ModBox } from '../mods/ModBox';
 import { useApplyUpdates } from '../mods/checkUpdates';
@@ -44,6 +36,8 @@ import styles from './Home.module.css';
 import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
 import { cleanCategoryName } from '../mods/modCategory';
 import { useModsQuery } from './ModsQuery';
+import { Virtuoso } from 'react-virtuoso';
+import ThrottledLoader from './ThrottledLoader';
 
 export default function ModsListPage() {
   const {
@@ -144,7 +138,7 @@ export default function ModsListPage() {
               </ActionIcon>
             </Tooltip>
             <Space w={20} />
-            {isQueryPending && <Loader size={20} />}
+            <ThrottledLoader loading={isQueryPending} />
           </Group>
           <Group
             justify="space-between"
@@ -188,18 +182,33 @@ export default function ModsListPage() {
 
           <Stack>
             <TextInput
-              placeholder="Search..."
+              placeholder="Search name, author..."
               value={query.text}
               onChange={(event) =>
                 setQuery({ text: event.currentTarget.value })
               }
-              rightSection={<IconSearch size={16} />}
+              rightSection={
+                query.text ? (
+                  <ActionIcon
+                    variant="transparent"
+                    color="gray.7"
+                    onClick={() => setQuery({ text: '' })}
+                  >
+                    <IconX size={16} />
+                  </ActionIcon>
+                ) : (
+                  <IconSearch size={16} />
+                )
+              }
+              rightSectionPointerEvents={query.text ? 'auto' : 'none'}
             />
             <Select
               placeholder="Filter by category.."
               size="sm"
-              searchable
+              // searchable
               data={categories}
+              value={query.category || null}
+              clearable
               onChange={(value) => setQuery({ category: value ?? '' })}
             />
             {hasFilters && (
@@ -216,8 +225,9 @@ export default function ModsListPage() {
           {/* <Button mt="md" onClick={applyFilters}>
           Apply Filters
         </Button> */}
-
-          <Stack mt="md">
+        </AppShell.Section>
+        <AppShell.Section>
+          <Stack mb="md">
             {availableUpdates.length > 0 ? (
               <Tooltip
                 color="dark.8"
@@ -254,8 +264,7 @@ export default function ModsListPage() {
               </Button>
             )}
           </Stack>
-        </AppShell.Section>
-        <AppShell.Section>
+
           <Box p="sm" bg="dark.8" style={{ borderRadius: '8px' }}>
             {/* <BackgroundImage src="https://www.civfanatics.com/wp-content/uploads/2016/10/logo.png"> */}
             <Text fz="sm" c="dimmed">
@@ -274,23 +283,34 @@ export default function ModsListPage() {
 
       <AppShell.Main className="main">
         <LoadingOverlay visible={isFirstLoading} />
-        <ScrollArea scrollbars="y" className="scroll-area">
-          {filteredMods.map((mod) => (
-            <ModBox key={mod.fetched.id} mod={mod} />
-          ))}
-          {filteredMods.length === 0 && (
-            <Box p="lg">
-              <Stack gap={'xs'} align="center">
-                <IconEyeQuestion size={40} />
-                <Text>No mods found</Text>
-                <Text c="dimmed">
-                  Try changing your filters or open Settings and double check
-                  Mods folder
-                </Text>
-              </Stack>
-            </Box>
+        <Virtuoso
+          // Too slow
+          // customScrollParent={document.body}
+          useWindowScroll
+          totalCount={filteredMods.length}
+          itemContent={(index) => (
+            <ModBox
+              key={filteredMods[index].fetched.id}
+              mod={filteredMods[index]}
+              setQuery={setQuery}
+            />
           )}
-        </ScrollArea>
+        />
+        {/* {filteredMods.map((mod) => (
+            <ModBox key={mod.fetched.id} mod={mod} />
+          ))} */}
+        {filteredMods.length === 0 && (
+          <Box p="lg">
+            <Stack gap={'xs'} align="center">
+              <IconEyeQuestion size={40} />
+              <Text>No mods found</Text>
+              <Text c="dimmed">
+                Try changing your filters or open Settings and double check Mods
+                folder
+              </Text>
+            </Stack>
+          </Box>
+        )}
       </AppShell.Main>
     </AppShell>
   );
