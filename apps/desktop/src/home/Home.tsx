@@ -26,6 +26,7 @@ import {
   IconFolder,
   IconRefresh,
   IconSearch,
+  IconX,
 } from '@tabler/icons-react';
 import { ModBox } from '../mods/ModBox';
 import { useApplyUpdates } from '../mods/checkUpdates';
@@ -36,6 +37,7 @@ import { useInstallDeepLink } from '../mods/deep-links/useInstallDeepLink';
 import { cleanCategoryName } from '../mods/modCategory';
 import { useModsQuery } from './ModsQuery';
 import { Virtuoso } from 'react-virtuoso';
+import ThrottledLoader from './ThrottledLoader';
 
 export default function ModsListPage() {
   const {
@@ -136,7 +138,7 @@ export default function ModsListPage() {
               </ActionIcon>
             </Tooltip>
             <Space w={20} />
-            {isQueryPending && <Loader size={20} />}
+            <ThrottledLoader loading={isQueryPending} />
           </Group>
           <Group
             justify="space-between"
@@ -185,13 +187,28 @@ export default function ModsListPage() {
               onChange={(event) =>
                 setQuery({ text: event.currentTarget.value })
               }
-              rightSection={<IconSearch size={16} />}
+              rightSection={
+                query.text ? (
+                  <ActionIcon
+                    variant="transparent"
+                    color="gray.7"
+                    onClick={() => setQuery({ text: '' })}
+                  >
+                    <IconX size={16} />
+                  </ActionIcon>
+                ) : (
+                  <IconSearch size={16} />
+                )
+              }
+              rightSectionPointerEvents={query.text ? 'auto' : 'none'}
             />
             <Select
               placeholder="Filter by category.."
               size="sm"
-              searchable
+              // searchable
               data={categories}
+              value={query.category || null}
+              clearable
               onChange={(value) => setQuery({ category: value ?? '' })}
             />
             {hasFilters && (
@@ -208,8 +225,9 @@ export default function ModsListPage() {
           {/* <Button mt="md" onClick={applyFilters}>
           Apply Filters
         </Button> */}
-
-          <Stack mt="md">
+        </AppShell.Section>
+        <AppShell.Section>
+          <Stack mb="md">
             {availableUpdates.length > 0 ? (
               <Tooltip
                 color="dark.8"
@@ -246,8 +264,7 @@ export default function ModsListPage() {
               </Button>
             )}
           </Stack>
-        </AppShell.Section>
-        <AppShell.Section>
+
           <Box p="sm" bg="dark.8" style={{ borderRadius: '8px' }}>
             {/* <BackgroundImage src="https://www.civfanatics.com/wp-content/uploads/2016/10/logo.png"> */}
             <Text fz="sm" c="dimmed">

@@ -36,8 +36,9 @@ export function useModsQuery() {
   const resetQuery = useCallback(() => {
     setQueryWithTransition({
       ...defaultQuery,
+      onlyInstalled: query.onlyInstalled,
     });
-  }, [setQueryWithTransition]);
+  }, [query, setQueryWithTransition]);
 
   return {
     query,
