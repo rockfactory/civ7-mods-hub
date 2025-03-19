@@ -22,18 +22,30 @@
         Download for Windows
       </a>
     </div>
+    {{#if release.downloads.macos_universal}}
+    <div id="download-macos_universal" class="download-card" data-platform="macos">
+      <a href="{{release.downloads.macos_universal}}" role="button">
+        {{{icon 'outline/brand-finder' 24}}}
+        Download for macOS <small>(Universal)</small>
+      </a>
+    </div>
+    {{/if}}
+    {{#if release.downloads.macos_intel}}
     <div id="download-macos_intel" class="download-card" data-platform="macos">
       <a href="{{release.downloads.macos_intel}}" role="button">
         {{{icon 'outline/brand-finder' 24}}}
         Download for macOS <small>(Intel)</small>
       </a>
     </div>
+    {{/if}}
+    {{#if release.downloads.macos_arm}}
     <div id="download-macos_arm" class="download-card" data-platform="macos">
       <a href="{{release.downloads.macos_arm}}" role="button">
         {{{icon 'outline/brand-finder' 24}}}
         Download for macOS <small>(Apple Silicon)</small>
       </a>
     </div>
+    {{/if}}
     <div id="download-linux" class="download-card" data-platform="linux">
       <a href="{{release.downloads.linux}}" role="button">
         {{{icon 'outline/brand-ubuntu' 32}}}

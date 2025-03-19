@@ -3,6 +3,7 @@ const PLATFORM_PATTERNS = {
   windows: /CivMods_.*_x64.*\.msi$/,
   macos_intel: /CivMods_.*_x64\.dmg$/,
   macos_arm: /CivMods_.*_aarch64\.dmg$/,
+  macos_universal: /CivMods_.*_universal\.dmg$/,
   linux: /CivMods_.*_amd64\.AppImage$/,
 };
 
@@ -16,6 +17,7 @@ export interface Release {
     windows?: string;
     macos_intel?: string;
     macos_arm?: string;
+    macos_universal?: string;
     linux?: string;
   };
 }
@@ -107,6 +109,8 @@ export async function getGithubRelease(
         release.downloads.macos_arm = downloadUrl;
       } else if (PLATFORM_PATTERNS.linux.test(fileName)) {
         release.downloads.linux = downloadUrl;
+      } else if (PLATFORM_PATTERNS.macos_universal.test(fileName)) {
+        release.downloads.macos_universal = downloadUrl;
       }
     }
 
