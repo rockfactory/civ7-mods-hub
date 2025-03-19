@@ -21,7 +21,7 @@ export function useModsQuery() {
     ...defaultQuery,
   });
 
-  const hasFilters = query.text || query.category;
+  const hasFilters = query.text || query.category || query.state;
 
   const [isPending, startTransition] = useTransition();
 
