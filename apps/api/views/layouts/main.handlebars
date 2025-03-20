@@ -50,6 +50,7 @@
   <link rel='stylesheet' href='/static/main.css' />
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.indigo.min.css' />
   <title>{{title}} | CivMods - Easily Install Civilization 7 Mods</title>
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="27a1674e-121f-4e90-bd36-88ac3bb94afd"></script>
 </head>
 
 <body>
@@ -64,7 +65,8 @@
           <img src="/static/logo.png" alt="CivMods Logo" width="32" />
         </li>
       </ul>
-      <ul>
+
+      <ul id="nav-menu">
         <li>
           <a href="/">
             Home
@@ -77,7 +79,13 @@
         </li>
         <li>
           <a href="/modders">
-            For Modders
+            Modders
+          </a>
+        </li>
+        <li>
+          <a class="icon-nav" title="Open CivMods Repository on GitHub"
+            href="https://github.com/rockfactory/civ7-mods-hub" target="_blank">
+            {{{icon 'outline/brand-github' 22}}}
           </a>
         </li>
       </ul>
@@ -93,9 +101,15 @@
       CivMods is not affiliated with Firaxis Games, Take-Two Interactive, or any other company.
     </p>
     <p>
-      <a href="https://github.com/rockfactory/civ7-mods-hub">GitHub</a>
+      <a href="https://github.com/rockfactory/civ7-mods-hub">
+        {{{icon 'outline/brand-github' 20 }}}
+        GitHub
+      </a>
     </p>
-    <p>&copy; 2025 CivMods.com &bullet; Made by LeonardFactory</p>
+    <p>&copy; 2025 CivMods.com &bullet;
+      <a href="/privacy-policy" class="secondary">Privacy Policy</a> &bullet;
+      Made by leonardfactory & contributors
+    </p>
   </footer>
 
   {{{_sections.scripts}}}

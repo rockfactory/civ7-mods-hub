@@ -137,7 +137,9 @@ app.get('/modders', async (req, res) => {
   res.render('modders', { title: 'Modders' });
 });
 
-app.post('/mods/import', async (req, res) => {});
+app.get('/privacy-policy', async (req, res) => {
+  res.render('privacy', { title: 'Privacy Policy' });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
