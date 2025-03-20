@@ -20,6 +20,7 @@
     "express-handlebars": "^8.0.1",
     "fast-xml-parser": "^5.0.8",
     "lodash": "^4.17.21",
+    "lz-string": "^1.5.0",
     "marked": "^15.0.7",
     "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",

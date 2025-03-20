@@ -3,13 +3,16 @@ import { useAppStore } from '../store/store';
 import {
   ActionIcon,
   Button,
+  Code,
   ComboboxData,
   ComboboxItemGroup,
+  CopyButton,
   Group,
   Select,
   Stack,
   Text,
   TextInput,
+  Tooltip,
 } from '@mantine/core';
 import { useCallback, useMemo, useState } from 'react';
 import { useProfilesContext } from './ProfilesContext';
@@ -20,15 +23,20 @@ import { ModProfile } from './ModProfile';
 import {
   IconAlertCircle,
   IconCards,
+  IconCheck,
   IconCircleCheckFilled,
+  IconCopy,
   IconCopyPlus,
   IconDots,
   IconPencil,
   IconPlayCard,
   IconPlayerPlayFilled,
+  IconShare,
   IconStack2,
 } from '@tabler/icons-react';
 import { EditProfilesModal } from './EditProfilesModal';
+import { generateProfileCode } from './generateProfileCode';
+import { useModsContext } from '../mods/ModsContext';
 
 export interface IProfileSwitcherProps {}
 
@@ -51,6 +59,7 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
         items: [
           { value: '$duplicate', label: 'Duplicate current' },
           { value: '$edit', label: 'Edit profiles' },
+          { value: '$share', label: 'Share profile' },
         ],
       },
       {
@@ -72,6 +81,63 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
 
     setDuplicatingProfile(profile);
   }, [currentProfile, profiles]);
+
+  const modsData = useModsContext().mods;
+
+  const handleShare = useCallback(
+    async (profile: ModProfile) => {
+      let profileCode: string;
+      try {
+        profileCode = await generateProfileCode(modsData, profile);
+      } catch (e) {
+        console.error(e);
+        notifications.show({
+          withBorder: false,
+          title: 'Failed to generate profile code',
+          message: String(e),
+          color: 'red',
+        });
+        return;
+      }
+
+      modals.open({
+        title: 'Share profile',
+        children: (
+          <Stack>
+            <Text size="sm">
+              Share this profile Code with other players to let them install it
+              directly.
+            </Text>
+            <Group wrap="nowrap">
+              <Code>{profileCode}</Code>
+              <CopyButton value={profileCode} timeout={2000}>
+                {({ copied, copy }) => (
+                  <Tooltip
+                    label={copied ? 'Copied' : 'Copy'}
+                    withArrow
+                    position="right"
+                  >
+                    <ActionIcon
+                      color={copied ? 'teal' : 'gray'}
+                      variant="subtle"
+                      onClick={copy}
+                    >
+                      {copied ? (
+                        <IconCheck size={16} />
+                      ) : (
+                        <IconCopy size={16} />
+                      )}
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+              </CopyButton>
+            </Group>
+          </Stack>
+        ),
+      });
+    },
+    [modsData]
+  );
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -124,6 +190,7 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
                   <IconCopyPlus size={16} />
                 )}
                 {option.option.value === '$edit' && <IconPencil size={16} />}
+                {option.option.value === '$share' && <IconShare size={16} />}
                 <Text size="sm" c={option.checked ? 'green' : undefined}>
                   {option.option.label}
                 </Text>
@@ -140,14 +207,19 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
           }
           searchable
           onChange={(value, option) => {
-            if (option?.value === '$duplicate') {
-              handleDuplicate();
-            } else if (option?.value === '$edit') {
-              setIsEditing(true);
-            } else if (option?.value != null) {
-              switchProfile(
-                profiles?.find((p) => p.folderName === option.value)!
-              );
+            switch (option?.value) {
+              case '$duplicate':
+                return handleDuplicate();
+              case '$edit':
+                return setIsEditing(true);
+              case '$share':
+                return handleShare(
+                  profiles?.find((p) => p.folderName === currentProfile)!
+                );
+              default:
+                return switchProfile(
+                  profiles?.find((p) => p.folderName === option.value)!
+                );
             }
           }}
         />

@@ -20,6 +20,7 @@ import { isSameVersion } from './isSameVersion';
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { openConfirmModal } from '@mantine/modals';
 import { getActiveModsFolder } from './getModsFolder';
+import { invokeScanCivMods } from './modsRustBindings';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -63,9 +64,8 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       console.log('Mods folder:', folder);
 
       try {
-        const modsInfo = await invoke<ModInfo[]>('scan_civ_mods', {
-          modsFolderPath: folder,
-        });
+        // Missing mods folder error is handled in rust bindings
+        const modsInfo = await invokeScanCivMods(folder!);
 
         setModsInfo(modsInfo);
         console.log(
