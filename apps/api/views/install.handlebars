@@ -4,10 +4,10 @@
       If you don't have CivMods installed, you can download it from the link below.
     </p>
     <p class="download-help">
-      Once you have installed CivMods, click the button below to install the mod.
+      Once you have installed CivMods, click the button below <strong>Install with CivMods</strong> to install the mod.
     </p>
-    <a id="download-btn" role="button" href="https://github.com/rockfactory/civ7-mods-hub/releases/latest">
-      Download CivMods
+    <a id="download-btn" role="button" href="https://civmods.com/releases/latest">
+      {{{icon 'outline/download' 24}}} Download CivMods
     </a>
   </article>
 
@@ -16,14 +16,14 @@
       You're about to install the following mod
     </header>
     {{#if mod.icon_url}}
-    <img src="{{mod.icon_url}}" alt="{{mod.name}}" />
+    <img class="mod-icon" src="{{mod.icon_url}}" alt="{{mod.name}}" />
     {{/if}}
     <h2>{{mod.name}}</h2>
     <p>{{mod.short_description}}</p>
 
     <a id="install-button" role="button" aria-busy="true" aria-label="Installing with CivMods..."
       href="civmods://install/?modId={{mod.id}}">
-      Installing with CivMods...
+      {{{icon 'outline/hexagon-plus' 24}}} <span class="text">Installing with CivMods...</span>
     </a>
     <footer>
       <a href="{{mod.url}}" target="_blank" rel="noopener noreferrer">
@@ -52,7 +52,7 @@
     // If the app isn't installed, show the download button
     setTimeout(function () {
       document.querySelector("a#install-button").removeAttribute("aria-busy");
-      document.querySelector("a#install-button").innerText = "Install with CivMods";
+      document.querySelector("a#install-button .text").innerText = "Install with CivMods";
       document.getElementById("not-installed").classList.remove("hidden");
     }, 2000);
 

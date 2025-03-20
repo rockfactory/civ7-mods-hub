@@ -123,6 +123,13 @@ article > header.mod-header {
   background-color: #292c4c;
 }
 
+img.mod-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
 .logo-container {
   display: flex;
   justify-content: center;
