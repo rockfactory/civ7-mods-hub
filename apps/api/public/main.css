@@ -2,6 +2,17 @@
   --civ-gradient: linear-gradient(90deg, #bfbeda, #dbc795);
 }
 
+@media (max-width: 768px) {
+  header .logo-container h1 {
+    /* display: none; */
+    font-size: 1.2rem;
+  }
+}
+
+a.icon-nav svg {
+  margin-top: 0.18em;
+}
+
 .hero {
   display: flex;
   flex-direction: column;
@@ -96,12 +107,15 @@ header h1 {
 }
 
 .screen {
-  margin-top: 4rem;
-  background-image: url('/static/screen-background.png');
-  background-size: contain;
-  background-position: top center;
-  height: 600px;
+  margin-top: 2.5rem;
+  width: 100%;
+  text-align: center;
   /* // Colorful gradient as shadow */
+}
+
+.screen img {
+  max-width: 100%;
+  max-height: 600px;
   box-shadow: 0 0 10px 10px var(--civ-gradient);
 }
 

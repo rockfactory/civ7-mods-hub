@@ -5,6 +5,7 @@ import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
 import { isSameVersion } from './isSameVersion';
 import { useAppStore } from '../store/store';
+import { installMod } from './installMod';
 
 export interface IModUpdate {
   mod: ModData;
@@ -46,7 +47,7 @@ export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
 }
 
 export function useApplyUpdates() {
-  const { mods, install, uninstall, triggerReload } = useModsContext();
+  const { mods, triggerReload } = useModsContext();
 
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -70,10 +71,8 @@ export function useApplyUpdates() {
           continue;
         }
 
-        if (update.mod.local) {
-          await uninstall(update.mod);
-        }
-        await install(update.mod, update.targetVersion!);
+        // Install already handles uninstalling the previous version
+        await installMod(update.mod, update.targetVersion!);
       } catch (error) {
         errors.push(error);
         console.error('Failed to apply update:', error);
@@ -99,7 +98,7 @@ export function useApplyUpdates() {
     triggerReload();
     setIsUpdating(false);
     return errors;
-  }, [availableUpdates, install, triggerReload, uninstall]);
+  }, [availableUpdates, triggerReload]);
 
   return {
     applyUpdates,

@@ -13,7 +13,7 @@ import { sortVersionsByDate } from './fetchMods';
 import { TypedPocketBase } from '../pocketbase-types';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 import { useAppStore } from '../store/store';
-import { installMod, uninstallMod } from './installMod';
+import { installMod, runLowLevelInstallMod, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
 import { open } from '@tauri-apps/plugin-dialog';
 import { isSameVersion } from './isSameVersion';
@@ -21,6 +21,12 @@ import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { openConfirmModal } from '@mantine/modals';
 import { getActiveModsFolder } from './getModsFolder';
 import { invokeScanCivMods } from './modsRustBindings';
+import {
+  invokeBackupModToTemp,
+  invokeCleanupModBackup,
+  invokeRestoreModFromTemp,
+} from './commands/modsRustBindings';
+import { getModFolderPath } from './commands/getModFolderPath';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -161,39 +167,44 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
   }, []);
 
   /**
-   * Uninstall mod
+   * Uninstall mod.
+   * Handles notifications
    */
   const uninstall = useCallback(
     async (mod: ModData) => {
       if (!mod.local) {
-        throw new Error('Mod is not installed');
+        notifications.show({
+          color: 'red',
+          title: 'Failed to uninstall mod',
+          message: 'Local mod data not found',
+        });
+        return;
       }
 
-      const folder = await getModsFolder();
-      await uninstallMod(mod.local, folder);
-      triggerReload();
+      try {
+        await uninstallMod(mod.local);
+      } catch (error) {
+        notifications.show({
+          color: 'red',
+          title: 'Failed to uninstall mod',
+          message: String(error),
+        });
+      } finally {
+        triggerReload();
+      }
     },
     [getModsFolder, triggerReload]
   );
 
   /**
-   * Install mod with specific version
+   * Install mod with specific version.
+   * Handles notifications
    */
   const install = useCallback(
     async (mod: ModData, version: ModVersionsRecord) => {
-      if (!version?.download_url) {
-        throw new Error(
-          `Mod ${mod.fetched.name} v: ${version?.name} has no download URL`
-        );
-      }
-
-      const modsFolder = await getModsFolder();
-
       try {
-        if (mod.local != null) {
-          await uninstallMod(mod.local, modsFolder);
-        }
-        await installMod(version, { modsFolderPath: modsFolder });
+        await installMod(mod, version);
+
         triggerReload();
 
         notifications.show({
@@ -202,7 +213,6 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
           message: `${mod.fetched.name} ${version.name} installed successfully`,
         });
       } catch (error) {
-        console.error('Failed to install mod:', error);
         notifications.show({
           color: 'red',
           title: 'Failed to install mod',
@@ -210,7 +220,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         });
       }
     },
-    [triggerReload, getModsFolder]
+    [triggerReload]
   );
 
   const chooseModFolder = useCallback(async () => {
