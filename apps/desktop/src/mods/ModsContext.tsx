@@ -21,6 +21,7 @@ import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { openConfirmModal } from '@mantine/modals';
 import { getActiveModsFolder } from './getModsFolder';
 import { invokeScanCivMods } from './commands/modsRustBindings';
+import { computeModsData } from './commands/computeModsData';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
@@ -29,6 +30,7 @@ const pb = new PocketBase(
 
 export type ModsContextType = {
   mods: ModData[];
+  fetchedMods: FetchedMod[];
   uninstall: (mod: ModData) => Promise<void>;
   install: (mod: ModData, version: ModVersionsRecord) => Promise<void>;
   triggerReload: () => void;
@@ -136,23 +138,9 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
    * Map fetched mods to local mods
    */
   const mods = useMemo(() => {
-    return fetchedMods.map((fetchedMod) => {
-      const local = modsInfo.find(
-        (info) =>
-          info.modinfo_id ===
-          fetchedMod.expand?.mod_versions_via_mod_id[0].modinfo_id
-      );
-
-      const installedVersion = fetchedMod.expand?.mod_versions_via_mod_id.find(
-        (version) => isSameVersion(version, local)
-      );
-
-      return {
-        fetched: fetchedMod,
-        local,
-        installedVersion,
-        isUnknown: !installedVersion && local != null,
-      } as ModData;
+    return computeModsData({
+      fetchedMods,
+      modsInfo,
     });
   }, [fetchedMods, modsInfo]);
 
@@ -253,6 +241,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       isFetching,
       isLoadingInstalled,
       getModsFolder,
+      fetchedMods,
     }),
     [
       mods,
@@ -263,6 +252,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       isFetching,
       isLoadingInstalled,
       getModsFolder,
+      fetchedMods,
     ]
   );
 

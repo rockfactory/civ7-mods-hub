@@ -20,7 +20,7 @@ export interface IImportProfileModalProps {
 
 export function ImportProfileModal(props: IImportProfileModalProps) {
   const { isOpen } = props;
-  const importProfile = useImportProfile();
+  const { importProfile, cancelImport } = useImportProfile();
   const [title, setTitle] = useState('');
 
   const [profileCode, setProfileCode] = useState('');
@@ -48,10 +48,12 @@ export function ImportProfileModal(props: IImportProfileModalProps) {
       closeOnEscape={!isImporting}
       title="Import profile"
       onClose={() => {
-        props.onClose();
+        cancelImport();
+        if (isImporting) return;
         setProfileCode('');
         setIsValid(false);
         setTitle('');
+        props.onClose();
       }}
     >
       <Box pos="relative">

@@ -1,19 +1,39 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useModsContext } from '../../mods/ModsContext';
 import { IShareableMod, unhashProfileCodes } from '@civmods/parser';
 import { createNewProfile } from '../commands/createNewProfile';
 import { modals } from '@mantine/modals';
-import { Center, Loader } from '@mantine/core';
-import { installMod } from '../../mods/installMod';
+import { Center, Loader, Progress, Stack, Text } from '@mantine/core';
+import { installMod, isModLocked } from '../../mods/installMod';
 import { ModData } from '../../home/IModInfo';
 import { notifications } from '@mantine/notifications';
+import { getActiveModsFolder } from '../../mods/getModsFolder';
+import { invokeScanCivMods } from '../../mods/commands/modsRustBindings';
+import { computeModsData } from '../../mods/commands/computeModsData';
+
+type ImportResult = {
+  status: 'warning' | 'error' | 'success';
+  message: string;
+};
 
 export function useImportProfile() {
-  const { mods: modsData } = useModsContext();
+  // We don't use installed mods data here, just fetched.
+  const { fetchedMods, triggerReload } = useModsContext();
 
-  return useCallback(
+  const isImportCanceled = useRef<boolean>(false);
+
+  const cancelImport = useCallback(() => {
+    isImportCanceled.current = true;
+  }, []);
+
+  const importProfile = useCallback(
     async (title: string, profileCode: string) => {
-      if (!modsData) return;
+      isImportCanceled.current = false;
+
+      if (!fetchedMods) {
+        console.warn('No fetched mods data. cannot import profile: ' + title);
+        return;
+      }
 
       let modalId = modals.open({
         title: 'Importing profile...',
@@ -26,8 +46,18 @@ export function useImportProfile() {
       });
 
       try {
+        const modsFolder = await getActiveModsFolder();
+        if (!modsFolder) {
+          throw new Error('Could not get active mods folder');
+        }
+
         const sharedProfile = unhashProfileCodes(profileCode);
         console.log(`Trying to import.. `, sharedProfile);
+
+        if (isImportCanceled.current) {
+          console.log('Import canceled');
+          throw new Error('Import canceled');
+        }
 
         // 1. Create a new profile
         const newProfile = await createNewProfile({
@@ -36,25 +66,64 @@ export function useImportProfile() {
           shouldDuplicate: false,
         });
 
-        let errors: string[] = [];
+        console.log(`New profile created for import: `, JSON.stringify(newProfile)); // prettier-ignore
 
+        // 2. Refresh the locally installed mods
+        const modsInfo = await invokeScanCivMods(modsFolder);
+        const modsData = computeModsData({ fetchedMods, modsInfo });
+
+        let results: ImportResult[] = [];
+
+        let count = 0;
+        let total = sharedProfile.ms.length;
         for (const sharedMod of sharedProfile.ms) {
+          count++;
+
+          if (isImportCanceled.current) {
+            console.log('Import canceled');
+            throw new Error('Import canceled');
+          }
+
           // 2. Install mod
           const mod = findModDataMatchingShared(modsData, sharedMod);
           if (!mod) {
             console.error(`Mod not found: `, JSON.stringify(sharedMod));
-            errors.push(`Mod not found: ${sharedMod.cfid ?? sharedMod.mid}`);
+            results.push({
+              status: 'error',
+              message: `Mod not found: ${sharedMod.cfid ?? sharedMod.mid}`,
+            });
             continue;
           }
 
           const latestVersion = mod.fetched.expand?.mod_versions_via_mod_id[0];
           if (!latestVersion) {
             console.error(`Mod has no versions: `, mod.fetched.name, mod.fetched.id, JSON.stringify(sharedMod)); // prettier-ignore
-            errors.push(`Mod has no versions: ${mod.fetched.name}`);
+            results.push({
+              status: 'error',
+              message: `Mod has no versions: ${mod.fetched.name}`,
+            });
+            continue;
+          }
+
+          if (mod.local && isModLocked(mod.local)) {
+            console.error(`Mod is locked: `, mod.fetched.name, mod.fetched.id);
+            results.push({
+              status: 'warning',
+              message: `Will not install Locked Mod "${mod.fetched.name}"`,
+            });
             continue;
           }
 
           try {
+            modals.updateModal({
+              modalId,
+              children: (
+                <Stack gap="xs" align="center">
+                  <Progress value={count / total} animated />
+                  <Text size="sm">Installing {mod.fetched.name}...</Text>
+                </Stack>
+              ),
+            });
             await installMod(mod, latestVersion);
           } catch (e) {
             console.error(
@@ -63,18 +132,35 @@ export function useImportProfile() {
               mod.fetched.id,
               e
             );
-            errors.push(`Failed to install mod: ${mod.fetched.name}`);
+            results.push({
+              status: 'error',
+              message: `Failed to install mod: ${mod.fetched.name}, ${e}`,
+            });
           }
         }
 
-        if (errors.length > 0) {
-          throw new Error(errors.join('\n'));
+        if (results.some((r) => r.status === 'error')) {
+          notifications.show({
+            title: 'Error importing profile',
+            message: results.map((r) => r.message).join('\n'),
+            color: 'red',
+          });
+          return;
         }
+
+        const warnings = results.filter((r) => r.status === 'warning');
 
         notifications.show({
           title: 'Profile imported',
-          message: `Profile has been imported successfully with ${sharedProfile.ms.length} mods`,
-          color: 'green',
+          message: `Profile has been imported successfully with ${
+            sharedProfile.ms.length
+          } mods.${
+            warnings.length > 0
+              ? ' Some mods were skipped due to being locked: ' +
+                warnings.map((r) => r.message).join(', ')
+              : ''
+          }`,
+          color: warnings.length > 0 ? 'orange' : 'green',
         });
       } catch (e) {
         console.error(e);
@@ -86,10 +172,13 @@ export function useImportProfile() {
       } finally {
         // No cleanup needed
         modals.close(modalId);
+        triggerReload();
       }
     },
-    [modsData]
+    [fetchedMods, triggerReload]
   );
+
+  return { importProfile, cancelImport };
 }
 
 function findModDataMatchingShared(

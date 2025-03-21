@@ -55,7 +55,7 @@ function getGoogleDriveDirectDownloadUrl(url: string): string | null {
   return null;
 }
 
-function isModLocked(mod: ModInfo) {
+export function isModLocked(mod: ModInfo) {
   const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
   return lockedModIds.has(mod.modinfo_id ?? '');
 }
@@ -82,6 +82,10 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
     }
 
     if (mod.local != null) {
+      if (isModLocked(mod.local)) {
+        throw new Error('Mod is locked');
+      }
+
       const modPath = await getModFolderPath(modsFolder!, mod.local);
       backupPath = await invokeBackupModToTemp(modPath);
 
@@ -96,7 +100,7 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
     // we need to make sure that cleanup is called before.
     if (backupPath) await invokeCleanupModBackup(backupPath);
   } catch (error) {
-    console.error('Failed to install mod:', error);
+    console.error('Failed to install mod:', error, error instanceof Error && error.stack); // prettier-ignore
     if (backupPath && modsFolder) {
       try {
         await invokeRestoreModFromTemp(modsFolder, backupPath);
