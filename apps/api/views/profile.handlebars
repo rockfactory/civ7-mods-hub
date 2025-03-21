@@ -1,0 +1,92 @@
+<main class="container mod">
+  <article id="not-installed" class="hidden">
+    <p class="download-help-first">
+      If you don't have CivMods installed, you can download it from the link below.
+    </p>
+    <p class="download-help">
+      Once you have installed CivMods, click the button below <strong>Install with CivMods</strong> to install the mod.
+    </p>
+    <a id="download-btn" role="button" href="https://civmods.com/releases/latest">
+      {{{icon 'outline/download' 24}}} Download CivMods
+    </a>
+  </article>
+
+  <article>
+    <header class="mod-header">
+      You're about to install the following profile
+    </header>
+
+    <a id="install-button" role="button" href="civmods://profile/?profileCode={{profileCode}}">
+      {{{icon 'outline/hexagon-plus' 28}}} <span class="text">Add Profile with CivMods</span>
+    </a>
+  </article>
+
+  <table>
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each mods}}
+      <tr>
+        <td>
+          {{#if icon_url}}
+          <img class="mod-icon profile" src="{{icon_url}}" alt="{{name}}" />
+          {{/if}}
+        </td>
+        <td>{{name}}</td>
+        <td>{{short_description}}</td>
+        <td><a href="{{url}}" target="_blank" rel="noopener noreferrer">See on CivFanatics</a></td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  {{!--
+  {{#if icon_url}}
+  <img class="mod-icon" src="{{icon_url}}" alt="{{name}}" />
+  {{/if}}
+  <h3>{{name}}</h3>
+  <p>{{short_description}}</p> --}}
+
+  {{!-- <a id="install-button" role="button" aria-busy="true" aria-label="Installing with CivMods..."
+    href="civmods://install/?modId={{id}}">
+    {{{icon 'outline/hexagon-plus' 24}}} <span class="text">Installing with CivMods...</span>
+  </a> --}}
+
+
+
+
+</main>
+
+{{#section 'scripts'}}
+<script>
+  function openCivMods() {
+    const deepLink = "civmods://profile?code={{code}}";
+
+    let timeout;
+    let hasFocus = true;
+
+    // Detect if the page loses focus (app opened successfully)
+    window.addEventListener("blur", function () {
+      hasFocus = false; // User switched away (likely opened the app)
+    });
+
+    // Try to open the app
+    window.location.href = deepLink;
+
+    // If the app isn't installed, show the download button
+    setTimeout(function () {
+      document.querySelector("a#install-button").removeAttribute("aria-busy");
+      document.querySelector("a#install-button .text").innerText = "Install with CivMods";
+      document.getElementById("not-installed").classList.remove("hidden");
+    }, 2000);
+
+  }
+  // openCivMods();
+</script>
+{{/section}}

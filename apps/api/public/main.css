@@ -144,6 +144,13 @@ img.mod-icon {
   margin-bottom: 0.5rem;
 }
 
+img.mod-icon.profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  margin-bottom: 0;
+}
+
 .logo-container {
   display: flex;
   justify-content: center;

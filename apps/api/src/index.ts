@@ -11,6 +11,7 @@ import {
 } from './download/downloadLinks.js';
 import { marked } from 'marked';
 import Handlebars from 'handlebars';
+import { IShareableProfile, unhashProfileCodes } from '@civmods/parser';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -132,6 +133,44 @@ app.get(
     }
   })
 );
+
+app.get('/profile', async (req, res) => {
+  const profileCode = req.query.profileCode;
+  if (!profileCode || typeof profileCode !== 'string') {
+    return res.status(400).render('error', {
+      title: 'Error',
+      error: 'Missing profileCode query parameter',
+    });
+  }
+
+  let sharedProfile: IShareableProfile;
+  try {
+    sharedProfile = unhashProfileCodes(profileCode);
+  } catch (err) {
+    console.error('Invalid profile code:', profileCode);
+    return res.status(400).render('error', {
+      title: 'Error',
+      error: 'Invalid profile code',
+    });
+  }
+
+  // console.log('Shared profile:', sharedProfile);
+
+  const modsFilter = pb.filter(
+    sharedProfile.ms.map((m, i) => `cf_id = {:cf_id_${i}}`).join(' || '),
+    sharedProfile.ms.reduce((acc, m, i) => {
+      // TODO Support modinfo_id or other identifiers
+      acc[`cf_id_${i}`] = m.cfid ?? 'unknown';
+      return acc;
+    }, {} as Record<string, string>)
+  );
+
+  const mods = await pb.collection('mods').getFullList(100, {
+    filter: modsFilter,
+  });
+
+  res.render('profile', { title: 'Profile', mods, profileCode });
+});
 
 app.get('/modders', async (req, res) => {
   res.render('modders', { title: 'Modders' });
