@@ -111,7 +111,15 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
               directly.
             </Text>
             <Group wrap="nowrap">
-              <Code>{profileCode}</Code>
+              <Code
+                block
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {profileCode}
+              </Code>
               <CopyButton value={profileCode} timeout={2000}>
                 {({ copied, copy }) => (
                   <Tooltip
@@ -120,8 +128,8 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
                     position="right"
                   >
                     <ActionIcon
-                      color={copied ? 'teal' : 'gray'}
-                      variant="subtle"
+                      color={copied ? 'teal' : 'blue'}
+                      variant="light"
                       onClick={copy}
                     >
                       {copied ? (

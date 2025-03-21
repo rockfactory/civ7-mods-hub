@@ -3,13 +3,14 @@ import { useModsContext } from '../../mods/ModsContext';
 import { IShareableMod, unhashProfileCodes } from '@civmods/parser';
 import { createNewProfile } from '../commands/createNewProfile';
 import { modals } from '@mantine/modals';
-import { Center, Loader, Progress, Stack, Text } from '@mantine/core';
+import { Button, Center, Loader, Progress, Stack, Text } from '@mantine/core';
 import { installMod, isModLocked } from '../../mods/installMod';
 import { ModData } from '../../home/IModInfo';
 import { notifications } from '@mantine/notifications';
 import { getActiveModsFolder } from '../../mods/getModsFolder';
 import { invokeScanCivMods } from '../../mods/commands/modsRustBindings';
 import { computeModsData } from '../../mods/commands/computeModsData';
+import { ImportProfileModalLoadingContent } from './ImportProfileModalLoadingContent';
 
 type ImportResult = {
   status: 'warning' | 'error' | 'success';
@@ -36,12 +37,18 @@ export function useImportProfile() {
       }
 
       let modalId = modals.open({
-        title: 'Importing profile...',
+        title: 'Importing profile',
         size: 'sm',
+        withCloseButton: false,
+        closeOnClickOutside: false,
+        closeOnEscape: false,
         children: (
-          <Center>
-            <Loader />
-          </Center>
+          <ImportProfileModalLoadingContent
+            isCanceling={isImportCanceled.current}
+            cancelImport={cancelImport}
+            value={1}
+            text="Preparing..."
+          />
         ),
       });
 
@@ -118,10 +125,12 @@ export function useImportProfile() {
             modals.updateModal({
               modalId,
               children: (
-                <Stack gap="xs" align="center">
-                  <Progress value={count / total} animated />
-                  <Text size="sm">Installing {mod.fetched.name}...</Text>
-                </Stack>
+                <ImportProfileModalLoadingContent
+                  isCanceling={isImportCanceled.current}
+                  cancelImport={cancelImport}
+                  value={(count / total) * 100}
+                  text={`Installing ${mod.fetched.name}...`}
+                />
               ),
             });
             await installMod(mod, latestVersion);

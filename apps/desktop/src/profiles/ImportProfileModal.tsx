@@ -11,7 +11,7 @@ import { notifications } from '@mantine/notifications';
 import * as React from 'react';
 import { useImportProfile } from './hooks/useImportProfile';
 import { unhashProfileCodes } from '@civmods/parser';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export interface IImportProfileModalProps {
   isOpen: boolean;
@@ -41,23 +41,40 @@ export function ImportProfileModal(props: IImportProfileModalProps) {
     }
   };
 
+  const handleClose = useCallback(() => {
+    if (isImporting) return;
+    setProfileCode('');
+    setIsValid(false);
+    setTitle('');
+    props.onClose();
+  }, [cancelImport, isImporting, props]);
+
+  const handleImport = useCallback(async () => {
+    setIsImporting(true);
+    try {
+      await importProfile(title, profileCode);
+      handleClose();
+    } catch (error) {
+      notifications.show({
+        title: 'Error importing profile',
+        message: String(error),
+        color: 'red',
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  }, [importProfile, title, profileCode, handleClose]);
+
   return (
     <Modal
       opened={isOpen}
       closeOnClickOutside={!isImporting}
       closeOnEscape={!isImporting}
       title="Import profile"
-      onClose={() => {
-        cancelImport();
-        if (isImporting) return;
-        setProfileCode('');
-        setIsValid(false);
-        setTitle('');
-        props.onClose();
-      }}
+      onClose={handleClose}
     >
       <Box pos="relative">
-        <LoadingOverlay visible={isImporting} />
+        {/** Start importing UI */}
         <Stack>
           <TextInput
             placeholder="Insert profile code..."
@@ -71,26 +88,7 @@ export function ImportProfileModal(props: IImportProfileModalProps) {
                 value={title}
                 onChange={(event) => setTitle(event.currentTarget.value)}
               />
-              <Button
-                color="blue"
-                onClick={() => {
-                  setIsImporting(true);
-                  importProfile(title, profileCode)
-                    .then(() => {
-                      props.onClose();
-                    })
-                    .catch((error) => {
-                      notifications.show({
-                        title: 'Error importing profile',
-                        message: String(error),
-                        color: 'red',
-                      });
-                    })
-                    .finally(() => {
-                      setIsImporting(false);
-                    });
-                }}
-              >
+              <Button color="blue" onClick={handleImport}>
                 Import
               </Button>
             </>
