@@ -112,7 +112,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         });
 
         console.log('Mods data:', data.length);
-        setFetchedMods(data);
+        setFetchedMods(data ?? []);
       } catch (error) {
         if (error instanceof ClientResponseError && error.isAbort) {
           console.log('Request aborted');

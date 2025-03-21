@@ -223,3 +223,31 @@ pub async fn delete_profile(app: AppHandle, profile_folder_name: String) -> Resu
 
     Ok(())
 }
+
+/// Creates an empty profile in the profiles directory.
+#[tauri::command]
+pub async fn create_empty_profile(
+    app: AppHandle,
+    profile_folder_name: String,
+) -> Result<(), String> {
+    // Get the app_data directory
+    let app_data = app
+        .path()
+        .app_data_dir()
+        .map_err(|_| "Failed to get appData directory".to_string())?;
+
+    // Define the profile directory path
+    let profile_dir = app_data.join("profiles").join(&profile_folder_name);
+
+    // Check if the profile already exists
+    if profile_dir.exists() {
+        return Err(format!("Profile '{}' already exists", profile_folder_name));
+    }
+
+    // Create the empty profile directory
+    async_fs::create_dir_all(&profile_dir)
+        .await
+        .map_err(|e| format!("Failed to create profile directory: {}", e))?;
+
+    Ok(())
+}

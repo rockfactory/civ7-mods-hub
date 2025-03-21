@@ -42,3 +42,9 @@ export async function invokeDeleteProfile(
 ): Promise<void> {
   return await invoke('delete_profile', { profileFolderName });
 }
+
+export async function invokeCreateEmptyProfile(
+  profileFolderName: string
+): Promise<void> {
+  return await invoke('create_empty_profile', { profileFolderName });
+}

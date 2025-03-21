@@ -1,4 +1,4 @@
-use mods::{backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp}, extract_archive, profiles::{delete_profile, list_profiles}, traversal::scan_civ_mods};
+use mods::{backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp}, extract_archive, profiles::{create_empty_profile, delete_profile, list_profiles}, traversal::scan_civ_mods};
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
@@ -52,6 +52,9 @@ pub fn run() {
                 use tauri_plugin_deep_link::DeepLinkExt;
                 _app.deep_link().register_all()?;
             }
+
+            log::info!("[CivMods] Tauri app setup complete");
+
             Ok(())
         })
         .plugin(
@@ -79,6 +82,7 @@ pub fn run() {
             restore_mods_from_profile,
             copy_mods_to_profile,
             delete_profile,
+            create_empty_profile,
             // Backups
             backup_mod_to_temp,
             restore_mod_from_temp,

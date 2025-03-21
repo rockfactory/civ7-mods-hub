@@ -32,11 +32,12 @@ import {
   IconPlayCard,
   IconPlayerPlayFilled,
   IconShare,
-  IconStack2,
+  IconTableImport,
 } from '@tabler/icons-react';
 import { EditProfilesModal } from './EditProfilesModal';
 import { generateProfileCode } from './generateProfileCode';
 import { useModsContext } from '../mods/ModsContext';
+import { ImportProfileModal } from './ImportProfileModal';
 
 export interface IProfileSwitcherProps {}
 
@@ -60,6 +61,7 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
           { value: '$duplicate', label: 'Duplicate current' },
           { value: '$edit', label: 'Edit profiles' },
           { value: '$share', label: 'Share profile' },
+          { value: '$import', label: 'Import profile' },
         ],
       },
       {
@@ -70,20 +72,20 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
   }, [profiles]);
 
   const { switchProfile } = useProfilesContext();
+  const modsData = useModsContext().mods;
 
-  const [duplicatingProfile, setDuplicatingProfile] = useState(
-    null as ModProfile | null
-  );
+  // == Duplicate profile ==
+  const [isDuplicating, setIsDuplicating] = useState(false);
+
   const handleDuplicate = useCallback(() => {
     if (!currentProfile) return;
     const profile = profiles?.find((p) => p.folderName === currentProfile);
     if (!profile) return;
 
-    setDuplicatingProfile(profile);
+    setIsDuplicating(true);
   }, [currentProfile, profiles]);
 
-  const modsData = useModsContext().mods;
-
+  // == Share profile ==
   const handleShare = useCallback(
     async (profile: ModProfile) => {
       let profileCode: string;
@@ -139,6 +141,10 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
     [modsData]
   );
 
+  // == Import Profile ==
+  const [isImporting, setIsImporting] = useState(false);
+
+  // == Edit profiles (open modal) ==
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -150,16 +156,12 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
           data={profileOptions}
           maw={300}
           miw={180}
-          maxDropdownHeight={300}
+          maxDropdownHeight={400}
           comboboxProps={{
             width: 300,
             position: 'bottom-start',
           }}
           leftSectionWidth={70}
-          // rightSection={
-
-          // }
-          // rightSectionPointerEvents="auto"
           renderOption={(option) => {
             if (
               typeof option === 'object' &&
@@ -191,6 +193,9 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
                 )}
                 {option.option.value === '$edit' && <IconPencil size={16} />}
                 {option.option.value === '$share' && <IconShare size={16} />}
+                {option.option.value === '$import' && (
+                  <IconTableImport size={16} />
+                )}
                 <Text size="sm" c={option.checked ? 'green' : undefined}>
                   {option.option.label}
                 </Text>
@@ -216,6 +221,8 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
                 return handleShare(
                   profiles?.find((p) => p.folderName === currentProfile)!
                 );
+              case '$import':
+                return setIsImporting(true);
               default:
                 return switchProfile(
                   profiles?.find((p) => p.folderName === option.value)!
@@ -225,10 +232,14 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
         />
       </Group>
       <DuplicateProfileModal
-        profile={duplicatingProfile}
-        onClose={() => setDuplicatingProfile(null)}
+        isOpen={isDuplicating}
+        onClose={() => setIsDuplicating(false)}
       />
       <EditProfilesModal isOpen={isEditing} close={() => setIsEditing(false)} />
+      <ImportProfileModal
+        isOpen={isImporting}
+        onClose={() => setIsImporting(false)}
+      />
     </>
   );
 }

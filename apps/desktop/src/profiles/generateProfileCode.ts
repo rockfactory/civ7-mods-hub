@@ -61,7 +61,7 @@ export async function generateProfileCode(
     })
     .filter((m) => m != null) as IShareableMod[];
 
-  const code = hashProfileCodes(mods);
+  const code = hashProfileCodes(mods, profile.title);
   console.log('Generated profile code:', code);
   return code.compressed;
 }

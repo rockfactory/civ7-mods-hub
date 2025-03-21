@@ -9,34 +9,35 @@ import {
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { profile } from 'console';
 import * as React from 'react';
 import { useProfilesContext } from './ProfilesContext';
 import { useEffect, useState } from 'react';
 import { ModProfile } from './ModProfile';
 import { useDisclosure } from '@mantine/hooks';
+import { useAppStore } from '../store/store';
 
 export interface IDuplicateProfileModalProps {
-  profile: ModProfile | null;
+  isOpen: boolean;
   onClose: () => void;
 }
 
 export function DuplicateProfileModal(props: IDuplicateProfileModalProps) {
-  const { profile } = props;
-  const [isOpen, { toggle, open, close }] = useDisclosure();
-  const { duplicateProfile } = useProfilesContext();
+  const { isOpen } = props;
+  const { createNewProfileWithNotifications } = useProfilesContext();
   const [title, setTitle] = useState('');
 
   const [isDuplicating, setIsDuplicating] = useState(false);
 
   useEffect(() => {
-    if (profile) {
-      setTitle(`${profile.title} (Copy)`);
-      open();
-    } else {
-      close();
+    if (isOpen) {
+      const profile = useAppStore
+        .getState()
+        .profiles?.find(
+          (p) => p.folderName === useAppStore.getState().currentProfile
+        );
+      setTitle(`${profile?.title ?? ''} (Copy)`);
     }
-  }, [profile]);
+  }, [isOpen]);
 
   return (
     <Modal
@@ -45,7 +46,7 @@ export function DuplicateProfileModal(props: IDuplicateProfileModalProps) {
       closeOnEscape={!isDuplicating}
       title="Duplicate profile"
       onClose={() => {
-        close();
+        props.onClose();
       }}
     >
       <Box pos="relative">
@@ -60,12 +61,13 @@ export function DuplicateProfileModal(props: IDuplicateProfileModalProps) {
           <Button
             color="blue"
             onClick={() => {
-              if (!profile) return;
-
+              if (!title) return;
               setIsDuplicating(true);
-              duplicateProfile(profile, title)
+              createNewProfileWithNotifications({
+                title,
+                shouldDuplicate: true,
+              })
                 .then(() => {
-                  close();
                   props.onClose();
                 })
                 .catch((error) => {
