@@ -1,4 +1,4 @@
-use mods::{extract_archive, profiles::{delete_profile, list_profiles}, traversal::scan_civ_mods};
+use mods::{backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp}, extract_archive, profiles::{delete_profile, list_profiles}, traversal::scan_civ_mods};
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
@@ -74,10 +74,15 @@ pub fn run() {
             get_mods_folder,
             extract_mod_archive,
             scan_civ_mods,
+            // Profiles
             list_profiles,
             restore_mods_from_profile,
             copy_mods_to_profile,
-            delete_profile
+            delete_profile,
+            // Backups
+            backup_mod_to_temp,
+            restore_mod_from_temp,
+            cleanup_mod_backup
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
