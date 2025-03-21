@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
+import { ModInfo } from '../../home/IModInfo';
 
 /**
  * Invokes `backup_mod_to_temp` to create a backup of the given mod folder in the temp directory.
@@ -37,4 +38,10 @@ export async function invokeCleanupModBackup(
     console.error('HIGH: Failed to cleanup mod backup:', error);
     // We don't want to throw an error here, as it's not critical to the operation.
   }
+}
+
+export async function invokeScanCivMods(modsFolderPath: string) {
+  return await invoke<ModInfo[]>('scan_civ_mods', {
+    modsFolderPath,
+  });
 }

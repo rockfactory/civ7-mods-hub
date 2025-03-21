@@ -2,7 +2,7 @@ import { appDataDir, join } from '@tauri-apps/api/path';
 import { getActiveModsFolder } from '../mods/getModsFolder';
 import { useAppStore } from '../store/store';
 import { ModProfile } from './ModProfile';
-import { invokeScanCivMods } from '../mods/modsRustBindings';
+import { invokeScanCivMods } from '../mods/commands/modsRustBindings';
 import { hashProfileCodes, IShareableMod } from '@civmods/parser';
 import { ModData } from '../home/IModInfo';
 
@@ -20,11 +20,6 @@ export async function generateProfileCode(
   profile: ModProfile
 ): Promise<string> {
   const currentProfile = useAppStore.getState().currentProfile;
-
-  // TODO Supporting only active profile for now
-  if (!currentProfile) {
-    throw new Error('No profile selected or profile is not active');
-  }
 
   const folderPath =
     currentProfile === profile.folderName

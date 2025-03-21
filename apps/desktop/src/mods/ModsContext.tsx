@@ -20,13 +20,7 @@ import { isSameVersion } from './isSameVersion';
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { openConfirmModal } from '@mantine/modals';
 import { getActiveModsFolder } from './getModsFolder';
-import { invokeScanCivMods } from './modsRustBindings';
-import {
-  invokeBackupModToTemp,
-  invokeCleanupModBackup,
-  invokeRestoreModFromTemp,
-} from './commands/modsRustBindings';
-import { getModFolderPath } from './commands/getModFolderPath';
+import { invokeScanCivMods } from './commands/modsRustBindings';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
