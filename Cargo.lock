@@ -2598,6 +2598,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "modinfo-parser"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "log",
+ "quick-xml 0.37.2",
+ "serde",
+]
+
+[[package]]
 name = "muda"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
