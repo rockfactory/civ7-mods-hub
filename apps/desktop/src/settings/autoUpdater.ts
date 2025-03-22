@@ -47,7 +47,7 @@ export async function checkForAppUpdates(onUserClick: boolean) {
 /**
  * Each 20 minutes check for updates
  */
-export function useCheckForAppUpdates() {
+export function useCheckForGlobalUpdates() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (isAskingUserForUpdateConfirmation || !shouldRemindLater) {

@@ -44,7 +44,7 @@ import { Virtuoso } from 'react-virtuoso';
 import ThrottledLoader from './ThrottledLoader';
 import { isSameVersion } from '../mods/isSameVersion';
 import { useAppStore } from '../store/store';
-import { useCheckForAppUpdates } from '../settings/autoUpdater';
+import { useCheckForGlobalUpdates } from '../settings/autoUpdater';
 
 export default function ModsListPage() {
   const {
@@ -67,7 +67,7 @@ export default function ModsListPage() {
 
   // Globals: deep link & update
   useInstallDeepLink();
-  useCheckForAppUpdates();
+  useCheckForGlobalUpdates();
 
   const isFirstLoading = useMemo(() => {
     console.log('isFirstLoading', {
