@@ -68,10 +68,6 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
           { value: '$import', label: 'Import profile' },
         ],
       },
-      {
-        value: '$experimental',
-        label: 'Experimental. Please backup your mods folder.',
-      },
     ] as ComboboxData;
   }, [profiles]);
 
@@ -176,23 +172,6 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
           }}
           leftSectionWidth={70}
           renderOption={(option) => {
-            if (
-              typeof option === 'object' &&
-              option.option.value === '$experimental'
-            ) {
-              return (
-                <Group wrap="nowrap" gap={2}>
-                  <IconAlertCircle
-                    color="var(--mantine-color-yellow-5)"
-                    size={16}
-                  />
-                  <Text size="xs" c="yellow">
-                    {option.option.label}
-                  </Text>
-                </Group>
-              );
-            }
-
             return (
               <Group gap={4}>
                 {option.checked && (

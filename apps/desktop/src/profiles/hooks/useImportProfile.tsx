@@ -42,6 +42,7 @@ export function useImportProfile() {
         withCloseButton: false,
         closeOnClickOutside: false,
         closeOnEscape: false,
+        zIndex: 202,
         children: (
           <ImportProfileModalLoadingContent
             isCanceling={isImportCanceled.current}
@@ -165,7 +166,7 @@ export function useImportProfile() {
             sharedProfile.ms.length
           } mods.${
             warnings.length > 0
-              ? ' Some mods were skipped due to being locked: ' +
+              ? ' Some mods were skipped: ' +
                 warnings.map((r) => r.message).join(', ')
               : ''
           }`,

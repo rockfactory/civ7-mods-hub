@@ -104,6 +104,7 @@ export function ImportProfileModal(props: IImportProfileModalProps) {
       closeOnEscape={!isImporting}
       title="Import profile"
       onClose={handleClose}
+      zIndex={201} // Higher than ShareProfileModal
     >
       <Box pos="relative">
         {/** Start importing UI */}
