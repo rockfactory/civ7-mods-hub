@@ -95,7 +95,7 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/apps/desktop"
           cat './src-tauri/tauri.conf.json' | jq '.bundle .windows += {"signCommand": env.WINDOWS_SIGN_COMMAND}' > './src-tauri/temp.json' && mv './src-tauri/temp.json' './src-tauri/tauri.conf.json'
-          cargo install trusted-signing-cli
+          cargo install --force trusted-signing-cli
 
       - name: Build and publish with Tauri
         uses: tauri-apps/tauri-action@v0
