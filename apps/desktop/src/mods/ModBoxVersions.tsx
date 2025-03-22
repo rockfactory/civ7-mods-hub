@@ -24,6 +24,10 @@ function humanizeSize(size: number) {
 
 export function ModBoxVersions(props: IModBoxVersionsProps) {
   const { mod } = props;
+  if (!mod.fetched) {
+    return null;
+  }
+
   const modVersions = mod.fetched.expand?.mod_versions_via_mod_id;
 
   return (

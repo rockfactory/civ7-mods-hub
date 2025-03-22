@@ -94,7 +94,7 @@ export function useImportProfile() {
 
           // 2. Install mod
           const mod = findModDataMatchingShared(modsData, sharedMod);
-          if (!mod) {
+          if (!mod || !mod.fetched) {
             console.error(`Mod not found: `, JSON.stringify(sharedMod));
             results.push({
               status: 'error',
@@ -103,7 +103,7 @@ export function useImportProfile() {
             continue;
           }
 
-          const latestVersion = mod.fetched.expand?.mod_versions_via_mod_id[0];
+          const latestVersion = mod.fetched?.expand?.mod_versions_via_mod_id[0];
           if (!latestVersion) {
             console.error(`Mod has no versions: `, mod.fetched.name, mod.fetched.id, JSON.stringify(sharedMod)); // prettier-ignore
             results.push({
@@ -198,12 +198,12 @@ function findModDataMatchingShared(
   return modsData.find((m) => {
     // Search by CivFanatics ID
     if (sharedMod.cfid) {
-      return m.fetched.cf_id === sharedMod.cfid;
+      return m.fetched?.cf_id === sharedMod.cfid;
     }
     // Search by ModInfo ID
     if (sharedMod.mid) {
       return (
-        m.fetched.expand?.mod_versions_via_mod_id[0].modinfo_id ===
+        m.fetched?.expand?.mod_versions_via_mod_id[0].modinfo_id ===
         sharedMod.mid
       );
     }

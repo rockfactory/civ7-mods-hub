@@ -164,6 +164,7 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
           value={currentProfile}
           data={profileOptions}
           maw={300}
+          width={'100%'}
           miw={180}
           maxDropdownHeight={400}
           comboboxProps={{

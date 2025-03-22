@@ -31,20 +31,20 @@ export function useInstallDeepLink() {
 
     const mod = mods.find((mod) => {
       if (modUrl) {
-        return mod.fetched.url.startsWith(modUrl);
+        return mod.fetched?.url.startsWith(modUrl);
       }
       if (modCfId) {
-        return mod.fetched.cf_id == modCfId;
+        return mod.fetched?.cf_id == modCfId;
       }
       if (modId) {
-        return mod.fetched.id == modId;
+        return mod.fetched?.id == modId;
       }
       return false;
     });
 
-    const latestVersion = mod?.fetched.expand?.mod_versions_via_mod_id[0];
+    const latestVersion = mod?.fetched?.expand?.mod_versions_via_mod_id[0];
 
-    if (!mod || !latestVersion) {
+    if (!mod || !mod.fetched || !latestVersion) {
       console.warn(
         'Mod not found in the list of available mods',
         mod?.fetched?.name,
@@ -98,7 +98,7 @@ export function useInstallDeepLink() {
       onConfirm: async () => {
         const loadingNotification = notifications.show({
           title: 'Installing mod',
-          message: `Downloading and installing ${mod.fetched.name}`,
+          message: `Downloading and installing ${mod.fetched?.name}`,
           loading: true,
           autoClose: false,
         });

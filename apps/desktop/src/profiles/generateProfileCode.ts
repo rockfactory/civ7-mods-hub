@@ -50,7 +50,7 @@ export async function generateProfileCode(
           mod.modinfo_id
       );
       if (!fetchedMod?.fetched?.cf_id) {
-        console.error('Could not find fetched mod', mod.modinfo_id, fetchedMod?.fetched.id); // prettier-ignore
+        console.error('Could not find remote (fetched) mod', mod.modinfo_id, fetchedMod?.fetched?.id); // prettier-ignore
         return;
       }
 
