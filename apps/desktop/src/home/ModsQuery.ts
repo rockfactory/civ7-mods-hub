@@ -4,7 +4,7 @@ export interface ModsQuery {
   text: string;
   category: string;
   onlyInstalled: boolean;
-  state: '' | 'needsUpdate' | 'locked' | 'uninstalled';
+  state: '' | 'needsUpdate' | 'locked' | 'uninstalled' | 'localOnly';
 }
 
 const defaultQuery: ModsQuery = {

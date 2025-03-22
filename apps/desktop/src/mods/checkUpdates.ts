@@ -1,5 +1,5 @@
 import { notifications } from '@mantine/notifications';
-import { ModData, ModInfo } from '../home/IModInfo';
+import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
 import { ModVersionsRecord } from '@civmods/parser';
 import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
@@ -9,6 +9,7 @@ import { installMod } from './installMod';
 
 export interface IModUpdate {
   mod: ModData;
+  fetched: FetchedMod;
   targetVersion?: ModVersionsRecord;
 }
 
@@ -22,11 +23,15 @@ export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
       continue;
     }
 
+    if (!installedMod.fetched) {
+      continue;
+    }
+
     const latestVersion =
       installedMod.fetched.expand?.mod_versions_via_mod_id[0];
 
     if (!latestVersion) {
-      console.warn(`Mod ${installedMod.fetched.name} has no versions`);
+      console.warn(`Mod ${installedMod.fetched?.name} has no versions`);
       continue;
     }
 
@@ -38,6 +43,7 @@ export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
     if (!isSameVersion(latestVersion, installedMod.local)) {
       needUpdates.push({
         mod: installedMod,
+        fetched: installedMod.fetched,
         targetVersion: latestVersion,
       });
     }
@@ -64,10 +70,10 @@ export function useApplyUpdates() {
 
     let errors = [];
     for (const update of availableUpdates) {
-      console.log('Applying update:', update.mod.fetched.id);
+      console.log('Applying update:', update.fetched.id);
       try {
         if (lockedModIds.has(update.mod.local?.modinfo_id ?? '')) {
-          console.warn('Skipping locked mod:', update.mod.fetched.name, update.mod.local?.modinfo_id); // prettier-ignore
+          console.warn('Skipping locked mod:', update.fetched.name, update.mod.local?.modinfo_id); // prettier-ignore
           continue;
         }
 

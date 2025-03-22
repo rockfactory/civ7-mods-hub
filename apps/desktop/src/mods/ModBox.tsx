@@ -22,6 +22,7 @@ import type { ModVersionsRecord } from '@civmods/parser';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { open } from '@tauri-apps/plugin-shell';
 import {
+  IconAlertHexagon,
   IconCategory,
   IconCheck,
   IconChecklist,
@@ -71,8 +72,8 @@ export function ModBox(props: IModBoxProps) {
 
   const { install, uninstall } = useModsContext();
 
-  const latestVersion = fetched.expand?.mod_versions_via_mod_id[0];
-  const isLatest = isSameVersion(latestVersion, local);
+  const latestVersion = fetched?.expand?.mod_versions_via_mod_id[0];
+  const isLatest = latestVersion && isSameVersion(latestVersion, local);
 
   const isLocked = useAppStore((state) =>
     state.lockedModIds?.includes(props.mod.local?.modinfo_id ?? '')
@@ -100,7 +101,7 @@ export function ModBox(props: IModBoxProps) {
           <Text size="sm">
             You are about to update the mod{' '}
             <Text fw={600} span>
-              {mod.fetched.name}
+              {mod.fetched?.name}
             </Text>
             .
           </Text>
@@ -132,15 +133,21 @@ export function ModBox(props: IModBoxProps) {
           <Text size="sm">
             You are about to uninstall the mod{' '}
             <Text fw={600} span>
-              {mod.fetched.name}
+              {mod.name}
             </Text>
             .
           </Text>
           <Text size="sm">Are you sure you want to proceed?</Text>
+          {mod.isLocalOnly && (
+            <Text size="sm" c="red">
+              This mod is not available in the mod repository. Uninstalling it
+              will remove all the files from the disk.
+            </Text>
+          )}
         </Stack>
       ),
       labels: {
-        confirm: 'Uninstall',
+        confirm: mod.isLocalOnly ? 'Remove from disk' : 'Uninstall',
         cancel: 'Cancel',
       },
       confirmProps: { color: 'red' },
@@ -158,7 +165,7 @@ export function ModBox(props: IModBoxProps) {
   return (
     <Box pb="sm">
       <Card
-        key={fetched.id}
+        key={mod.id}
         className={styles.modCard}
         shadow="sm"
         p="sm"
@@ -168,7 +175,7 @@ export function ModBox(props: IModBoxProps) {
         <LoadingOverlay visible={loading} />
         <Flex justify="space-between" align="flex-start">
           <Group justify="normal" wrap="nowrap" w="100%">
-            {fetched.icon_url ? (
+            {fetched?.icon_url ? (
               <Image
                 width={40}
                 height={40}
@@ -177,27 +184,37 @@ export function ModBox(props: IModBoxProps) {
                 alt={fetched.name}
               />
             ) : (
-              <div style={{ width: 40, height: 40 }}>
+              <Box
+                className={
+                  styles.modIcon +
+                  ' ' +
+                  (mod.isLocalOnly ? styles.localOnly : '')
+                }
+              >
                 <IconSettings size={40} />
-              </div>
+              </Box>
             )}
             <Flex justify="space-between" w="100%">
               <Stack gap={0} align="flex-start">
                 <Text fw={600}>
-                  <a
-                    className={styles.plainLink}
-                    href={fetched.url}
-                    target="_blank"
-                  >
-                    {fetched.name}
-                    {latestVersion?.name && (
-                      <Text span c="dimmed">
-                        {' '}
-                        {latestVersion.name}
-                      </Text>
-                    )}{' '}
-                    <IconExternalLink size={12} />
-                  </a>
+                  {fetched ? (
+                    <a
+                      className={styles.plainLink}
+                      href={fetched?.url}
+                      target="_blank"
+                    >
+                      {fetched.name}
+                      {latestVersion?.name && (
+                        <Text span c="dimmed">
+                          {' '}
+                          {latestVersion.name}
+                        </Text>
+                      )}{' '}
+                      <IconExternalLink size={12} />
+                    </a>
+                  ) : (
+                    mod.name
+                  )}
                 </Text>
                 <Group gap={4} align="flex-start">
                   <Text
@@ -217,27 +234,33 @@ export function ModBox(props: IModBoxProps) {
                     <IconCopy size={12} />{' '}
                     {latestVersion?.modinfo_id ?? local?.modinfo_id}
                   </Text>
-                  <Text
-                    c="dimmed"
-                    className={styles.textAction}
-                    onClick={() => {
-                      setQuery({ text: fetched.author });
-                    }}
-                  >
-                    <IconUser size={12} /> {fetched.author}
-                  </Text>
+                  {/* TODO: Add back author when fetched from modinfo */}
+                  {fetched && (
+                    <Text
+                      c="dimmed"
+                      className={styles.textAction}
+                      onClick={() => {
+                        setQuery({ text: fetched.author });
+                      }}
+                    >
+                      <IconUser size={12} /> {fetched.author}
+                    </Text>
+                  )}
                   {mod.fetched?.category && (
                     <Text
                       c="dimmed"
                       className={styles.textAction}
                       onClick={() => {
-                        setQuery({ category: mod.fetched.category });
+                        setQuery({ category: mod.fetched!.category });
                       }}
                     >
                       <IconTag size={12} />{' '}
                       {cleanCategoryName(mod.fetched.category)}
                     </Text>
                   )}
+                  {/**
+                   * TODO Read this from modinfo
+                   */}
                   {latestVersion?.affect_saves && (
                     <Tooltip
                       color="dark.8"
@@ -270,14 +293,21 @@ export function ModBox(props: IModBoxProps) {
             <Flex align="flex-end" justify="flex-end">
               <Group gap={4} align="flex-end">
                 {!isLocked && mod.local && (
-                  <ActionIcon
-                    mt="sm"
-                    variant="light"
-                    color="red"
-                    onClick={() => handleUninstall()}
+                  <Tooltip
+                    color="dark.8"
+                    label={
+                      mod.isLocalOnly ? 'Remove folder from disk' : 'Uninstall'
+                    }
                   >
-                    <IconTrash size={16} />
-                  </ActionIcon>
+                    <ActionIcon
+                      mt="sm"
+                      variant={'light'}
+                      color="red"
+                      onClick={() => handleUninstall()}
+                    >
+                      <IconTrash size={16} />
+                    </ActionIcon>
+                  </Tooltip>
                 )}
                 {isLocked && (
                   <Tooltip
@@ -310,7 +340,7 @@ export function ModBox(props: IModBoxProps) {
                 </Menu.Target>
                 <Menu.Dropdown>
                   <Menu.Label>Mod Actions</Menu.Label>
-                  {!isLocked && (
+                  {!isLocked && mod.fetched && (
                     <Menu.Item
                       leftSection={<IconSwitch size={16} />}
                       onClick={() => setChoosingVersion(true)}
@@ -335,9 +365,9 @@ export function ModBox(props: IModBoxProps) {
           </Box>
         </Flex>
 
-        <Text c="dimmed">{fetched.short_description}</Text>
+        <Text c="dimmed">{fetched?.short_description ?? ''}</Text>
       </Card>
-      {isChoosingVersion && (
+      {isChoosingVersion && fetched && (
         <Modal
           opened={isChoosingVersion}
           size="lg"

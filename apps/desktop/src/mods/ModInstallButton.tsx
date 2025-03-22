@@ -6,6 +6,7 @@ import {
   IconTransitionBottom,
   IconDownload,
   IconCircleCheckFilled,
+  IconAlertHexagon,
 } from '@tabler/icons-react';
 
 export interface IModInstallButtonProps {
@@ -16,6 +17,20 @@ export interface IModInstallButtonProps {
 
 export function ModInstallButton(props: IModInstallButtonProps) {
   const { mod, version } = props;
+
+  // Local-only mods
+  if (!mod.fetched) {
+    return (
+      <Tooltip
+        color="dark.8"
+        label="This mod is not available in the mod repository, it was installed manually."
+      >
+        <ActionIcon variant="filled" color="orange">
+          <IconAlertHexagon size={16} />
+        </ActionIcon>
+      </Tooltip>
+    );
+  }
 
   const isTargetLatest =
     mod.fetched.expand?.mod_versions_via_mod_id[0].hash_stable ===

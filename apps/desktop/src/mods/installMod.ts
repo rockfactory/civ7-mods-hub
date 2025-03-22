@@ -66,9 +66,7 @@ export function isModLocked(mod: ModInfo) {
  */
 export async function installMod(mod: ModData, version: ModVersionsRecord) {
   if (!version?.download_url) {
-    throw new Error(
-      `Mod ${mod.fetched.name} v: ${version?.name} has no download URL`
-    );
+    throw new Error(`Mod ${mod.name} v: ${version?.name} has no download URL`);
   }
 
   const modsFolder = await getActiveModsFolder();

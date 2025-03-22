@@ -59,8 +59,17 @@ export default function ModsListPage() {
   useInstallDeepLink();
   useCheckForAppUpdates();
 
-  const isFirstLoading =
-    (isFetching || isLoadingInstalled) && mods.length === 0;
+  const isFirstLoading = useMemo(() => {
+    console.log('isFirstLoading', {
+      isFetching,
+      isLoadingInstalled,
+      mods: mods.filter((m) => m.fetched).length,
+    });
+    return (
+      (isFetching || isLoadingInstalled) &&
+      mods.filter((m) => m.fetched).length === 0
+    );
+  }, [isFetching, isLoadingInstalled, mods]);
 
   const filteredMods = useMemo(() => {
     const installedModIds = new Set(
@@ -76,7 +85,7 @@ export default function ModsListPage() {
 
       if (query.text) {
         const searchText =
-          mod.fetched.name.toLocaleLowerCase() +
+          mod.name.toLocaleLowerCase() +
           ' ' +
           mod.local?.modinfo_id +
           ' ' +
@@ -91,23 +100,20 @@ export default function ModsListPage() {
 
       if (query.category) {
         shouldInclude =
-          shouldInclude && mod.fetched.category === query.category;
+          shouldInclude && mod.fetched?.category === query.category;
       }
 
       if (query.onlyInstalled) {
-        shouldInclude =
-          shouldInclude &&
-          installedModIds.has(
-            mod.fetched.expand?.mod_versions_via_mod_id[0].modinfo_id
-          );
+        shouldInclude = shouldInclude && installedModIds.has(mod.modinfo_id);
       }
 
       if (query.state === 'needsUpdate') {
         shouldInclude =
           shouldInclude &&
           mod.local?.modinfo_id != null &&
+          mod.fetched != null &&
           !isSameVersion(
-            mod.fetched.expand?.mod_versions_via_mod_id[0],
+            mod.fetched?.expand?.mod_versions_via_mod_id[0],
             mod.local
           ) &&
           !lockedModIds.has(mod.local.modinfo_id);
@@ -118,6 +124,8 @@ export default function ModsListPage() {
           lockedModIds.has(mod.local.modinfo_id);
       } else if (query.state === 'uninstalled') {
         shouldInclude = shouldInclude && !mod.local;
+      } else if (query.state === 'localOnly') {
+        shouldInclude = shouldInclude && mod.isLocalOnly;
       }
 
       return shouldInclude;
@@ -127,7 +135,7 @@ export default function ModsListPage() {
   const categories = useMemo(() => {
     const categories = new Map<string, string>();
     mods.forEach((mod) => {
-      if (mod.fetched.category && !categories.has(mod.fetched.category)) {
+      if (mod.fetched?.category && !categories.has(mod.fetched.category)) {
         categories.set(
           mod.fetched.category,
           cleanCategoryName(mod.fetched.category)
@@ -249,6 +257,7 @@ export default function ModsListPage() {
                 { label: 'Needs Update', value: 'needsUpdate' },
                 { label: 'Locked', value: 'locked' },
                 { label: 'Not Installed', value: 'uninstalled' },
+                { label: 'Local Only', value: 'localOnly' },
               ]}
             />
             {hasFilters && (
@@ -280,8 +289,8 @@ export default function ModsListPage() {
                   <Stack gap={2}>
                     <Text fz="sm">Will update:</Text>
                     {availableUpdates.map((update) => (
-                      <Text fz="sm" key={update.mod.fetched.id}>
-                        {update.mod.fetched.name}:{' '}
+                      <Text fz="sm" key={update.fetched.id}>
+                        {update.fetched.name}:{' '}
                         {update.mod.installedVersion?.name} →{' '}
                         {update.targetVersion?.name}
                       </Text>
@@ -323,33 +332,34 @@ export default function ModsListPage() {
 
       <AppShell.Main className="main">
         <LoadingOverlay visible={isFirstLoading} />
-        <Virtuoso
-          // Too slow
-          // customScrollParent={document.body}
-          useWindowScroll
-          totalCount={filteredMods.length}
-          itemContent={(index) => (
-            <ModBox
-              key={filteredMods[index].fetched.id}
-              mod={filteredMods[index]}
-              setQuery={setQuery}
+        {!isFirstLoading && (
+          <>
+            <Virtuoso
+              // Too slow
+              // customScrollParent={document.body}
+              useWindowScroll
+              totalCount={filteredMods.length}
+              itemContent={(index) => (
+                <ModBox
+                  key={filteredMods[index].modinfo_id || index}
+                  mod={filteredMods[index]}
+                  setQuery={setQuery}
+                />
+              )}
             />
-          )}
-        />
-        {/* {filteredMods.map((mod) => (
-            <ModBox key={mod.fetched.id} mod={mod} />
-          ))} */}
-        {filteredMods.length === 0 && (
-          <Box p="lg">
-            <Stack gap={'xs'} align="center">
-              <IconEyeQuestion size={40} />
-              <Text>No mods found</Text>
-              <Text c="dimmed">
-                Try changing your filters or open Settings and double check Mods
-                folder
-              </Text>
-            </Stack>
-          </Box>
+            {filteredMods.length === 0 && (
+              <Box p="lg">
+                <Stack gap={'xs'} align="center">
+                  <IconEyeQuestion size={40} />
+                  <Text>No mods found</Text>
+                  <Text c="dimmed">
+                    Try changing your filters or open Settings and double check
+                    Mods folder
+                  </Text>
+                </Stack>
+              </Box>
+            )}
+          </>
         )}
       </AppShell.Main>
     </AppShell>

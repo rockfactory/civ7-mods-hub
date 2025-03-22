@@ -5,15 +5,23 @@ export type FetchedMod = ModsResponse<{
 }>;
 
 export interface ModInfo {
+  /**
+   * @deprecated This is the folder name, use `folder_name` instead
+   */
   mod_name: string;
   modinfo_path?: string;
   modinfo_id?: string;
   folder_hash: string;
+  folder_name: string;
 }
 
 export type ModData = {
-  fetched: FetchedMod;
-  local: ModInfo | null;
+  fetched?: FetchedMod;
+  local: ModInfo | null | undefined;
   installedVersion?: ModVersionsRecord;
   isUnknown: boolean;
+  isLocalOnly: boolean;
+  id: string;
+  name: string;
+  modinfo_id?: string;
 };
