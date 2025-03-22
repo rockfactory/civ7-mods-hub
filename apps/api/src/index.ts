@@ -4,19 +4,17 @@ import fsSync from 'fs';
 import { engine } from 'express-handlebars';
 import { pb } from './core/pocketbase.js';
 import { safeAsync } from './core/async.js';
-import {
-  getCachedGithubRelease,
-  getGithubRelease,
-  Release,
-} from './download/downloadLinks.js';
+import { getCachedGithubRelease, Release } from './download/downloadLinks.js';
 import { marked } from 'marked';
 import Handlebars from 'handlebars';
 import { IShareableProfile, unhashProfileCodes } from '@civmods/parser';
+import { logResponseTime } from './middlewares/logResponseTime.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use('/static', express.static('public'));
+app.use(logResponseTime);
 app.engine(
   'handlebars',
   engine({
