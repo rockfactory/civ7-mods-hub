@@ -2,42 +2,72 @@ import { onOpenUrl, getCurrent } from '@tauri-apps/plugin-deep-link';
 import { emit, listen } from '@tauri-apps/api/event';
 import { useEffect, useState } from 'react';
 
+export type DeepLinkType = 'install' | 'profile';
+
 export interface IDeepLinkActivation {
   url: string;
+  type: DeepLinkType;
 }
 
-export const DeepLinkActivations: IDeepLinkActivation[] = [];
+const SupportedTypes = {
+  'civmods://install': 'install',
+  'civmods://profile': 'profile',
+} as const;
+
+export const DeepLinkActivations: Record<DeepLinkType, IDeepLinkActivation[]> =
+  {
+    install: [],
+    profile: [],
+  };
+
+function addDeepLinkActivation(urls: string[] | null) {
+  const url = urls?.[0];
+  if (!url) return;
+
+  console.log('[deeplink] Found deep link:', url);
+  if (!url.startsWith('civmods://')) {
+    return;
+  }
+
+  let type: 'install' | 'profile' | undefined;
+  for (const prefix in SupportedTypes) {
+    if (url.startsWith(prefix)) {
+      type = SupportedTypes[prefix as keyof typeof SupportedTypes];
+      break;
+    }
+  }
+  if (!type) {
+    console.warn('[deeplink] Unsupported deep link:', url);
+    return;
+  }
+
+  DeepLinkActivations[type].push({ url, type });
+  emit('deep-link-activation', { url, type });
+}
 
 export async function registerDeepLink() {
   console.log('[v2] Waiting for deep link registration..');
   await getCurrent().then((url) => {
-    if (url?.[0]) {
-      console.log('[v2] Current deep link:', url);
-      DeepLinkActivations.push({ url: url[0] });
-      emit('deep-link-activation');
-    }
+    addDeepLinkActivation(url);
   });
 
   await onOpenUrl(async (urls) => {
-    const url = urls[0];
-    console.log('[deeplink] Found deep link:', url);
-    if (!url.startsWith('civmods://')) {
-      return;
-    }
-
-    DeepLinkActivations.push({ url });
-    emit('deep-link-activation');
+    addDeepLinkActivation(urls);
   });
 }
 
-export function useDeepLinkActivation() {
+export function useDeepLinkActivation(type: DeepLinkType) {
   const [count, setCount] = useState(0);
+
   useEffect(() => {
     let unlisten: () => void;
 
     async function init() {
-      unlisten = await listen('deep-link-activation', () => {
-        setCount((c) => c + 1);
+      unlisten = await listen('deep-link-activation', (event) => {
+        const payload = event.payload as IDeepLinkActivation;
+        if (payload.type === type) {
+          setCount((prev) => prev + 1);
+        }
       });
     }
 

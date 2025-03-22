@@ -169,7 +169,12 @@ app.get('/profile', async (req, res) => {
     filter: modsFilter,
   });
 
-  res.render('profile', { title: 'Profile', mods, profileCode });
+  res.render('profile', {
+    title: 'Profile',
+    mods,
+    profileTitle: sharedProfile.t,
+    profileCode,
+  });
 });
 
 app.get('/modders', async (req, res) => {

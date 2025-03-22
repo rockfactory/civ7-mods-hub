@@ -2,11 +2,13 @@ import * as React from 'react';
 import { useAppStore } from '../store/store';
 import {
   ActionIcon,
+  Box,
   Button,
   Code,
   ComboboxData,
   ComboboxItemGroup,
   CopyButton,
+  Divider,
   Group,
   Select,
   Stack,
@@ -28,6 +30,7 @@ import {
   IconCopy,
   IconCopyPlus,
   IconDots,
+  IconExternalLink,
   IconPencil,
   IconPlayCard,
   IconPlayerPlayFilled,
@@ -38,6 +41,7 @@ import { EditProfilesModal } from './EditProfilesModal';
 import { generateProfileCode } from './generateProfileCode';
 import { useModsContext } from '../mods/ModsContext';
 import { ImportProfileModal } from './ImportProfileModal';
+import { ActionCopyButton } from './components/ActionCopyButton';
 
 export interface IProfileSwitcherProps {}
 
@@ -102,13 +106,34 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
         return;
       }
 
+      const link = `http://localhost:3000/profile?profileCode=${profileCode}`;
+
       modals.open({
         title: 'Share profile',
         children: (
           <Stack>
             <Text size="sm">
-              Share this profile Code with other players to let them install it
-              directly.
+              Share the following link to let other players see and install this
+              profile (and install CivMods) directly.
+            </Text>
+            <Group wrap="nowrap" w="100%" justify="space-between">
+              <Button
+                rightSection={<IconExternalLink size={16} />}
+                component="a"
+                color="teal"
+                fullWidth
+                href={link}
+                target="_blank"
+              >
+                CivMods.com {profile.title} profile installation
+              </Button>
+
+              <ActionCopyButton value={link} title="Copy link" />
+            </Group>
+            <Divider mt="xs" label="Having issues?" />
+            <Text size="sm">
+              Share this profile Code directly with other players to let them
+              install it
             </Text>
             <Group wrap="nowrap">
               <Code
@@ -120,27 +145,7 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
               >
                 {profileCode}
               </Code>
-              <CopyButton value={profileCode} timeout={2000}>
-                {({ copied, copy }) => (
-                  <Tooltip
-                    label={copied ? 'Copied' : 'Copy'}
-                    withArrow
-                    position="right"
-                  >
-                    <ActionIcon
-                      color={copied ? 'teal' : 'blue'}
-                      variant="light"
-                      onClick={copy}
-                    >
-                      {copied ? (
-                        <IconCheck size={16} />
-                      ) : (
-                        <IconCopy size={16} />
-                      )}
-                    </ActionIcon>
-                  </Tooltip>
-                )}
-              </CopyButton>
+              <ActionCopyButton value={profileCode} title="Copy code" />
             </Group>
           </Stack>
         ),
@@ -244,10 +249,7 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
         onClose={() => setIsDuplicating(false)}
       />
       <EditProfilesModal isOpen={isEditing} close={() => setIsEditing(false)} />
-      <ImportProfileModal
-        isOpen={isImporting}
-        onClose={() => setIsImporting(false)}
-      />
+      <ImportProfileModal isOpen={isImporting} setOpen={setIsImporting} />
     </>
   );
 }

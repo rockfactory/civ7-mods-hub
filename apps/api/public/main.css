@@ -145,10 +145,15 @@ img.mod-icon {
 }
 
 img.mod-icon.profile {
-  width: 32px;
-  height: 32px;
+  max-width: 32px;
+  max-height: 32px;
+  aspect-ratio: 1;
   border-radius: 4px;
   margin-bottom: 0;
+}
+
+tr.mod-row:hover {
+  background-color: #2a2c3f;
 }
 
 .logo-container {
