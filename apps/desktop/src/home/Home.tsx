@@ -59,9 +59,17 @@ export default function ModsListPage() {
   useInstallDeepLink();
   useCheckForAppUpdates();
 
-  const isFirstLoading =
-    (isFetching || isLoadingInstalled) &&
-    mods.filter((m) => m.fetched).length === 0;
+  const isFirstLoading = useMemo(() => {
+    console.log('isFirstLoading', {
+      isFetching,
+      isLoadingInstalled,
+      mods: mods.filter((m) => m.fetched).length,
+    });
+    return (
+      (isFetching || isLoadingInstalled) &&
+      mods.filter((m) => m.fetched).length === 0
+    );
+  }, [isFetching, isLoadingInstalled, mods]);
 
   const filteredMods = useMemo(() => {
     const installedModIds = new Set(
@@ -324,33 +332,34 @@ export default function ModsListPage() {
 
       <AppShell.Main className="main">
         <LoadingOverlay visible={isFirstLoading} />
-        <Virtuoso
-          // Too slow
-          // customScrollParent={document.body}
-          useWindowScroll
-          totalCount={filteredMods.length}
-          itemContent={(index) => (
-            <ModBox
-              key={filteredMods[index].modinfo_id || index}
-              mod={filteredMods[index]}
-              setQuery={setQuery}
+        {!isFirstLoading && (
+          <>
+            <Virtuoso
+              // Too slow
+              // customScrollParent={document.body}
+              useWindowScroll
+              totalCount={filteredMods.length}
+              itemContent={(index) => (
+                <ModBox
+                  key={filteredMods[index].modinfo_id || index}
+                  mod={filteredMods[index]}
+                  setQuery={setQuery}
+                />
+              )}
             />
-          )}
-        />
-        {/* {filteredMods.map((mod) => (
-            <ModBox key={mod.fetched.id} mod={mod} />
-          ))} */}
-        {filteredMods.length === 0 && (
-          <Box p="lg">
-            <Stack gap={'xs'} align="center">
-              <IconEyeQuestion size={40} />
-              <Text>No mods found</Text>
-              <Text c="dimmed">
-                Try changing your filters or open Settings and double check Mods
-                folder
-              </Text>
-            </Stack>
-          </Box>
+            {filteredMods.length === 0 && (
+              <Box p="lg">
+                <Stack gap={'xs'} align="center">
+                  <IconEyeQuestion size={40} />
+                  <Text>No mods found</Text>
+                  <Text c="dimmed">
+                    Try changing your filters or open Settings and double check
+                    Mods folder
+                  </Text>
+                </Stack>
+              </Box>
+            )}
+          </>
         )}
       </AppShell.Main>
     </AppShell>

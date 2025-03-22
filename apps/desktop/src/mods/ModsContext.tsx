@@ -43,7 +43,7 @@ export type ModsContextType = {
 export const ModsContext = createContext({} as ModsContextType);
 
 export function ModsContextProvider(props: { children: React.ReactNode }) {
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [fetchedMods, setFetchedMods] = useState<FetchedMod[]>([]);
 
   const [isLoadingInstalled, setIsLoadingInstalled] = useState(false);
@@ -127,8 +127,9 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
             autoClose: 10000,
           });
         }
+      } finally {
+        setIsFetching(false);
       }
-      setIsFetching(false);
     }
 
     fetchMods();
