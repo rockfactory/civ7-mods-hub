@@ -1,8 +1,8 @@
-import {
+import type {
   ModsResponse,
   ModVersionsRecord,
   ModVersionsResponse,
-} from '../pocketbase-types';
+} from '@civmods/parser';
 import { fetch } from '@tauri-apps/plugin-http';
 import * as fs from '@tauri-apps/plugin-fs';
 // import { parseContentDisposition } from '../../../../packages/parser/src/headers';

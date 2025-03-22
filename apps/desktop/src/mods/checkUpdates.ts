@@ -1,6 +1,6 @@
 import { notifications } from '@mantine/notifications';
 import { ModData, ModInfo } from '../home/IModInfo';
-import { ModVersionsRecord } from '../pocketbase-types';
+import { ModVersionsRecord } from '@civmods/parser';
 import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
 import { isSameVersion } from './isSameVersion';

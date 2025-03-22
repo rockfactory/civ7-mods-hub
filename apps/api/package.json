@@ -5,8 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/api/src/index.js",
-    "start:worker": "node dist/api/src/worker.js",
+    "start": "node dist/index.js",
+    "start:worker": "node dist/worker.js",
     "dev": "tsx watch --env-file=../../.env ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

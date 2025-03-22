@@ -6,11 +6,11 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
+import type { ModsResponse, ModVersionsRecord } from '@civmods/parser';
 import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
 import { invoke } from '@tauri-apps/api/core';
 import { sortVersionsByDate } from './fetchMods';
-import { TypedPocketBase } from '../pocketbase-types';
+import { TypedPocketBase } from '@civmods/parser';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 import { useAppStore } from '../store/store';
 import { installMod, runLowLevelInstallMod, uninstallMod } from './installMod';

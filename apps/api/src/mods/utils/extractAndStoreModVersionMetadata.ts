@@ -5,10 +5,7 @@ import { XMLParser } from 'fast-xml-parser';
 import { unpack } from '7zip-min';
 import * as unrar from 'node-unrar-js';
 import sleep from 'sleep-promise';
-import {
-  ModsRecord,
-  ModVersionsRecord,
-} from '../../../../desktop/src/pocketbase-types';
+import { ModsRecord, ModVersionsRecord } from '@civmods/parser';
 import { ScrapeModsOptions, SyncModVersion } from './scrapeMods';
 import { pb } from '../../core/pocketbase';
 

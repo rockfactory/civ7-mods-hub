@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ModData } from '../home/IModInfo';
-import { ModVersionsRecord } from '../pocketbase-types';
+import type { ModVersionsRecord } from '@civmods/parser';
 import { Tooltip, ActionIcon } from '@mantine/core';
 import {
   IconTransitionBottom,

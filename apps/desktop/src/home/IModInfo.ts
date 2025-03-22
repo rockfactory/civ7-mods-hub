@@ -1,4 +1,4 @@
-import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
+import { ModsResponse, ModVersionsRecord } from '@civmods/parser';
 
 export type FetchedMod = ModsResponse<{
   mod_versions_via_mod_id: ModVersionsRecord[];

@@ -2,7 +2,7 @@ import {
   ModsRecord,
   ModVersionsRecord,
   ModVersionsResponse,
-} from '../../../../desktop/src/pocketbase-types';
+} from '@civmods/parser';
 import { pb } from '../../core/pocketbase';
 import { getModIdFromUrl, getVersionIdFromUrl } from './cfIds';
 import { extractAndStoreModVersionMetadata } from './extractAndStoreModVersionMetadata';

@@ -27,7 +27,7 @@ npm run -w @civmods/desktop tauri dev
 To update PocketBase Typescript types:
 
 ```bash
-npx pocketbase-typegen --db ./apps/backend/pb_data/data.db --out ./apps/desktop/src/pocketbase-types.ts
+npx pocketbase-typegen --db ./apps/backend/pb_data/data.db --out ./packages/parser/src/pocketbase-types.ts
 ```
 
 ### Local Import

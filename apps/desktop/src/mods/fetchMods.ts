@@ -1,4 +1,4 @@
-import { ModVersionsRecord } from '../pocketbase-types';
+import { ModVersionsRecord } from '@civmods/parser';
 
 /**
  * Safely sorts an array of objects by a Date field stored as a string.

@@ -1,7 +1,7 @@
 import { pb } from '../core/pocketbase';
 import fs from 'fs/promises';
 import { getModIdFromUrl, getVersionIdFromUrl } from '../mods/utils/cfIds';
-import { ModsRecord } from '../../../desktop/src/pocketbase-types';
+import { ModsRecord } from '@civmods/parser';
 
 async function fixCFIds() {
   const allMods = await pb.collection('mods').getList(1, 1000);

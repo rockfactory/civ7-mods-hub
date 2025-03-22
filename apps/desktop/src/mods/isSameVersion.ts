@@ -1,5 +1,5 @@
-import { ModInfo } from '../home/IModInfo';
-import { ModVersionsRecord } from '../pocketbase-types';
+import type { ModInfo } from '../home/IModInfo';
+import type { ModVersionsRecord } from '@civmods/parser';
 
 export function isSameVersion(
   version: ModVersionsRecord | undefined,

@@ -1,4 +1,4 @@
-import { type TypedPocketBase } from '../../../desktop/src/pocketbase-types';
+import { type TypedPocketBase } from '@civmods/parser';
 import PocketBase from 'pocketbase/cjs';
 
 const pb = new PocketBase(

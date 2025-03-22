@@ -18,7 +18,7 @@ import {
   CopyButton,
 } from '@mantine/core';
 import * as React from 'react';
-import { ModVersionsRecord } from '../pocketbase-types';
+import type { ModVersionsRecord } from '@civmods/parser';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { open } from '@tauri-apps/plugin-shell';
 import {

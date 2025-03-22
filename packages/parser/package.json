@@ -3,9 +3,23 @@
   "version": "0.1.0",
   "description": "",
   "main": "src/index.ts",
-  "devDependencies": {},
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./src/index.ts"
+      },
+      "require": {
+        "types": "./src/index.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "devDependencies": {
+    "pocketbase": "^0.25.2"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC"

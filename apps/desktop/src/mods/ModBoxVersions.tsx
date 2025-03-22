@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ModData, ModInfo } from '../home/IModInfo';
-import { ModVersionsRecord } from '../pocketbase-types';
+import type { ModVersionsRecord } from '@civmods/parser';
 import { ActionIcon, Box, LoadingOverlay, Table, Text } from '@mantine/core';
 import { IconCircleCheckFilled, IconDownload } from '@tabler/icons-react';
 import { DateFormatter } from '../ui/DateFormatter';
