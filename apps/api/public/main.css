@@ -173,6 +173,11 @@ tr.mod-row:hover {
   background-color: #0f1115;
 }
 
+pre,
+code {
+  word-break: break-all;
+}
+
 .code > pre,
 .code > code {
   background-color: transparent;

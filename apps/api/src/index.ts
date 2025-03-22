@@ -173,7 +173,7 @@ app.get('/profile', async (req, res) => {
     title: 'Profile',
     mods,
     profileTitle: sharedProfile.t,
-    profileCode,
+    profileCode: profileCode.replace(/ /g, '+'), // Easier to copy, same behavior for lz-string
   });
 });
 
