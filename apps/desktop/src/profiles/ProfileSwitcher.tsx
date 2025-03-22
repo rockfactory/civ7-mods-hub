@@ -102,7 +102,7 @@ export function ProfileSwitcher(props: IProfileSwitcherProps) {
         return;
       }
 
-      const link = `http://localhost:3000/profile?profileCode=${profileCode}`;
+      const link = `https://civmods.com/profile?profileCode=${profileCode}`;
 
       modals.open({
         title: 'Share profile',
