@@ -149,6 +149,11 @@ export interface ScrapeModsOptions {
   skipSaveToDatabase?: boolean;
   skipExtractAndStore?: boolean;
   forceExtractAndStore?: boolean;
+  /**
+   * Skips versions, just global data from the lists (e.g. name).
+   * Incompatible with `forceExtractAndStore  and `stopAfterLastModVersion`
+   */
+  onlyListData?: boolean;
 }
 
 export async function scrapeMods(
@@ -182,9 +187,13 @@ export async function scrapeMods(
     firstModUrlOnLastPage = modsOnPage[0]?.modPageUrl;
 
     for (const mod of modsOnPage) {
-      console.log(`Fetching versions for mod: ${mod.modName}`);
-      const historyUrl = mod.modPageUrl + '/history';
-      mod.versions = await getModVersions(historyUrl);
+      // Download mod details (versions)
+      if (!options.onlyListData) {
+        console.log(`Fetching versions for mod: ${mod.modName}`);
+        const historyUrl = mod.modPageUrl + '/history';
+        mod.versions = await getModVersions(historyUrl);
+      }
+
       mods.push(mod);
 
       console.log(`Mod JSON:`, JSON.stringify(mod, null, 2));
@@ -199,9 +208,11 @@ export async function scrapeMods(
         return mods;
       }
 
-      const sleepTime = Math.floor(Math.random() * (200 + 1)) + 100; // Random sleep 100-300 ms
-      console.log(`Sleeping for ${sleepTime} ms`);
-      await sleep(sleepTime);
+      if (!options.onlyListData) {
+        const sleepTime = Math.floor(Math.random() * (200 + 1)) + 100; // Random sleep 100-300 ms
+        console.log(`Sleeping for ${sleepTime} ms`);
+        await sleep(sleepTime);
+      }
     }
   }
 

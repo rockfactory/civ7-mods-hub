@@ -15,7 +15,7 @@ function syncModToModRecord(syncMod: SyncMod): Partial<ModsRecord> {
     url: syncMod.modPageUrl,
     rating: parseFloat(syncMod.rating),
     short_description: syncMod.shortDescription,
-    downloads_count: parseInt(syncMod.downloadsCount, 10),
+    downloads_count: parseInt(syncMod.downloadsCount.replace(/,/g, ''), 10),
     mod_updated: syncMod.updatedAt ? syncMod.updatedAt : undefined,
     mod_released: syncMod.releasedAt ? syncMod.releasedAt : undefined,
     category: syncMod.category,
@@ -44,6 +44,10 @@ export async function saveModToDatabase(
 
   // If mod doesn't exist, create it. If it does, update it.
   if (!mod) {
+    // We don't want to create mods on "list only" mode, since
+    // we won't be able to process versions
+    if (options.onlyListData) return;
+
     console.log(`Creating new mod: ${syncMod.modName} (${syncMod.modPageUrl})`);
     mod = await pb.collection('mods').create({
       ...syncModToModRecord(syncMod),
@@ -60,6 +64,9 @@ export async function saveModToDatabase(
   if (!mod) {
     throw new Error(`Failed to create or update mod: ${syncMod.modName}`);
   }
+
+  // If we're only listing data, we can skip the rest of the process
+  if (options.onlyListData) return;
 
   // Process versions
   let isNewVersionsAvailable = false;

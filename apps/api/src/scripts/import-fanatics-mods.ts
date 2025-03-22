@@ -1,8 +1,9 @@
 import { scrapeMods } from '../mods/utils/scrapeMods';
 
 const forceExtractAndStore = true;
-const maxPages = 1; // 15 full
+const maxPages = 15; // 15 full
 const stopAfterLastModVersion = false;
+const onlyListData = true;
 
 // Main entry point
 scrapeMods({
@@ -10,6 +11,7 @@ scrapeMods({
   maxPages,
   forceExtractAndStore,
   stopAfterLastModVersion,
+  onlyListData,
 })
   .then((mods) => {
     // fs.writeFileSync('civ7_mods.json', JSON.stringify(mods, null, 2));

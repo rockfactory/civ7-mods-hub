@@ -135,3 +135,27 @@ cron.schedule('*/5 * * * *', () => {
       console.log('\n\n=== Finished [FAST] mods updating cron job ===\n\n');
     });
 });
+
+/**
+ * Cron job to update "list" data, e.g. mod names, downloads, rating
+ * Runs every 4 hours
+ */
+cron.schedule('0 */4 * * *', () => {
+  if (isRunning) {
+    console.log('Previous job is still running, skipping this run');
+    return;
+  }
+
+  isRunning = true;
+
+  console.log('\n\n=== Running [LIST] mods updating cron job ===\n\n');
+  scrapeMods({ firstPage: 1, maxPages: 50, onlyListData: true })
+    .then((mods) => {
+      console.log(`[LIST] Scraped ${mods.length} mods`);
+    })
+    .catch((err) => console.error(err))
+    .finally(() => {
+      isRunning = false;
+      console.log('\n\n=== Finished [LIST] mods updating cron job ===\n\n');
+    });
+});
