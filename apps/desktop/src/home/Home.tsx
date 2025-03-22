@@ -24,8 +24,11 @@ import {
   IconEyeQuestion,
   IconFilterOff,
   IconFolder,
+  IconMenuOrder,
   IconRefresh,
   IconSearch,
+  IconSortAZ,
+  IconSortDescending,
   IconX,
 } from '@tabler/icons-react';
 import { ModBox } from '../mods/ModBox';
@@ -52,8 +55,15 @@ export default function ModsListPage() {
     isLoadingInstalled,
   } = useModsContext();
 
-  const { query, isQueryPending, hasFilters, setQuery, resetQuery } =
-    useModsQuery();
+  const {
+    query,
+    isQueryPending,
+    hasFilters,
+    setQuery,
+    resetQuery,
+    sort,
+    setSort,
+  } = useModsQuery();
 
   // Globals: deep link & update
   useInstallDeepLink();
@@ -71,16 +81,46 @@ export default function ModsListPage() {
     );
   }, [isFetching, isLoadingInstalled, mods]);
 
+  /**
+   * Sort mods based on query
+   */
+  const sortedMods = useMemo(() => {
+    return [...mods].sort((a, b) => {
+      switch (sort) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'updated':
+          // Compare two ISO dates
+          return (
+            new Date(b.fetched?.mod_updated ?? 0).getTime() -
+            new Date(a.fetched?.mod_updated ?? 0).getTime()
+          );
+        case 'rating':
+          return (b.fetched?.rating ?? 0) - (a.fetched?.rating ?? 0);
+        case 'downloads':
+          return (
+            (b.fetched?.downloads_count ?? 0) -
+            (a.fetched?.downloads_count ?? 0)
+          );
+        default:
+          return 0;
+      }
+    });
+  }, [mods, sort]);
+
+  /**
+   * Filter mods based on query
+   */
   const filteredMods = useMemo(() => {
     const installedModIds = new Set(
-      mods
+      sortedMods
         .filter(({ local }) => local?.modinfo_id)
         .map(({ local }) => local?.modinfo_id)
     );
 
     const lockedModIds = new Set(useAppStore.getState().lockedModIds);
 
-    return mods.filter((mod) => {
+    return sortedMods.filter((mod) => {
       let shouldInclude = true;
 
       if (query.text) {
@@ -130,7 +170,7 @@ export default function ModsListPage() {
 
       return shouldInclude;
     });
-  }, [mods, query]);
+  }, [sortedMods, query]);
 
   const categories = useMemo(() => {
     const categories = new Map<string, string>();
@@ -269,6 +309,19 @@ export default function ModsListPage() {
                 Reset Filters
               </Button>
             )}
+            <Select
+              size="sm"
+              leftSection={<IconSortDescending size={16} />}
+              placeholder="Sort by..."
+              value={sort}
+              onChange={(value) => setSort(value as any)}
+              data={[
+                { label: 'Sort by Name', value: 'name' },
+                { label: 'Sort by Last Update', value: 'updated' },
+                { label: 'Sort by Rating', value: 'rating' },
+                { label: 'Sort by Downloads', value: 'downloads' },
+              ]}
+            />
           </Stack>
 
           {/* <Button mt="md" onClick={applyFilters}>

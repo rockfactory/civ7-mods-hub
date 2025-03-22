@@ -39,6 +39,10 @@
   margin-top: 0.1rem;
 }
 
+.textStatic {
+  font-size: 0.85rem !important;
+}
+
 .textAction {
   cursor: pointer;
   font-size: 0.85rem !important;

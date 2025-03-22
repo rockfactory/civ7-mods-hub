@@ -39,6 +39,7 @@ import {
   IconLock,
   IconSettings,
   IconSettings2,
+  IconStar,
   IconSwitch,
   IconTag,
   IconTransitionBottom,
@@ -195,7 +196,7 @@ export function ModBox(props: IModBoxProps) {
               </Box>
             )}
             <Flex justify="space-between" w="100%">
-              <Stack gap={0} align="flex-start">
+              <Stack gap={0} align="flex-start" w="100%">
                 <Text fw={600}>
                   {fetched ? (
                     <a
@@ -216,67 +217,83 @@ export function ModBox(props: IModBoxProps) {
                     mod.name
                   )}
                 </Text>
-                <Group gap={4} align="flex-start">
-                  <Text
-                    c="dimmed"
-                    className={styles.textAction}
-                    onClick={(e) => {
-                      const modinfo_id =
-                        latestVersion?.modinfo_id ?? local?.modinfo_id ?? 'N/A';
-                      navigator.clipboard.writeText(modinfo_id);
-                      notifications.show({
-                        title: 'Mod ID copied',
-                        message: modinfo_id,
-                        color: 'blue',
-                      });
-                    }}
-                  >
-                    <IconCopy size={12} />{' '}
-                    {latestVersion?.modinfo_id ?? local?.modinfo_id}
-                  </Text>
-                  {/* TODO: Add back author when fetched from modinfo */}
-                  {fetched && (
+                <Group gap={2} justify="space-between" w={'100%'}>
+                  <Group gap={4} align="flex-start">
                     <Text
                       c="dimmed"
                       className={styles.textAction}
-                      onClick={() => {
-                        setQuery({ text: fetched.author });
+                      onClick={(e) => {
+                        const modinfo_id =
+                          latestVersion?.modinfo_id ??
+                          local?.modinfo_id ??
+                          'N/A';
+                        navigator.clipboard.writeText(modinfo_id);
+                        notifications.show({
+                          title: 'Mod ID copied',
+                          message: modinfo_id,
+                          color: 'blue',
+                        });
                       }}
                     >
-                      <IconUser size={12} /> {fetched.author}
+                      <IconCopy size={12} />{' '}
+                      {latestVersion?.modinfo_id ?? local?.modinfo_id}
                     </Text>
-                  )}
-                  {mod.fetched?.category && (
-                    <Text
-                      c="dimmed"
-                      className={styles.textAction}
-                      onClick={() => {
-                        setQuery({ category: mod.fetched!.category });
-                      }}
-                    >
-                      <IconTag size={12} />{' '}
-                      {cleanCategoryName(mod.fetched.category)}
-                    </Text>
-                  )}
-                  {/**
-                   * TODO Read this from modinfo
-                   */}
-                  {latestVersion?.affect_saves && (
-                    <Tooltip
-                      color="dark.8"
-                      multiline
-                      w={320}
-                      label="This mod affects save files: it means that you shouldn't remove it in the middle of the game."
-                    >
+                    {/* TODO: Add back author when fetched from modinfo */}
+                    {fetched && (
                       <Text
-                        c="orange.1"
-                        fz={'0.85rem'}
-                        className={styles.descriptionBlock}
+                        c="dimmed"
+                        className={styles.textAction}
+                        onClick={() => {
+                          setQuery({ text: fetched.author });
+                        }}
                       >
-                        <IconDeviceFloppy size={12} /> Save file
+                        <IconUser size={12} /> {fetched.author}
                       </Text>
-                    </Tooltip>
-                  )}
+                    )}
+                    {mod.fetched?.category && (
+                      <Text
+                        c="dimmed"
+                        className={styles.textAction}
+                        onClick={() => {
+                          setQuery({ category: mod.fetched!.category });
+                        }}
+                      >
+                        <IconTag size={12} />{' '}
+                        {cleanCategoryName(mod.fetched.category)}
+                      </Text>
+                    )}
+                    {/**
+                     * TODO Read this from modinfo
+                     */}
+                    {latestVersion?.affect_saves && (
+                      <Tooltip
+                        color="dark.8"
+                        multiline
+                        w={320}
+                        label="This mod affects save files: it means that you shouldn't remove it in the middle of the game."
+                      >
+                        <Text
+                          c="orange.1"
+                          fz={'0.85rem'}
+                          className={styles.descriptionBlock}
+                        >
+                          <IconDeviceFloppy size={12} /> Save file
+                        </Text>
+                      </Tooltip>
+                    )}
+                  </Group>
+                  <Group gap={4} align="flex-start" mr="md">
+                    {mod.fetched?.downloads_count && (
+                      <Text c="dimmed" className={styles.textStatic}>
+                        <IconDownload size={12} /> {mod.fetched.downloads_count}
+                      </Text>
+                    )}
+                    {mod.fetched?.rating && (
+                      <Text c="dimmed" className={styles.textStatic}>
+                        <IconStar size={12} /> {mod.fetched.rating}
+                      </Text>
+                    )}
+                  </Group>
                 </Group>
               </Stack>
               {/* {latestVersion && (

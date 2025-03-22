@@ -14,9 +14,15 @@ const defaultQuery: ModsQuery = {
   state: '',
 };
 
+export type ModsSortBy = 'name' | 'updated' | 'rating' | 'downloads';
+
 export type SetModsQueryFn = (query: Partial<ModsQuery>) => void;
 
 export function useModsQuery() {
+  // Sorting
+  const [sort, setSort] = useState<ModsSortBy>('updated');
+
+  // Filters
   const [query, setQuery] = useState<ModsQuery>({
     ...defaultQuery,
   });
@@ -51,5 +57,7 @@ export function useModsQuery() {
     setQuery: setQueryWithTransition,
     resetQuery,
     hasFilters,
+    sort,
+    setSort,
   };
 }
