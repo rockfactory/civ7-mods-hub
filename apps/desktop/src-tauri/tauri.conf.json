@@ -17,7 +17,9 @@
         "width": 950,
         "height": 600,
         "minWidth": 950,
-        "minHeight": 600
+        "minHeight": 600,
+        "visible": false,
+        "backgroundColor": "#191b20"
       }
     ],
     "security": {
