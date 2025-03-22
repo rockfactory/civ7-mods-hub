@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="lf-policies-yields-preview" version="1" xmlns="ModInfo">
+	<Properties>
+		<Name>LOC_MOD_LF_YIELDS_MOD_NAME</Name>
+		<Description>LOC_MOD_LF_YIELDS_MOD_DESC</Description>
+		<Authors>leonardfactory</Authors>
+		<Package>Mod</Package>
+		<AffectsSavedGames>0</AffectsSavedGames>
+		<Version>0.7.1</Version>
+		<URL>https://forums.civfanatics.com/resources/leonardfactorys-policy-yield-previews.32012/</URL>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME" />
+	</Dependencies>
+	<References>
+		<Mod id="core" title="LOC_MODULE_CORE_NAME"/>
+	</References>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet></AlwaysMet>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="shell-lf-policies-ui" scope="shell" criteria="always">
+			<Properties>
+				<LoadOrder>500</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateText>
+					<Item>text/de_DE/InGameText.xml</Item>
+					<Item>text/en_US/InGameText.xml</Item>
+					<Item>text/it_IT/InGameText.xml</Item>
+					<Item>text/ko_KR/InGameText.xml</Item>
+					<File>text/ru_RU/InGameText.xml</File>
+				</UpdateText>
+				<UIScripts>
+					<Item>scripts/core/settings.js</Item>
+					<Item>scripts/ui/settings-init.js</Item>
+				</UIScripts>
+			</Actions>
+		</ActionGroup>
+		<ActionGroup id="game-lf-policies-ui" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>500</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateText>
+					<Item>text/de_DE/InGameText.xml</Item>
+					<Item>text/en_US/InGameText.xml</Item>
+					<Item>text/it_IT/InGameText.xml</Item>
+					<Item>text/ko_KR/InGameText.xml</Item>
+					<File>text/ru_RU/InGameText.xml</File>
+				</UpdateText>
+				<UIScripts>
+					<Item>scripts/core/settings.js</Item>
+					<Item>scripts/core/execution-context.js</Item>
+					<Item>scripts/ui/render-yields-preview.js</Item>
+					<Item>scripts/ui/yields-styles.js</Item>
+					<Item>scripts/ui/policies/policy-chooser-item-yields-decorator.js</Item>
+					<Item>scripts/ui/policies/screen-policies-yields-decorator.js</Item>
+					<Item>scripts/ui/attributes/attribute-card-yields-decorator.js</Item>
+					<Item>scripts/ui/tech-civic/tech-civic-tooltip-decorator.js</Item>
+					<Item>scripts/ui/settings-init.js</Item>
+					<Item>scripts/effects/apply-effects.js</Item>
+					<Item>scripts/effects/yields.js</Item>
+					<Item>scripts/game/adjacency.js</Item>
+					<Item>scripts/game/city.js</Item>
+					<Item>scripts/game/constructibles.js</Item>
+					<Item>scripts/game/helpers.js</Item>
+					<Item>scripts/game/player.js</Item>
+					<Item>scripts/game/plot.js</Item>
+					<Item>scripts/game/units.js</Item>
+					<Item>scripts/game/warehouse.js</Item>
+					<Item>scripts/requirements/requirement.js</Item>
+					<Item>scripts/requirements/resolve-subjects.js</Item>
+					<Item>scripts/requirements/assert-subject.js</Item>
+					<Item>scripts/preview-yields.js</Item>
+					<Item>scripts/fetch-modifiers.js</Item>
+					<Item>scripts/modifiers.js</Item>
+					<Item>scripts/cache.js</Item>
+				</UIScripts>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+	<LocalizedText>
+		<File>text/de_DE/ModInfoText.xml</File>
+		<File>text/en_US/ModInfoText.xml</File>
+		<File>text/it_IT/ModInfoText.xml</File>
+		<File>text/ko_KR/ModInfoText.xml</File>
+		<File>text/ru_RU/ModInfoText.xml</File>
+	</LocalizedText>
+</Mod>

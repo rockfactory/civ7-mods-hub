@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="f1rstdan-cool-ui" version="1"
+    xmlns="ModInfo">
+    <Properties>
+        <Name>LOC_MOD_F1RSTDAN_COOL_UI_NAME</Name>
+        <Version>1.7.4</Version>
+        <Description>LOC_MOD_F1RSTDAN_COOL_UI_DESCRIPTION</Description>
+        <Authors>F1rstDan</Authors>
+        <URL>https://forums.civfanatics.com/resources/31961/</URL>
+        <Package>Mod</Package>
+        <AffectsSavedGames>0</AffectsSavedGames>
+    </Properties>
+    <Dependencies>
+        <Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME" />
+    </Dependencies>
+    <ActionCriteria>
+        <Criteria id="always">
+            <AlwaysMet></AlwaysMet>
+        </Criteria>
+    </ActionCriteria>
+    <ActionGroups>
+        <ActionGroup id="f1rstdan-menu" scope="shell" criteria="always">
+            <Properties>
+                <LoadOrder>1111</LoadOrder>
+            </Properties>
+            <Actions>
+                <UIScripts>
+                    <Item>ui/options/f1rstdan-cool-ui-options.js</Item>
+                    <Item>ui/options/mod-options-decorator.js</Item>
+                </UIScripts>
+                <UpdateText>
+                    <Item>text/en_us/InGameText.xml</Item>
+                    <Item>text/zh_Hans_CN/InGameText.xml</Item>
+                    <Item>text/ko_KR/InGameText.xml</Item>
+                    <Item>text/ru_RU/InGameText.xml</Item>                    
+                </UpdateText>
+            </Actions>
+        </ActionGroup>
+        <ActionGroup id="f1rstdan-cool-ui-city" scope="game" criteria="always">
+            <Properties>
+                <LoadOrder>1111</LoadOrder>
+            </Properties>
+            <Actions>
+                <UIScripts>
+                    <Item>ui/dan-city-production/dan-item-layout-decorator.js</Item>
+				</UIScripts>
+                <ImportFiles>
+                    <Item>ui/production-chooser/panel-production-chooser.js</Item>
+                    <Item>ui/production-chooser/production-chooser-unique-quarter.js</Item>
+                    <Item>ui/production-chooser/dan-quick-buy-item.js</Item>
+                </ImportFiles>
+                <UpdateText>
+                    <Item>text/en_us/InGameText.xml</Item>
+                    <Item>text/zh_Hans_CN/InGameText.xml</Item>
+                    <Item>text/ko_KR/InGameText.xml</Item>
+                    <Item>text/ru_RU/InGameText.xml</Item>                    
+                </UpdateText>
+            </Actions>
+        </ActionGroup>
+        <ActionGroup id="f1rstdan-cool-ui-city-yields" scope="game" criteria="always">
+            <Properties>
+                <LoadOrder>1111</LoadOrder>
+            </Properties>
+            <Actions>
+				<UIScripts>
+                    <Item>ui/dan-city-yields/dan-city-yields-decorator.js</Item>
+					<Item>ui/dan-city-yields/dan-city-yields-tooltip.js</Item>
+				</UIScripts>
+				<ImportFiles>
+					<Item>textures/F1dan_city_population.png</Item>
+					<Item>textures/F1dan_city_connectivity.png</Item>
+				</ImportFiles>
+				<UpdateIcons>
+					<Item>icons/icons.xml</Item>
+				</UpdateIcons>
+            </Actions>
+        </ActionGroup>
+    </ActionGroups>
+    <LocalizedText>
+        <File>text/en_us/ModInfoText.xml</File>
+        <File>text/zh_Hans_CN/ModInfoText.xml</File>
+        <File>text/ko_KR/ModInfoText.xml</File>
+        <File>text/ru_RU/ModInfoText.xml</File>        
+    </LocalizedText>
+</Mod>

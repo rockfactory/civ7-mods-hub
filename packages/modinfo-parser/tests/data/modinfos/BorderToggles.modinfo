@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="finwickle-border-boggles" version="2.5" xmlns="ModInfo">
+	<Properties>
+		<Name>LOC_MOD_BORDER_TOGGLES_NAME</Name>
+		<Description>LOC_MOD_BORDER_TOGGLES_DESCRIPTION</Description>
+		<Authors>Finwickle</Authors>
+		<SpecialThanks>LOC_MOD_BORDER_TOGGLES_SPECIALTHANKS</SpecialThanks>
+		<Compatibility>LOC_MOD_BORDER_TOGGLES_COMPATIBILITY</Compatibility>
+		<URL>https://forums.civfanatics.com/resources/border-toggles.32008/</URL>
+		<Package>Mod</Package>
+		<AffectsSavedGames>0</AffectsSavedGames>
+		<Version>2.5</Version>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME" />
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet/>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="border-toggles-shell-actions" scope="shell" criteria="always">
+		<!-- The shell actiongroup is needed for showing localized text in the TCS Improved Mod Page mod -->
+			<Actions>
+				<UpdateText>
+					<Item>text/en_us/ModuleText.xml</Item>
+					<Item locale="de_DE">text/de_de/ModuleText.xml</Item>
+ 					<Item locale="es_ES">text/es_es/ModuleText.xml</Item>
+ 					<Item locale="fr_FR">text/fr_fr/ModuleText.xml</Item>
+ 					<Item locale="it_IT">text/it_it/ModuleText.xml</Item>
+ 					<Item locale="ja_JP">text/ja_jp/ModuleText.xml</Item>
+					<Item locale="ko_KR">text/ko_kr/ModuleText.xml</Item>
+					<Item locale="pl_PL">text/pl_pl/ModuleText.xml</Item>
+ 					<Item locale="pt_BR">text/pt_br/ModuleText.xml</Item>
+					<Item locale="ru_RU">text/ru_ru/ModuleText.xml</Item>
+ 					<Item locale="zh_Hans_CN">text/zh_hans_cn/ModuleText.xml</Item>
+ 					<Item locale="zh_Hant_HK">text/zh_hant_hk/ModuleText.xml</Item>
+				</UpdateText>
+			</Actions>
+		</ActionGroup>
+		<ActionGroup id="border-toggles-actions" scope="game" criteria="always">
+			<Actions>
+				<UIScripts>
+					<Item>ui/mini-map/border-toggles-panel-mini-map.js</Item>
+				</UIScripts>
+				<UpdateText>
+					<Item>text/en_us/UIText.xml</Item>
+					<Item locale="de_DE">text/de_de/UIText.xml</Item>
+ 					<Item locale="es_ES">text/es_es/UIText.xml</Item>
+ 					<Item locale="fr_FR">text/fr_fr/UIText.xml</Item>
+ 					<Item locale="it_IT">text/it_it/UIText.xml</Item>
+ 					<Item locale="ja_JP">text/ja_jp/UIText.xml</Item>
+					<Item locale="ko_KR">text/ko_kr/UIText.xml</Item>
+					<Item locale="pl_PL">text/pl_pl/UIText.xml</Item>
+ 					<Item locale="pt_BR">text/pt_br/UIText.xml</Item>
+					<Item locale="ru_RU">text/ru_ru/UIText.xml</Item>
+ 					<Item locale="zh_Hans_CN">text/zh_hans_cn/UIText.xml</Item>
+ 					<Item locale="zh_Hant_HK">text/zh_hant_hk/UIText.xml</Item>
+				</UpdateText>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+	<LocalizedText>
+		<File>text/en_us/ModuleText.xml</File>
+		<File>text/de_de/ModuleText.xml</File>
+		<File>text/es_es/ModuleText.xml</File>
+		<File>text/fr_fr/ModuleText.xml</File>
+		<File>text/it_it/ModuleText.xml</File>
+		<File>text/ja_jp/ModuleText.xml</File>
+		<File>text/ko_kr/ModuleText.xml</File>
+		<File>text/pl_pl/ModuleText.xml</File>
+		<File>text/pt_br/ModuleText.xml</File>
+		<File>text/ru_ru/ModuleText.xml</File>
+		<File>text/zh_hans_cn/ModuleText.xml</File>
+		<File>text/zh_hant_hk/ModuleText.xml</File>
+	</LocalizedText>
+</Mod>

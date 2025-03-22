@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="chrispresso-debug-console" version="1.0.0" xmlns="chrispresso-debug-console">
+    <Properties>
+        <Name>Chrispresso's Debug Console (CDC)</Name>
+        <Description>A better debug console</Description>
+        <Authors>Chrispresso</Authors>
+        <Package>Mod</Package>
+        <SortIndex>1000</SortIndex>
+    </Properties>
+    <Dependencies>
+        <Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME"/>
+        <Mod id="core" title="Core"/>
+    </Dependencies>
+    <Files>
+        <File>ui/debug-console/debug-console.js</File>
+        <File>ui/debug-console/completions.js</File>
+    </Files>
+    <Scripts>
+        <File>ui/debug-console/debug-console.js</File>
+    </Scripts>
+    <ImportFiles>
+        <Item>ui/debug-console/debug-console.html</Item>
+        <Item>ui/debug-console/debug-console.css</Item>
+        <Item>config/input.xml</Item>
+    </ImportFiles>
+    <ActionCriteria>
+        <Criteria id="always">
+            <AlwaysMet></AlwaysMet>
+        </Criteria>
+    </ActionCriteria>
+    <ActionGroups>
+        <ActionGroup id="core-game" scope="game" criteria="always">
+            <Actions>
+                <UIScripts>
+                    <Item>ui/debug-console/debug-console.js</Item>
+                </UIScripts>
+            </Actions>
+        </ActionGroup>
+
+        <ActionGroup id="core-shell" scope="shell" criteria="always">
+            <Actions>
+                <UpdateDatabase>
+                    <Item>config/input.xml</Item>
+                </UpdateDatabase>
+            </Actions>
+        </ActionGroup>
+    </ActionGroups>
+    <LocalizedText>
+        <File>text/en_us/UnitActions.xml</File>
+        <File>text/en_us/InputText.xml</File>
+    </LocalizedText>
+</Mod>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="misc_ui_modifications" version="1.13"
+	xmlns="ModInfo">
+	<Properties>
+		<Name>KayleeR's Misc UI Modifications</Name>
+		<Description>Miscellaneous modifications to improve the base game UI.</Description>
+		<Authors>KayleeR</Authors>
+		<Package>Mod</Package>
+		<AffectsSavedGames>0</AffectsSavedGames>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME"/>
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet></AlwaysMet>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="game-misc-ui-modifications-always" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>100</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateText>
+					<Item>text/misc-ui-modifications-text.sql</Item>
+				</UpdateText>
+				<ImportFiles>
+					<Item>ui/building-placement/building-placement-manager.js</Item>
+					<Item>ui/interface-modes/interface-mode-place-building.js</Item>
+					<Item>ui/lenses/layer/building-placement-layer.js</Item>
+					<Item>ui/lenses/layer/resource-layer.js</Item>
+					<Item>ui/plot-icon/plot-icons-root.js</Item>
+					<Item>ui/plot-icon/plot-icon-resource.js</Item>
+					<Item>ui/plot-icon/plot-icon-resource.css</Item>
+					<Item>ui/plot-icon/plot-icon-discovery.css</Item>
+					<Item>ui/resource-allocation/screen-resource-allocation.css</Item>
+					<Item>ui/resource-allocation/screen-resource-allocation.js</Item>
+					<Item>ui/resource-allocation/model-resource-allocation.js</Item>
+
+					<!-- Add repair category-->
+					<Item>ui/production-chooser/production-chooser-helpers.js</Item>
+				</ImportFiles>
+				<UIScripts>
+					<!-- Add discovery layer-->
+					<Item>ui/lenses/layer/discovery-layer.js</Item>
+					<Item>ui/plot-icon/plot-icon-discovery.js</Item>
+					<Item>ui/mini-map/mini-map-decorator.js</Item>
+
+					<!-- Fix bug with repairs not updating valid items -->
+					<Item>ui/production-chooser/panel-production-chooser-decorator.js</Item>
+				</UIScripts>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+</Mod>

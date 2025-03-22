@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="ged-ynamp" version="1" xmlns="ModInfo">
+	<Properties>
+		<Name>LOC_MODULE_YNAMP_NAME</Name>
+		<Description>LOC_MODULE_YNAMP_DESCRIPTION</Description>
+		<Authors>Gedemon</Authors>
+		<Package>Mod</Package>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME"/>
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet></AlwaysMet>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="base-game-init-ynamp" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>-1000</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>data/tables.sql</Item>
+				</UpdateDatabase>
+			</Actions>
+		</ActionGroup>
+		<ActionGroup id="base-game-main-ynamp" scope="game" criteria="always">
+			<Actions>
+				<UpdateDatabase>
+					<Item>version.sql</Item>
+					<Item>data/maps.xml</Item>
+					<Item>maps/giant-earth-map/giant-earth.xml</Item>
+					<Item>maps/giant-earth-map/giant-earth-city.xml</Item>
+					<Item>maps/greatest-earth-map/greatest-earth.xml</Item>
+					<Item>maps/greatest-earth-map/greatest-earth-city.xml</Item>
+				</UpdateDatabase>
+				<UpdateText>
+					<Item>text/en_us/MapText.xml</Item>
+					<Item locale="de_DE">text/de_DE_Text.xml</Item>
+					<Item locale="es_ES">text/es_ES_Text.xml</Item>
+					<Item locale="fr_FR">text/fr_FR_Text.xml</Item>
+					<Item locale="it_IT">text/it_IT_Text.xml</Item>
+					<Item locale="ja_JP">text/ja_JP_Text.xml</Item>
+					<Item locale="ko_KR">text/ko_KR_Text.xml</Item>
+					<Item locale="pl_PL">text/pl_PL_Text.xml</Item>
+					<Item locale="pt_BR">text/pt_BR_Text.xml</Item>
+					<Item locale="ru_RU">text/ru_RU_Text.xml</Item>
+					<Item locale="zh_Hans_CN">text/zh_Hans_CN_Text.xml</Item>
+					<Item locale="zh_Hant_HK">text/zh_Hant_HK_Text.xml</Item>
+				</UpdateText>
+				<ImportFiles>
+					<Item>icons/happy_cat.png</Item>
+					<Item>icons/civ6_earth.png</Item>
+				</ImportFiles>
+				<UpdateIcons>
+					<Item>icons/ynamp-icons.xml</Item>
+				</UpdateIcons>
+				<ScenarioScripts>
+					<Item>scenario/test.js</Item>
+				</ScenarioScripts>
+			</Actions>
+		</ActionGroup>
+		<ActionGroup id="shell-ynamp" scope="shell" criteria="always">
+			<Actions>
+				<UpdateDatabase>
+					<Item>config/config.xml</Item>
+				</UpdateDatabase>
+				<UpdateText>
+					<Item>text/en_us/MapText.xml</Item>
+					<Item locale="de_DE">text/de_DE_Text.xml</Item>
+					<Item locale="es_ES">text/es_ES_Text.xml</Item>
+					<Item locale="fr_FR">text/fr_FR_Text.xml</Item>
+					<Item locale="it_IT">text/it_IT_Text.xml</Item>
+					<Item locale="ja_JP">text/ja_JP_Text.xml</Item>
+					<Item locale="ko_KR">text/ko_KR_Text.xml</Item>
+					<Item locale="pl_PL">text/pl_PL_Text.xml</Item>
+					<Item locale="pt_BR">text/pt_BR_Text.xml</Item>
+					<Item locale="ru_RU">text/ru_RU_Text.xml</Item>
+					<Item locale="zh_Hans_CN">text/zh_Hans_CN_Text.xml</Item>
+					<Item locale="zh_Hant_HK">text/zh_Hant_HK_Text.xml</Item>
+				</UpdateText>
+				<ImportFiles>
+					<Item>icons/happy_cat.png</Item>
+					<Item>icons/civ6_earth.png</Item>
+				</ImportFiles>
+				<UpdateIcons>
+					<Item>icons/ynamp-icons.xml</Item>
+				</UpdateIcons>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+	<LocalizedText>
+		<File>text/en_us/ModuleText.xml</File>
+		<File>text/ModuleText.xml</File>
+	</LocalizedText>
+</Mod>

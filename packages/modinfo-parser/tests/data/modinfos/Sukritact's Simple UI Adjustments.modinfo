@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="sukritacts_simple_ui_adjustments" version="1"
+	xmlns="ModInfo">
+	<Properties>
+		<Name>Sukritact's Simple UI Adjustments</Name>
+		<Description>Makes simple QoL changes to the UI.</Description>
+		<Authors>Sukritact</Authors>
+		<Package>Mod</Package>
+		<AffectsSavedGames>0</AffectsSavedGames>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME"/>
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet></AlwaysMet>
+		</Criteria>
+		<Criteria any="true" id="plot-tooltip-compat">
+			<ModInUse inverse="1">tcs-ui-improved-plot-tooltip</ModInUse>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="game-suk-simple-ui-plot-tooltip" scope="game" criteria="plot-tooltip-compat">
+			<Properties>
+				<LoadOrder>10</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateText>
+					<Item>text/Suk_Simple_UI_Adjustments_Text.sql</Item>
+				</UpdateText>
+				<ImportFiles>
+					<Item>ui/tooltips/plot-tooltip.js</Item>
+				</ImportFiles>
+			</Actions>
+		</ActionGroup>
+		<ActionGroup id="game-suk-simple-ui-building-placement" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>1</LoadOrder>
+			</Properties>
+			<Actions>
+				<ImportFiles>
+					<Item>ui/place-building/model-place-building.js</Item>
+					<Item>ui/place-building/panel-place-building.js</Item>
+					<Item>ui/lenses/layer/building-placement-layer.js</Item>
+				</ImportFiles>
+				<ImportFiles>
+					<Item>textures/Suk_SUA_WarehouseBonus</Item>
+					<Item>textures/Suk_SUA_ToOthers.png</Item>
+					<Item>textures/Suk_SUA_SpecialistBonus</Item>
+					<Item>textures/Suk_SUA_BaseYield</Item>
+					<Item>textures/Suk_SUA_AdjacencyBonus.png</Item>
+					<Item>textures/Suk_SUA_PotentialLoss.png</Item>
+					<Item>textures/Suk_SUA_DevelopmentLoss.png</Item>
+				</ImportFiles>
+			</Actions>
+		</ActionGroup>
+		<ActionGroup id="game-suk-simple-ui-always" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>10</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>data/Suk_Simple_UI_Adjustments_Data.sql</Item>
+				</UpdateDatabase>
+				<UpdateIcons>
+					<Item>data/Suk_Simple_UI_Adjustments_Icons.sql</Item>
+				</UpdateIcons>
+				<UpdateText>
+					<Item>text/Suk_Simple_UI_Adjustments_Text.sql</Item>
+				</UpdateText>
+				<UIScripts>
+					<Item>ui/unit-flags/suk-unit-flags.js</Item>
+					<Item>ui/sub-system-dock/suk-celebration-turncounter.js</Item>
+					<Item>ui/city-banners/suk-city-banners-decorator.js</Item>
+				</UIScripts>
+				<ImportFiles>
+					<Item>ui/lenses/lens/founder-lens.js</Item>
+					<Item>ui/utilities/utilities-core-textprovider.js</Item>
+					<Item>ui/utilities/utilities-textprovider.js</Item>
+					<Item>textures/Suk_TurnCounter_Backing.png</Item>
+					<Item>textures/Suk_SUA_UnlockGreatWork.png</Item>
+					<Item>textures/Suk_SUA_UnlockReligion.png</Item>
+				</ImportFiles>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+</Mod>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="resource-fixes-deadbeef" version="1"
+	xmlns="ModInfo">
+	<Properties>
+		<Name>Resource Screen Improvements</Name>
+		<Description>Improves the Trade Panel with extra filters</Description>
+		<Authors>Slothoth</Authors>
+		<Package>Mod</Package>
+		<AffectsSavedGames>0</AffectsSavedGames>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME"/>
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet></AlwaysMet>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="game-sloth-resource-always" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>100</LoadOrder>
+			</Properties>
+			<Actions>
+				<ImportFiles>
+					<Item>ui/trade-route-chooser/trade-route-chooser.js</Item>
+					<Item>ui/trade-route-chooser/trade-routes-model.js</Item>
+				</ImportFiles>
+				<UpdateText>
+					<Item>text/loc.sql</Item>
+				</UpdateText>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+</Mod>

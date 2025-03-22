@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="bz-map-trix" version="10801"
+    xmlns="ModInfo">
+    <Properties>
+        <Name>LOC_MOD_BZ_MAP_TRIX_NAME</Name>
+        <Version>1.8.1</Version>
+        <Description>LOC_MOD_BZ_MAP_TRIX_DESCRIPTION</Description>
+        <Authors>beezany</Authors>
+        <URL>https://forums.civfanatics.com/resources/map-trix.31950/</URL>
+        <Package>Mod</Package>
+        <AffectsSavedGames>0</AffectsSavedGames>
+    </Properties>
+    <Dependencies>
+        <Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME" />
+    </Dependencies>
+    <ActionCriteria>
+        <Criteria id="always">
+            <AlwaysMet></AlwaysMet>
+        </Criteria>
+    </ActionCriteria>
+    <ActionGroups>
+        <ActionGroup id="bz-map-trix-menu" scope="shell" criteria="always">
+            <Properties>
+                <LoadOrder>1000</LoadOrder>
+            </Properties>
+            <Actions>
+                <UIScripts>
+                    <Item>ui/options/bz-map-trix-options.js</Item>
+                    <Item>ui/options/mod-options-decorator.js</Item>
+                </UIScripts>
+                <UpdateText>
+                    <Item>text/en_us/InGameText.xml</Item>
+                    <Item locale="de_DE">text/de_DE/InGameText.xml</Item>
+                    <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
+                    <Item locale="ko_KR">text/ko_kr/InGameText.xml</Item>
+                    <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
+                </UpdateText>
+            </Actions>
+        </ActionGroup>
+        <ActionGroup id="bz-map-trix-ui" scope="game" criteria="always">
+            <Properties>
+                <LoadOrder>1000</LoadOrder>
+            </Properties>
+            <Actions>
+                <UIScripts>
+                    <Item>ui/diplo-ribbon/bz-panel-yield-banner.js</Item>
+                    <Item>ui/options/bz-map-trix-options.js</Item>
+                    <Item>ui/options/mod-options-decorator.js</Item>
+                    <Item>ui/tooltips/bz-plot-tooltip.js</Item>
+                </UIScripts>
+                <UpdateText>
+                    <Item>text/en_us/InGameText.xml</Item>
+                    <Item locale="de_DE">text/de_DE/InGameText.xml</Item>
+                    <Item locale="it_IT">text/it_IT/InGameText.xml</Item>
+                    <Item locale="ko_KR">text/ko_kr/InGameText.xml</Item>
+                    <Item locale="ru_RU">text/ru_RU/InGameText.xml</Item>
+                </UpdateText>
+            </Actions>
+        </ActionGroup>
+    </ActionGroups>
+    <LocalizedText>
+        <File>text/en_us/ModInfoText.xml</File>
+        <File>text/de_DE/ModInfoText.xml</File>
+        <File>text/it_IT/ModInfoText.xml</File>
+        <File>text/ko_KR/ModInfoText.xml</File>
+    </LocalizedText>
+</Mod>
