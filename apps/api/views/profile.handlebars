@@ -1,0 +1,72 @@
+<main class="container">
+  <hgroup>
+    <h2>
+      CivMods Profile: {{profileTitle}}
+    </h2>
+    <p>Click the button below to add this profile to CivMods, installing all the mods at once</p>
+  </hgroup>
+  <a id="install-button" role="button" href="civmods://profile/?profileCode={{profileCode}}">
+    {{{icon 'outline/hexagon-plus' 28}}} <span class="text">Add Profile with CivMods</span>
+  </a>
+</main>
+
+<section class="container">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Install</th>
+        <th scope="col">Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each mods}}
+      <tr class="mod-row">
+        <td>
+          {{#if icon_url}}
+          <img class="mod-icon profile" src="{{icon_url}}" alt="{{name}}" />
+          {{/if}}
+        </td>
+        <td>{{name}}</td>
+        <td>{{short_description}}</td>
+        <td>
+          <a href="civmods://install/?modCfId={{cf_id}}">
+            {{{icon 'outline/hexagon-plus' 24}}} Install
+          </a>
+        </td>
+        <td><a href="{{url}}" target="_blank" rel="noopener noreferrer">See on CivFanatics</a></td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</section>
+
+<section class="container">
+  <a id="install-button" role="button" href="civmods://profile/?profileCode={{profileCode}}">
+    {{{icon 'outline/hexagon-plus' 28}}} <span class="text">Add Profile with CivMods</span>
+  </a>
+
+  <article style="margin-top: 1rem;">
+    <p>
+      Profile Code for manual installation:
+    </p>
+    <code>{{profileCode}}</code>
+  </article>
+</section>
+
+<section class="container">
+  <article id="not-installed">
+    <p class="download-help-first">
+      If you don't have CivMods installed, you can download it from the link below.
+    </p>
+    <p class="download-help">
+      Once you have installed CivMods, click the button <strong>Add Profile with CivMods</strong> to install the
+      profile.
+    </p>
+    <a id="download-btn" role="button" href="https://civmods.com/releases/latest">
+      {{{icon 'outline/download' 24}}} Download CivMods
+    </a>
+  </article>
+</section>

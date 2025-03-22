@@ -6,15 +6,8 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { ModsResponse, ModVersionsRecord } from '../pocketbase-types';
-import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
-import { invoke } from '@tauri-apps/api/core';
-import { TypedPocketBase } from '../pocketbase-types';
-import PocketBase, { ClientResponseError } from 'pocketbase';
 import { useAppStore } from '../store/store';
 import { notifications } from '@mantine/notifications';
-import { open } from '@tauri-apps/plugin-dialog';
-import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { modals, openConfirmModal } from '@mantine/modals';
 import {
   copyModsToProfile,
@@ -24,17 +17,17 @@ import {
 } from './profileRustBindings';
 import { getActiveModsFolder } from '../mods/getModsFolder';
 import { ModProfile } from './ModProfile';
-import { kebabCase, snakeCase } from 'es-toolkit';
 import { Center, Loader, Text } from '@mantine/core';
-
-const pb = new PocketBase(
-  'https://backend.civmods.com'
-  /*'http://localhost:8090'*/
-) as TypedPocketBase;
+import {
+  createNewProfile,
+  CreateNewProfileOptions,
+} from './commands/createNewProfile';
 
 export type ProfilesContextType = {
   switchProfile: (profile: ModProfile) => Promise<void>;
-  duplicateProfile: (profile: ModProfile, title: string) => Promise<void>;
+  createNewProfileWithNotifications: (
+    options: CreateNewProfileOptions
+  ) => Promise<void>;
   deleteProfile: (profile: ModProfile) => Promise<void>;
 };
 
@@ -157,52 +150,31 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
     }
   }, []);
 
-  const duplicateProfile = useCallback(
-    async (profile: ModProfile, title: string) => {
-      const modsFolder = await getActiveModsFolder();
-      if (modsFolder == null) {
+  const createNewProfileWithNotifications = useCallback(
+    async (options: CreateNewProfileOptions) => {
+      try {
+        const newProfile = await createNewProfile(options);
+
+        setReloadIndex((i) => i + 1);
+
         notifications.show({
           withBorder: false,
-          title: 'Error',
-          message: 'Failed to get active mods folder',
+          title: 'Profile created',
+          message: `Profile has been ${
+            options.shouldDuplicate ? 'duplicated' : 'created'
+          } successfully`,
+          color: 'green',
+        });
+      } catch (e) {
+        console.error(e);
+        notifications.show({
+          withBorder: false,
+          title: 'Error creating profile',
+          message: String(e),
           color: 'red',
         });
         return;
       }
-
-      const folderName = kebabCase(title.replace(/[^\w\s]/gi, ''));
-      console.log('Duplicating profile:', profile.folderName, 'to', folderName);
-      // If it already exists in appData dir, don't duplicate and show error
-      const existing = useAppStore
-        .getState()
-        .profiles?.find((p) => p.folderName === folderName);
-      if (existing) {
-        notifications.show({
-          withBorder: false,
-          title: 'Error',
-          message: `Cannot create profile "${title}", found folder with similar name "${folderName}"`,
-          color: 'red',
-        });
-        return;
-      }
-
-      const lockedIds = useAppStore.getState().lockedModIds ?? [];
-      await copyModsToProfile(modsFolder, lockedIds, profile.folderName, false);
-
-      useAppStore.getState().addProfile({
-        folderName,
-        title,
-      });
-      useAppStore.getState().setCurrentProfile(folderName);
-
-      setReloadIndex((i) => i + 1);
-
-      notifications.show({
-        withBorder: false,
-        title: 'Profile duplicated',
-        message: 'Profile has been duplicated successfully',
-        color: 'green',
-      });
     },
     []
   );
@@ -268,8 +240,12 @@ export function ProfilesContextProvider(props: { children: React.ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ switchProfile, duplicateProfile, deleteProfile }),
-    [switchProfile, duplicateProfile, deleteProfile]
+    () => ({
+      switchProfile,
+      createNewProfileWithNotifications,
+      deleteProfile,
+    }),
+    [switchProfile, createNewProfileWithNotifications, deleteProfile]
   );
 
   return (

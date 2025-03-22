@@ -8,7 +8,7 @@ import { IconUser } from '@tabler/icons-react';
 
 export function useInstallDeepLink() {
   const { mods, install } = useModsContext();
-  const changedDeepLink = useDeepLinkActivation();
+  const count = useDeepLinkActivation('install');
 
   useEffect(() => {
     // Wait for mods to load
@@ -16,7 +16,7 @@ export function useInstallDeepLink() {
       return;
     }
 
-    const deepLink = DeepLinkActivations.shift();
+    const deepLink = DeepLinkActivations.install.shift();
     if (!deepLink) {
       console.log('No deep link found');
       return;
@@ -109,5 +109,5 @@ export function useInstallDeepLink() {
         }
       },
     });
-  }, [mods, install, changedDeepLink]);
+  }, [mods, install, count]);
 }

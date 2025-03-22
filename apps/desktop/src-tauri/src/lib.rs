@@ -1,4 +1,4 @@
-use mods::{backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp}, extract_archive, profiles::{delete_profile, list_profiles}, traversal::scan_civ_mods};
+use mods::{backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp}, extract_archive, profiles::{create_empty_profile, delete_profile, list_profiles}, traversal::scan_civ_mods};
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
@@ -45,15 +45,7 @@ pub fn run() {
                        .expect("no main window")
                        .set_focus();
         }))
-        .plugin(tauri_plugin_deep_link::init())
-        .setup(|_app| { // prefix with _ to avoid unused variable warning in MacOS
-            #[cfg(any(windows, target_os = "linux"))]
-            {
-                use tauri_plugin_deep_link::DeepLinkExt;
-                _app.deep_link().register_all()?;
-            }
-            Ok(())
-        })
+        .plugin(tauri_plugin_deep_link::init())        
         .plugin(
             tauri_plugin_log::Builder::new()
             .max_file_size(5_000_000) // 5MB in bytes
@@ -69,6 +61,22 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
+        .setup(|app| { // prefix with _ to avoid unused variable warning in MacOS
+            #[cfg(any(windows, target_os = "linux"))]
+            {
+                use tauri_plugin_deep_link::DeepLinkExt;
+                app.deep_link().register_all()?;
+            }
+
+            log::info!("[CivMods] Tauri app setup complete");
+            
+            // We show the main window manually in order to avoid 
+            // flickering due to window_state plugin changing the window 
+            // position after it's shown
+            let _ = app.get_webview_window("main").expect("no main  window").show();
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             greet,
             get_mods_folder,
@@ -79,6 +87,7 @@ pub fn run() {
             restore_mods_from_profile,
             copy_mods_to_profile,
             delete_profile,
+            create_empty_profile,
             // Backups
             backup_mod_to_temp,
             restore_mod_from_temp,

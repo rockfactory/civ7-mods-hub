@@ -144,6 +144,18 @@ img.mod-icon {
   margin-bottom: 0.5rem;
 }
 
+img.mod-icon.profile {
+  max-width: 32px;
+  max-height: 32px;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  margin-bottom: 0;
+}
+
+tr.mod-row:hover {
+  background-color: #2a2c3f;
+}
+
 .logo-container {
   display: flex;
   justify-content: center;
@@ -159,6 +171,11 @@ img.mod-icon {
   border-radius: 0.4rem;
   position: relative;
   background-color: #0f1115;
+}
+
+pre,
+code {
+  word-break: break-all;
 }
 
 .code > pre,
