@@ -118,6 +118,13 @@ export function ImportProfileModal(props: IImportProfileModalProps) {
             <>
               <Text size="sm" c="dimmed">
                 Will install a new profile with {modsCount} mods.
+                <br /> See the full list on the{' '}
+                <a
+                  href={`https://civmods.com/profile?profileCode=${profileCode}`}
+                  target="_blank"
+                >
+                  CivMods.com Page
+                </a>
               </Text>
               <Text size="sm">Enter new profile title:</Text>
               <TextInput
