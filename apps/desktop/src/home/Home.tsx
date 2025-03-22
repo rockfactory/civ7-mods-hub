@@ -41,6 +41,7 @@ import { Virtuoso } from 'react-virtuoso';
 import ThrottledLoader from './ThrottledLoader';
 import { isSameVersion } from '../mods/isSameVersion';
 import { useAppStore } from '../store/store';
+import { useCheckForAppUpdates } from '../settings/autoUpdater';
 
 export default function ModsListPage() {
   const {
@@ -54,7 +55,9 @@ export default function ModsListPage() {
   const { query, isQueryPending, hasFilters, setQuery, resetQuery } =
     useModsQuery();
 
+  // Globals: deep link & update
   useInstallDeepLink();
+  useCheckForAppUpdates();
 
   const isFirstLoading =
     (isFetching || isLoadingInstalled) && mods.length === 0;

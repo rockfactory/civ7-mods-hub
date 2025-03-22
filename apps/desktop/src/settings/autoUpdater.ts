@@ -4,6 +4,7 @@ import { relaunch } from '@tauri-apps/plugin-process';
 import { useEffect } from 'react';
 
 let isAskingUserForUpdateConfirmation = false;
+let shouldRemindLater = true;
 
 export async function checkForAppUpdates(onUserClick: boolean) {
   const update = await check();
@@ -37,20 +38,23 @@ export async function checkForAppUpdates(onUserClick: boolean) {
       // It is good practice to shut down any background processes gracefully before restarting
       // As an alternative, you could ask the user to restart the app manually
       await relaunch();
+    } else {
+      shouldRemindLater = false;
     }
   }
 }
 
 /**
- * Each 10 minutes check for updates
+ * Each 20 minutes check for updates
  */
 export function useCheckForAppUpdates() {
   useEffect(() => {
     const interval = setInterval(() => {
-      if (isAskingUserForUpdateConfirmation) {
+      if (isAskingUserForUpdateConfirmation || !shouldRemindLater) {
         return;
       }
       isAskingUserForUpdateConfirmation = true;
+      console.log('[autoUpdater] Checking for updates...');
       checkForAppUpdates(false)
         .catch((err) => {
           console.error('[autoUpdater] Failed to check for updates:', err);
@@ -58,7 +62,7 @@ export function useCheckForAppUpdates() {
         .finally(() => {
           isAskingUserForUpdateConfirmation = false;
         });
-    }, 10 * 60 * 1000);
+    }, 20 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
