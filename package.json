@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Unofficial Civ7 Mod Manager",
   "main": "src/index.ts",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "test": "vitest",
     "build": "npm run -w @civmods/api build && npm run -w @civmods/parser build",
