@@ -25,8 +25,8 @@ pub async fn backup_mod_to_temp(app: AppHandle, mod_path: String) -> Result<Stri
     // Generate the temp backup directory path
     let temp_dir = app
         .path()
-        .temp_dir()
-        .map_err(|_| "Failed to get temporary directory".to_string())?;
+        .app_local_data_dir()
+        .map_err(|_| "Failed to get local data directory".to_string())?;
     log::info!("Temp directory: {:?}", temp_dir);
 
     // Create a unique timestamped folder
@@ -37,7 +37,9 @@ pub async fn backup_mod_to_temp(app: AppHandle, mod_path: String) -> Result<Stri
         .to_string_lossy()
         .to_string();
 
-    let backup_parent_folder = temp_dir.join(format!("civmods_bkp_{}_{}", mod_name, timestamp));
+    let backup_parent_folder = temp_dir
+        .join("backups")
+        .join(format!("{}_{}", mod_name, timestamp));
     let temp_backup_path = backup_parent_folder.join(&mod_name); // Store the mod inside
     log::info!("Temp Backup path: {:?}", temp_backup_path);
 
