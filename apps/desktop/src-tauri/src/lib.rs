@@ -1,4 +1,8 @@
-use mods::{backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp}, extract_archive, profiles::{create_empty_profile, delete_profile, list_profiles}, traversal::scan_civ_mods};
+use mods::backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp};
+use mods::profiles::{create_empty_profile, delete_profile, list_profiles};
+use mods::traversal::scan_civ_mods;
+use mods::extract_archive::extract_mod_archive;
+use mods::patch_modinfo::patch_modinfo_xml_command;
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
@@ -25,12 +29,6 @@ async fn get_mods_folder(app_handle: tauri::AppHandle) -> Result<Option<String>,
     }
 
     Ok(mods_folder.map(|p| p.to_string_lossy().to_string()))
-}
-
-#[tauri::command]
-async fn extract_mod_archive(archive_path: &str, extract_to: &str) -> Result<(), String> {
-    extract_archive::extract_archive(&archive_path, &extract_to)
-        .map_err(|e| format!("Failed to extract archive: {}", e))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -82,6 +80,7 @@ pub fn run() {
             get_mods_folder,
             extract_mod_archive,
             scan_civ_mods,
+            patch_modinfo_xml_command,
             // Profiles
             list_profiles,
             restore_mods_from_profile,

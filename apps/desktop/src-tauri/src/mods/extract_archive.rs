@@ -6,7 +6,23 @@ use std::path::Path;
 use unrar::Archive;
 use zip::ZipArchive;
 
+use super::patch_modinfo::{patch_modinfo_xml, CivModsProperties};
 use super::traversal::find_modinfo_file;
+
+#[tauri::command]
+pub async fn extract_mod_archive(
+    archive_path: &str,
+    extract_path: &str,
+    properties: CivModsProperties,
+) -> Result<(), String> {
+    let info = extract_archive(&archive_path, &extract_path)
+        .map_err(|e| format!("Failed to extract archive: {}", e))?;
+
+    patch_modinfo_xml(info.modinfo_path, properties)
+        .map_err(|e| format!("Failed to patch modinfo: {}", e))?;
+
+    Ok(())
+}
 
 /// Extract ZIP files using `zip 2.x`
 fn extract_zip(archive_path: &str, extract_to: &str) -> io::Result<()> {
@@ -87,8 +103,13 @@ fn extract_tgz(archive_path: &str, extract_to: &str) -> io::Result<()> {
     Ok(())
 }
 
+pub struct ExtractArchiveInfo {
+    modinfo_path: String,
+    modinfo_dir: String,
+}
+
 /// Extracts any archive format based on file extension
-pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<(), String> {
+pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<ExtractArchiveInfo, String> {
     let ext = Path::new(archive_path)
         .extension()
         .and_then(|ext| ext.to_str())
@@ -135,7 +156,13 @@ pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<(), Strin
     fs::remove_dir_all(&temp_target)
         .map_err(|e| format!("Failed to remove temp directory: {}", e))?;
 
-    Ok(())
+    // Find the modinfo file and return the path
+    let (updated_modinfo_path, _) = find_modinfo_file(Path::new(extract_to));
+
+    Ok(ExtractArchiveInfo {
+        modinfo_path: updated_modinfo_path.ok_or("Modinfo file not found")?,
+        modinfo_dir: extract_to.to_string(),
+    })
 }
 
 pub(crate) fn recursively_grant_write_permissions(root: &Path) -> io::Result<()> {
