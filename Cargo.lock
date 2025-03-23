@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "CivMods"
-version = "0.7.0-alpha.1"
+version = "0.7.0"
 dependencies = [
  "diffy",
  "dirs 5.0.1",
