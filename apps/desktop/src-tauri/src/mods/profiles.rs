@@ -4,6 +4,8 @@ use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 use tokio::fs as async_fs;
 
+use crate::mods::extract_archive::recursively_grant_write_permissions;
+
 use super::traversal::get_unlocked_mod_folders;
 
 /// Lists all profile folders inside the "profiles" directory in appData.

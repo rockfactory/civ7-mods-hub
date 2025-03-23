@@ -1,7 +1,7 @@
 {
   "name": "@civmods/desktop",
   "private": true,
-  "version": "0.6.3",
+  "version": "0.6.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -27,6 +27,7 @@
     "@tauri-apps/plugin-process": "^2.2.0",
     "@tauri-apps/plugin-shell": "^2.2.0",
     "@tauri-apps/plugin-store": "^2.2.0",
+    "@tauri-apps/plugin-updater": "^2.6.0",
     "@tauri-apps/plugin-window-state": "^2.2.1",
     "es-toolkit": "^1.33.0",
     "fast-xml-parser": "^5.0.8",
