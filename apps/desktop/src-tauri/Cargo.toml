@@ -28,7 +28,7 @@ zip = "2"
 sevenz-rust = "0.6.1"
 unrar = "0.5.8"
 tokio = { version = "1", features = ["full"] }               # Required for async handling
-tauri-plugin-http = "2"
+tauri-plugin-http = "=2.4.0"
 sha2 = "0.10"
 walkdir = "2"
 quick-xml = { version = "0.37.2", features = ["serialize"] } # XML parsing
