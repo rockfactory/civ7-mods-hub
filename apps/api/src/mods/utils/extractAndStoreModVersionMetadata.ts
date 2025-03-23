@@ -25,13 +25,18 @@ export async function extractAndStoreModVersionMetadata(
   const extractPath = path.join(EXTRACTED_DIR, version.id);
 
   try {
-    if (!version.download_url || version.skip_install) return;
+    if (
+      !version.download_url ||
+      (version.skip_install && !options.forceExtractAndStore)
+    )
+      return;
 
     const isAlreadyDownloaded = await fs.stat(extractPath).catch(() => null);
 
     let archiveHash = undefined as string | undefined;
     if (!isAlreadyDownloaded?.isDirectory) {
       // Download archive
+      console.log(`Downloading: ${version.download_url}`);
       archivePath = await downloadFile(version.download_url, version.id);
       if (!archivePath) return;
 
@@ -49,6 +54,8 @@ export async function extractAndStoreModVersionMetadata(
       const sleepTime = Math.floor(Math.random() * (2000 - 300 + 1)) + 1000; // Random sleep between 1-2 seconds
       console.log(`Sleeping for ${sleepTime} ms`);
       await sleep(sleepTime);
+    } else {
+      console.log(`Already downloaded: ${extractPath}`);
     }
 
     // Find .modinfo file
@@ -109,6 +116,7 @@ export async function extractAndStoreModVersionMetadata(
     console.error(error);
   } finally {
     if (process.env.NODE_ENV !== 'development') {
+      console.log(`Cleaning up: ${version.name}, NODE_ENV: ${process.env.NODE_ENV}`); // prettier-ignore
       try {
         if (archivePath) await fs.rm(archivePath);
         if (extractPath) await fs.rm(extractPath, { recursive: true });
