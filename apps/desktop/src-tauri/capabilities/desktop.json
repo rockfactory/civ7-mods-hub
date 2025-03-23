@@ -1,20 +1,12 @@
 {
   "identifier": "desktop-capability",
-  "platforms": [
-    "macOS",
-    "windows",
-    "linux"
-  ],
-  "windows": [
-    "main"
-  ],
+  "platforms": ["macOS", "windows", "linux"],
+  "windows": ["main"],
   "permissions": [
-    "updater:default",
     "store:default",
     "dialog:default",
     "log:default",
     "deep-link:default",
-    "updater:default",
     "process:default",
     "window-state:default"
   ]

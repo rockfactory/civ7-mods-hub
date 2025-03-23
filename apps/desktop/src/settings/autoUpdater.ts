@@ -1,4 +1,4 @@
-import { check } from '@tauri-apps/plugin-updater';
+// import { check } from '@tauri-apps/plugin-updater';
 import { ask, message } from '@tauri-apps/plugin-dialog';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { useEffect } from 'react';
@@ -7,7 +7,9 @@ let isAskingUserForUpdateConfirmation = false;
 let shouldRemindLater = true;
 
 export async function checkForAppUpdates(onUserClick: boolean) {
-  const update = await check();
+  return;
+
+  const update = null as any; // await check();
 
   if (!update) {
     console.log('No update available');
