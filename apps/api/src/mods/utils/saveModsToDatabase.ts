@@ -53,9 +53,12 @@ export async function saveModToDatabase(
       ...syncModToModRecord(syncMod),
     } as Partial<ModsRecord>);
   } else {
-    console.log(
-      `Mod already exists, updating: ${syncMod.modName} (${syncMod.modPageUrl})`
-    );
+    if (mod.is_hidden) {
+      console.log(`Mod is hidden, skipping: ${syncMod.modName} (${syncMod.modPageUrl})`); // prettier-ignore
+      return;
+    }
+
+    console.log(`Mod already exists, updating: ${syncMod.modName} (${syncMod.modPageUrl})`); // prettier-ignore
     mod = await pb.collection('mods').update(mod.id, {
       ...syncModToModRecord(syncMod),
     } as Partial<ModsRecord>);
