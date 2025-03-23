@@ -136,13 +136,63 @@ async function getModVersions(historyUrl: string): Promise<SyncModVersion[]> {
 }
 
 // Keeping this function for future use, currently avoiding API calls
-async function getModDetails(mod: SyncMod): Promise<SyncMod> {
-  return mod;
+async function getSingleMod(url: string): Promise<SyncMod> {
+  const { data } = await axios.get(url, {
+    headers: { 'User-Agent': 'CivMods/1.0' },
+  });
+  const $ = cheerio.load(data);
+
+  const modName = $('h1.p-title-value')
+    .clone()
+    .children('.u-muted')
+    .remove()
+    .end()
+    .text()
+    .trim();
+  const modPageUrl = url;
+  const modAuthor = $('a.username.u-concealed').first().text().trim();
+  const iconUrl = $('a.resourceIcon img').attr('src');
+
+  const ratingMatch = $('.ratingStarsRow .ratingStars')
+    .attr('title')
+    ?.match(/[\d.]+/);
+  const rating = ratingMatch ? ratingMatch[0] : 'No rating';
+
+  const shortDescription = $('.resourceBody-description')
+    .text()
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const updatedAt = $('dl.resourceInfo time.u-dt').first().attr('datetime');
+
+  const downloadsCount = $('dl.resourceInfo dd').eq(1).text().trim();
+
+  const releasedAt = $('dl.resourceInfo time.u-dt').last().attr('datetime');
+
+  const category = $('a[href^="/resources/categories/"]').first().text().trim();
+
+  return {
+    modName,
+    modPageUrl,
+    modAuthor,
+    rating,
+    shortDescription,
+    updatedAt,
+    downloadsCount,
+    iconUrl,
+    releasedAt,
+    category,
+  };
 }
 
 export interface ScrapeModsOptions {
   firstPage?: number;
   maxPages?: number;
+  /**
+   * Exclusive: Scrape only a single mod by URL.
+   * If provided, `firstPage` and `maxPages` are ignored.
+   */
+  singleModUrl?: string;
   stopAfterLastModVersion?: boolean;
   /** For debugging */
   stopAfterFirstMod?: boolean;
@@ -164,7 +214,26 @@ export async function scrapeMods(
     stopAfterFirstMod,
     stopAfterLastModVersion,
     firstPage = 1,
+    singleModUrl,
   } = options;
+
+  // Single mod
+  if (singleModUrl) {
+    console.log(`Scraping single mod: ${singleModUrl}`);
+
+    const mod = await getSingleMod(singleModUrl);
+
+    if (!options.onlyListData) {
+      console.log(`Fetching versions for mod: ${mod.modName}`);
+      const historyUrl = mod.modPageUrl + '/history';
+      mod.versions = await getModVersions(historyUrl);
+    }
+
+    console.log(`Mod JSON:`, JSON.stringify(mod, null, 2));
+
+    await saveModToDatabase(options, mod);
+    return [mod];
+  }
 
   // limit to avoid long scraping
   const mods: SyncMod[] = [];
