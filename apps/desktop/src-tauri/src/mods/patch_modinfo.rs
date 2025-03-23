@@ -57,11 +57,12 @@ pub fn patch_modinfo_xml<P: AsRef<Path>>(
                 in_properties = true;
                 writer.write_event(Event::Start(e.to_owned())).unwrap();
             }
-            Ok(Event::Text(e)) if in_properties && indent_prefix.is_none() => {
+            Ok(Event::Text(e)) if in_properties => {
                 let text = e.unescape().unwrap_or_default();
                 if text.trim().is_empty() {
-                    let last_line = text.lines().last().unwrap_or(""); // Get the indentation only
-                    indent_prefix = Some(format!("\n{}", last_line));
+                    // Get only the indentation (last line's spaces/tabs)
+                    let indent_only = text.lines().last().unwrap_or_default();
+                    indent_prefix = Some(indent_only.to_string());
                 }
                 writer.write_event(Event::Text(e)).unwrap();
             }
@@ -69,10 +70,11 @@ pub fn patch_modinfo_xml<P: AsRef<Path>>(
                 if in_properties && e.name().as_ref().eq_ignore_ascii_case(b"Properties") =>
             {
                 if !inserted {
+                    log::info!("patch/hash: Inserting custom properties into modinfo file, indent is '{:?}'", indent_prefix);
                     insert_custom_properties(
                         &mut writer,
                         &props_map,
-                        indent_prefix.as_deref().unwrap_or("\n    "),
+                        indent_prefix.as_deref().unwrap_or("    "),
                     )?;
 
                     inserted = true;
@@ -113,6 +115,16 @@ fn insert_custom_properties<W: std::io::Write>(
     props: &BTreeMap<String, String>,
     indent: &str,
 ) -> Result<(), String> {
+    writer
+        .write_event(Event::Comment(BytesText::new(
+            " Added automatically by CivMods: Do not edit ",
+        )))
+        .unwrap();
+    // Write comment before inserted properties
+    writer
+        .write_event(Event::Text(BytesText::new(&format!("\n{}", indent))))
+        .unwrap();
+
     for (key, value) in props {
         let element = BytesStart::new(key.as_str());
         writer.write_event(Event::Start(element)).unwrap();
@@ -124,7 +136,7 @@ fn insert_custom_properties<W: std::io::Write>(
             .unwrap();
 
         writer
-            .write_event(Event::Text(BytesText::new(indent)))
+            .write_event(Event::Text(BytesText::new(&format!("\n{}", indent))))
             .unwrap();
     }
 

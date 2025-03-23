@@ -18,8 +18,9 @@ pub async fn extract_mod_archive(
     let info = extract_archive(&archive_path, &extract_path)
         .map_err(|e| format!("Failed to extract archive: {}", e))?;
 
-    patch_modinfo_xml(info.modinfo_path, properties)
-        .map_err(|e| format!("Failed to patch modinfo: {}", e))?;
+    if let Err(e) = patch_modinfo_xml(info.modinfo_path.clone(), properties) {
+        log::error!("Failed to patch modinfo '{}': {}", info.modinfo_path, e);
+    }
 
     Ok(())
 }
