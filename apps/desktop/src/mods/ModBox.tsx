@@ -211,6 +211,9 @@ export function ModBox(props: IModBoxProps) {
                           {latestVersion.name}
                         </Text>
                       )}{' '}
+                      {/* <Text span c="gray" fz="0.85rem">
+                        CivFanatics
+                      </Text> */}
                       <IconExternalLink size={12} />
                     </a>
                   ) : (
@@ -373,6 +376,14 @@ export function ModBox(props: IModBoxProps) {
                       }
                     >
                       Open mod folder
+                    </Menu.Item>
+                  )}
+                  {mod.fetched && (
+                    <Menu.Item
+                      leftSection={<IconExternalLink size={16} />}
+                      onClick={() => open(mod.fetched!.url)}
+                    >
+                      See on CivFanatics
                     </Menu.Item>
                   )}
                   <ModLockActionItem mod={mod} />
