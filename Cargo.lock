@@ -4708,8 +4708,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-dialog"
 version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b59fd750551b1066744ab956a1cd6b1ea3e1b3763b0b9153ac27a044d596426"
+source = "git+https://github.com/tauri-apps/plugins-workspace.git?branch=fix%2Fhttp%2Fabort-stream-response#aa07fa0835faca168de2d7e56525ea4b165568c7"
 dependencies = [
  "log",
  "raw-window-handle",
@@ -4726,8 +4725,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-fs"
 version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1a1edf18000f02903a7c2e5997fb89aca455ecbc0acc15c6535afbb883be223"
+source = "git+https://github.com/tauri-apps/plugins-workspace.git?branch=fix%2Fhttp%2Fabort-stream-response#aa07fa0835faca168de2d7e56525ea4b165568c7"
 dependencies = [
  "anyhow",
  "dunce",
@@ -4748,10 +4746,11 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-http"
-version = "2.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "028093def653e1f9da23a80beedfd33b88899427693b2c8357ce0c1cc26284b2"
+version = "2.4.2"
+source = "git+https://github.com/tauri-apps/plugins-workspace.git?branch=fix%2Fhttp%2Fabort-stream-response#aa07fa0835faca168de2d7e56525ea4b165568c7"
 dependencies = [
+ "bytes",
+ "cookie_store",
  "data-url",
  "http",
  "regex",
@@ -4815,8 +4814,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-persisted-scope"
 version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abce10c2d5e26e00472ce6cbeafa90bdb2d5c32f90248e361ae01df41f67ec05"
+source = "git+https://github.com/tauri-apps/plugins-workspace.git?branch=fix%2Fhttp%2Fabort-stream-response#aa07fa0835faca168de2d7e56525ea4b165568c7"
 dependencies = [
  "aho-corasick",
  "bincode",
