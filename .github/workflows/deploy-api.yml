@@ -26,6 +26,7 @@ jobs:
       - name: Deploy civ-api to Dokku
         uses: dokku/github-action@master
         with:
+          branch: 'main'
           git_push_flags: '--force'
           git_remote_url: 'ssh://dokku@dokku.civmods.com/civ-api'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -42,6 +43,7 @@ jobs:
       - name: Deploy civ-backend to Dokku
         uses: dokku/github-action@master
         with:
+          branch: 'main'
           git_push_flags: '--force'
           git_remote_url: 'ssh://dokku@dokku.civmods.com/civ-backend'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
