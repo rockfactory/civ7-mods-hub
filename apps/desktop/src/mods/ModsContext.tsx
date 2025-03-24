@@ -22,10 +22,11 @@ import { openConfirmModal } from '@mantine/modals';
 import { getActiveModsFolder } from './getModsFolder';
 import { invokeScanCivMods } from './commands/modsRustBindings';
 import { computeModsData } from './commands/computeModsData';
+import { getVersion } from '@tauri-apps/api/app';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
-  /*'http://localhost:8090'*/
+  // 'http://localhost:8090'
 ) as TypedPocketBase;
 
 export type ModsContextType = {
@@ -95,10 +96,12 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
     async function fetchMods() {
       setIsFetching(true);
       try {
+        const version = await getVersion();
         const records = await pb.collection('mods').getFullList<FetchedMod>({
           filter: 'is_hidden != true',
           expand: 'mod_versions_via_mod_id',
           sort: '-mod_updated',
+          headers: { 'x-version': `CivMods/v${version}` },
         });
 
         const data = records.map((record) => {
