@@ -5,13 +5,16 @@ import { engine } from 'express-handlebars';
 import { pb } from './core/pocketbase.js';
 import { safeAsync } from './core/async.js';
 import { getCachedGithubRelease, Release } from './download/downloadLinks.js';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 import Handlebars from 'handlebars';
 import { IShareableProfile, unhashProfileCodes } from '@civmods/parser';
 import { logResponseTime } from './middlewares/logResponseTime.js';
+import markedAlert from 'marked-alert';
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const markedRenderer = new Marked().use(markedAlert() as any);
 
 app.use('/static', express.static('public'));
 app.use(logResponseTime);
@@ -27,7 +30,7 @@ app.engine(
       },
       markdown: function (content: string) {
         return new Handlebars.SafeString(
-          marked.parse(content, { async: false })
+          markedRenderer.parse(content, { async: false })
         );
       },
       icon: function (name: string, size: number = 24) {

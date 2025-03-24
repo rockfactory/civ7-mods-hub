@@ -62,7 +62,10 @@ export async function getGithubRelease(
   tag: 'latest' | string = 'latest'
 ): Promise<Release | null> {
   // tag should be latest or app-vx.x.x
-  if (tag !== 'latest' && !/^app-v\d+\.\d+\.\d+$/.test(tag)) {
+  if (
+    tag !== 'latest' &&
+    !/^app-v\d+\.\d+\.\d+(-(?:alpha|beta)(?:\.\d+)?)?$/.test(tag)
+  ) {
     throw new Error('Invalid version tag format');
   }
 

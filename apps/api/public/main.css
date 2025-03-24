@@ -203,3 +203,58 @@ code {
 .release article header h6 {
   margin-bottom: 0;
 }
+
+.markdown-alert {
+  border-left: 4px solid #ccc;
+  padding: 0.2rem 1rem;
+  margin-bottom: 2rem;
+}
+
+.markdown-alert p {
+  margin-bottom: 0.1rem;
+}
+
+.markdown-alert-title {
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.markdown-alert-title .octicon {
+  width: 1.8rem;
+  transform: scale(1.4);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-color: #f0ad4e;
+}
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: #f0ad4e;
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-color: #d9534f;
+}
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: #d9534f;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-color: #4493f8;
+}
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: #4493f8;
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-color: #5cb85c;
+}
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: #5cb85c;
+}
+
+.markdown-alert.markdown-alert-important {
+  border-color: #ab7df8;
+}
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: #ab7df8;
+}
