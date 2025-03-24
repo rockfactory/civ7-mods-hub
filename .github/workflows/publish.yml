@@ -101,8 +101,8 @@ jobs:
           # Extract and convert version to Windows/MSI-friendly format
           RAW_VERSION=$(jq -r .version package.json)
           WIN_VERSION=$(echo "$RAW_VERSION" | sed 's/[^0-9]/./g' | sed 's/\.\+/\./g' | sed 's/^\.//; s/\.$//')
-          echo "Using Windows-compatible version: $WIN_VERSION"
-          cat './src-tauri/tauri.conf.json' | jq --arg winver "$WIN_VERSION" '.version = $winver' > './src-tauri/temp.json' && mv './src-tauri/temp.json' './src-tauri/tauri.conf.json'
+          echo "Using Windows-compatible version for MSI: $WIN_VERSION"
+          cat './src-tauri/tauri.conf.json' | jq --arg winver "$WIN_VERSION" '.bundle .windows .wix += { "version": $winver }' > './src-tauri/temp.json' && mv './src-tauri/temp.json' './src-tauri/tauri.conf.json'
 
       - name: Build and publish with Tauri
         uses: tauri-apps/tauri-action@v0
