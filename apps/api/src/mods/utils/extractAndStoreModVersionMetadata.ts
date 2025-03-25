@@ -24,6 +24,13 @@ class SkipInstallError extends Error {
   }
 }
 
+class DownloadError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DownloadError';
+  }
+}
+
 export async function extractAndStoreModVersionMetadata(
   options: ScrapeModsOptions,
   mod: ModsRecord,
@@ -128,6 +135,15 @@ export async function extractAndStoreModVersionMetadata(
         .collection('mod_versions')
         .update<ModVersionsRecord>(version.id, {
           skip_install: true,
+          is_processing: false,
+        } as ModVersionsRecord);
+    }
+
+    if (error instanceof DownloadError) {
+      await pb
+        .collection('mod_versions')
+        .update<ModVersionsRecord>(version.id, {
+          download_error: true,
           is_processing: false,
         } as ModVersionsRecord);
     }
@@ -354,11 +370,9 @@ async function downloadFile(url: string, id: string): Promise<string | null> {
 
   if (extension == null) {
     console.warn(`No extension found for ${url}`, { filename, extension });
-    await pb.collection('mod_versions').update(id, {
-      download_error: true,
-      is_processing: false,
-    } as Partial<ModVersionsRecord>);
-    return null;
+    throw new DownloadError(
+      `No extension found for ${url}. Filename: ${filename}, Extension: ${extension}`
+    );
   }
 
   await fs.writeFile(
