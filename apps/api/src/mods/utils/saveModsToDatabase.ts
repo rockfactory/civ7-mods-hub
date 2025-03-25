@@ -7,6 +7,7 @@ import { pb } from '../../core/pocketbase';
 import { getModIdFromUrl, getVersionIdFromUrl } from './cfIds';
 import { extractAndStoreModVersionMetadata } from './extractAndStoreModVersionMetadata';
 import { ScrapeModsOptions, SyncMod } from './scrapeMods';
+import { DiscordLog } from '../../integrations/discord/DiscordLog';
 
 function syncModToModRecord(syncMod: SyncMod): Partial<ModsRecord> {
   return {
@@ -143,6 +144,7 @@ export async function saveModToDatabase(
   if (isNewVersionsAvailable && !options.skipExtractAndStore) {
     for (const version of processableVersions) {
       console.log(`[mod=${mod.name}] Processing version: ${version.name}`);
+      DiscordLog.onVersionProcessing(mod, version);
       await extractAndStoreModVersionMetadata(options, mod, version);
     }
   }
