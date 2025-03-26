@@ -1,4 +1,4 @@
-use logs::{redact_path, redact_path_for_logs};
+use logger::{redact_path, redact_path_for_logs};
 use mods::{
     backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp},
     extract_archive,
@@ -8,7 +8,7 @@ use mods::{
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
-mod logs;
+mod logger;
 mod mods;
 use crate::mods::get_civ_mods_folder;
 use mods::profiles::{copy_mods_to_profile, restore_mods_from_profile};
