@@ -1,5 +1,4 @@
 import express from 'express';
-import fs from 'fs/promises';
 import fsSync from 'fs';
 import { engine } from 'express-handlebars';
 import { pb } from './core/pocketbase.js';
@@ -10,6 +9,7 @@ import Handlebars from 'handlebars';
 import { IShareableProfile, unhashProfileCodes } from '@civmods/parser';
 import { logResponseTime } from './middlewares/logResponseTime.js';
 import markedAlert from 'marked-alert';
+import { renderSocialImage } from './mods/images/socialShare.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -129,6 +129,11 @@ app.get(
         title: 'Install mod ' + mod.name,
         mod,
         instant: req.query.instant !== 'false', // Opt-out of instant install
+        og: {
+          title: `Install ${mod.name}`,
+          url: `/install?modId=${mod.id}`,
+          image: `/mod/${mod.id}/social-image.png`,
+        },
       });
     } catch (err) {
       return res.status(404).render('error', {
@@ -136,6 +141,13 @@ app.get(
         error: "We couldn't find the mod you're looking for",
       });
     }
+  })
+);
+
+app.get(
+  '/mod/:id/social-image.png',
+  safeAsync(async (req, res) => {
+    await renderSocialImage(req, res);
   })
 );
 

@@ -9,20 +9,33 @@
     content="CivMods makes installing Civilization 7 mods easy. Browse, install, and manage mods in just a few clicks.">
 
   <meta name="keywords" content="Civilization 7, CivMods, Civ 7 Mods, Mod Manager, Strategy Game Mods">
-  <link rel="canonical" href="https://civmods.com/">
 
-  <meta property="og:title" content="CivMods - Easily Install Civilization 7 Mods">
   <meta property="og:description"
     content="CivMods makes installing Civilization 7 mods easy. Browse, install, and manage mods in just a few clicks.">
-  <meta property="og:image" content="https://civmods.com/static/screen-background.png">
+
+  {{#if og}}
+  <link rel="canonical" href="https://civmods.com/{{og.url}}">
+  <meta property="og:url" content="https://civmods.com/{{og.url}}">
+  <meta name="og:title" content="CivMods - Easily Install Civilization 7 Mods">
+  <meta property="og:image" content="https://civmods.com/{{og.image}}">
+  {{else}}
+  <link rel="canonical" href="https://civmods.com">
   <meta property="og:url" content="https://civmods.com/">
+  <meta name="og:title" content="{{og.title}} | CivMods - Easily Install Civilization 7 Mods">
+  <meta property="og:image" content="https://civmods.com/static/screen-background.png">
+  {{/if}}
   <meta property="og:type" content="website">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="CivMods - Easily Install Civilization 7 Mods">
   <meta name="twitter:description"
     content="CivMods makes installing Civilization 7 mods easy. Browse, install, and manage mods in just a few clicks.">
+  {{#if og}}
+  <meta name="twitter:title" content="{{og.title}} | CivMods - Easily Install Civilization 7 Mods">
+  <meta name="twitter:image" content="https://civmods.com/{{og.image}}">
+  {{else}}
+  <meta name="twitter:title" content="CivMods - Easily Install Civilization 7 Mods">
   <meta name="twitter:image" content="https://civmods.com/static/screen-background.png">
+  {{/if}}
   <meta name="twitter:site" content="@leonardfactory">
 
   <script type="application/ld+json">
