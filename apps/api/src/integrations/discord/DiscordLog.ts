@@ -10,6 +10,7 @@ const secrets = redactEnv.build(
     'POCKETBASE_TOKEN',
     'POCKETBASE_USER',
     'POCKETBASE_PASSWORD',
+    'CIVFANATICS_API_KEY',
   ],
   process.env
 );
