@@ -182,6 +182,10 @@ app.get('/modders', async (req, res) => {
   res.render('modders', { title: 'Modders' });
 });
 
+app.get('/discord', async (req, res) => {
+  res.redirect('https://discord.gg/kdsBHSAMDG');
+});
+
 app.get('/privacy-policy', async (req, res) => {
   res.render('privacy', { title: 'Privacy Policy' });
 });

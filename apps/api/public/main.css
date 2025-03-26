@@ -60,9 +60,15 @@ header h1 {
   display: block;
 }
 
-.downloads,
+.downloads {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .downloads-help {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
@@ -83,11 +89,15 @@ header h1 {
   text-align: center;
 }
 
+.small {
+  font-size: 0.8rem;
+}
+
 .downloads-other-platform a {
   margin-left: 1rem;
 }
 
-.downloads-help a,
+.downloads-help a.secondary,
 .downloads-other-platform a {
   color: #9098a8;
   text-decoration-color: #9098a8;
@@ -97,13 +107,6 @@ header h1 {
   background-color: transparent;
   border: none;
   margin-left: 1rem;
-}
-
-.downloads > div a {
-  /* background-color: #391c6c; */
-  /* background: linear-gradient(0deg, #1e4792, #2d8bce); */
-  /* border: none; */
-  /* font-weight: 500; */
 }
 
 .screen {
@@ -197,6 +200,10 @@ code {
 
 #generate-result h6 {
   margin-top: 1rem;
+}
+
+.help {
+  text-align: center;
 }
 
 /** Release notes */
