@@ -289,7 +289,7 @@ async function extractArchive(
   } else if (archivePath.endsWith('.rar')) {
     await extractRar(archivePath, extractTo);
   } else {
-    throw new Error(`Unsupported archive format: ${archivePath}`);
+    throw new SkipInstallError(`Unsupported archive format: ${archivePath}`);
   }
 
   // Ensure all files have sufficient permissions
