@@ -7,12 +7,12 @@ import { notifications } from '@mantine/notifications';
 import { IconUser } from '@tabler/icons-react';
 
 export function useInstallDeepLink() {
-  const { mods, install } = useModsContext();
+  const { mods, install, lastFetch, triggerReload } = useModsContext();
   const count = useDeepLinkActivation('install');
 
   useEffect(() => {
     // Wait for mods to load
-    if (mods.length === 0) {
+    if (mods.filter((m) => m.fetched).length === 0) {
       return;
     }
 
@@ -41,6 +41,15 @@ export function useInstallDeepLink() {
       }
       return false;
     });
+
+    // If cache is stale (> 1 minute), and mod isn't found, reload mods
+    if (!mod && lastFetch && Date.now() - lastFetch.getTime() > 1000 * 60) {
+      console.log(`Reloading mods cache, since mod: ${modId} wasn't found in the index`); // prettier-ignore
+      triggerReload();
+      // Re-add the deep link to the queue
+      DeepLinkActivations.install.unshift(deepLink);
+      return;
+    }
 
     const latestVersion = mod?.fetched?.expand?.mod_versions_via_mod_id[0];
 
@@ -109,5 +118,5 @@ export function useInstallDeepLink() {
         }
       },
     });
-  }, [mods, install, count]);
+  }, [mods, install, count, lastFetch, triggerReload]);
 }

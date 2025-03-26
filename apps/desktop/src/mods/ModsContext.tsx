@@ -39,6 +39,7 @@ export type ModsContextType = {
   getModsFolder: () => Promise<string | null>;
   isFetching: boolean;
   isLoadingInstalled: boolean;
+  lastFetch: Date | null;
 };
 
 export const ModsContext = createContext({} as ModsContextType);
@@ -50,6 +51,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
   const [isLoadingInstalled, setIsLoadingInstalled] = useState(false);
   const [modsInfo, setModsInfo] = useState<ModInfo[]>([]);
   const [reloadIndex, setReloadIndex] = useState(0);
+  const [lastFetch, setLastFetch] = useState<Date | null>(null);
 
   const getModsFolder = useCallback(async () => {
     return await getActiveModsFolder();
@@ -118,6 +120,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
 
         console.log('Mods data:', data.length);
         setFetchedMods(data ?? []);
+        setLastFetch(new Date());
       } catch (error) {
         if (error instanceof ClientResponseError && error.isAbort) {
           console.log('Request aborted');
@@ -246,6 +249,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       isLoadingInstalled,
       getModsFolder,
       fetchedMods,
+      lastFetch,
     }),
     [
       mods,
@@ -257,6 +261,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       isLoadingInstalled,
       getModsFolder,
       fetchedMods,
+      lastFetch,
     ]
   );
 
