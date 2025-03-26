@@ -6,10 +6,16 @@ import satori from 'satori';
 import sharp from 'sharp';
 import { Request, Response } from 'express';
 
-const fontFilePath = path.join(__dirname, './inter-24pt-regular.ttf');
+const fontFilePath = path.join(
+  __dirname,
+  '../../../public/inter-24pt-regular.ttf'
+);
 const fontFile = readFileSync(fontFilePath);
 
-const fontBoldFilePath = path.join(__dirname, './inter-28pt-bold.ttf');
+const fontBoldFilePath = path.join(
+  __dirname,
+  '../../../public/inter-28pt-bold.ttf'
+);
 const fontBoldFile = readFileSync(fontBoldFilePath);
 
 const imageLogoPath = path.resolve(__dirname, '../../../public/logo.png');
