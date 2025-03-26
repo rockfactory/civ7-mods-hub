@@ -125,7 +125,11 @@ app.get(
 
     try {
       const mod = await pb.collection('mods').getFirstListItem(filter);
-      res.render('install', { title: 'Install mod', mod });
+      res.render('install', {
+        title: 'Install mod ' + mod.name,
+        mod,
+        instant: req.query.instant !== 'false', // Opt-out of instant install
+      });
     } catch (err) {
       return res.status(404).render('error', {
         title: 'Mod not found',

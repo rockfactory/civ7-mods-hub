@@ -1,5 +1,5 @@
 <main class="container mod">
-  <article id="not-installed" class="hidden">
+  <article id="not-installed" {{#if instant}}class="hidden" {{/if}}>
     <p class="download-help-first">
       If you don't have CivMods installed, you can download it from the link below.
     </p>
@@ -13,7 +13,11 @@
 
   <article>
     <header class="mod-header">
+      {{#if instant}}
       You're about to install the following mod
+      {{else}}
+      Install the following mod with CivMods
+      {{/if}}
     </header>
     {{#if mod.icon_url}}
     <img class="mod-icon" src="{{mod.icon_url}}" alt="{{mod.name}}" />
@@ -21,19 +25,26 @@
     <h2>{{mod.name}}</h2>
     <p>{{mod.short_description}}</p>
 
+    {{#if instant}}
     <a id="install-button" role="button" aria-busy="true" aria-label="Installing with CivMods..."
       href="civmods://install/?modId={{mod.id}}">
       {{{icon 'outline/hexagon-plus' 24}}} <span class="text">Installing with CivMods...</span>
     </a>
+    {{else}}
+    <a id="install-button" role="button" href="civmods://install/?modId={{mod.id}}">
+      {{{icon 'outline/hexagon-plus' 24}}} <span class="text">Install with CivMods</span>
+    </a>
+    {{/if}}
     <footer>
       <a href="{{mod.url}}" target="_blank" rel="noopener noreferrer">
-        Back to CivFanatics
+        See on CivFanatics
       </a>
     </footer>
   </article>
 </main>
 
 {{#section 'scripts'}}
+{{#if instant}}
 <script>
   function openCivMods() {
     const deepLink = "civmods://install?modId={{mod.id}}";
@@ -54,9 +65,10 @@
       document.querySelector("a#install-button").removeAttribute("aria-busy");
       document.querySelector("a#install-button .text").innerText = "Install with CivMods";
       document.getElementById("not-installed").classList.remove("hidden");
-    }, 2000);
+    }, 2200);
 
   }
   openCivMods();
 </script>
+{{/if}}
 {{/section}}
