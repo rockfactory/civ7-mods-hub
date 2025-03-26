@@ -131,8 +131,8 @@ app.get(
         instant: req.query.instant !== 'false', // Opt-out of instant install
         og: {
           title: `Install ${mod.name}`,
-          url: `/install?modId=${mod.id}`,
-          image: `/mod/${mod.id}/social-image.png`,
+          url: `install?modId=${mod.id}`,
+          image: `mods/${mod.id}/social-image.png`,
         },
       });
     } catch (err) {
@@ -145,7 +145,7 @@ app.get(
 );
 
 app.get(
-  '/mod/:id/social-image.png',
+  '/mods/:id/social-image.png',
   safeAsync(async (req, res) => {
     await renderSocialImage(req, res);
   })
