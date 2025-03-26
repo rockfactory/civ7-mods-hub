@@ -10,9 +10,13 @@ import {
 } from '@mantine/core';
 import { useDisclosure, useToggle } from '@mantine/hooks';
 import {
+  IconBrandDiscord,
+  IconBrandGithub,
+  IconBrandTorchain,
   IconExternalLink,
   IconFolder,
   IconLogs,
+  IconMessage,
   IconRefresh,
   IconSettings,
 } from '@tabler/icons-react';
@@ -151,6 +155,47 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
           >
             Open Civilization7 logs folder
           </Button>
+          <Text c="dimmed" size="sm" mt="xs">
+            Need help?
+          </Text>
+          <Group gap={0}>
+            <Button
+              component="a"
+              size="xs"
+              color="indigo"
+              leftSection={<IconBrandDiscord size={16} />}
+              variant="transparent"
+              href="https://civmods.com/discord"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ask in our Discord
+            </Button>
+            <Button
+              component="a"
+              size="xs"
+              color="gray"
+              leftSection={<IconMessage size={16} />}
+              variant="transparent"
+              href="https://forums.civfanatics.com/threads/civmods-civ7-mods-manager-discussion.696844/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ask on CivFanatics
+            </Button>
+            <Button
+              component="a"
+              size="xs"
+              color="gray"
+              leftSection={<IconBrandGithub size={16} />}
+              variant="transparent"
+              href="https://github.com/rockfactory/civ7-mods-hub/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Report an issue
+            </Button>
+          </Group>
         </Stack>
         <div className={styles.footer}>
           <Text c="dimmed" size="sm">
