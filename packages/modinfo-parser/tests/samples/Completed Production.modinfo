@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="completed-production" version="1.0"
+	xmlns="ModInfo">
+	<Properties>
+		<Name>Completed Production</Name>
+		<Description>Display the object completed this turn in the city production screen.</Description>
+		<Authors>KayleeR</Authors>
+		<Package>Mod</Package>
+		<AffectsSavedGames>0</AffectsSavedGames>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME"/>
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet></AlwaysMet>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="game-misc-ui-modifications-always" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>100</LoadOrder>
+			</Properties>
+			<Actions>
+				<UIScripts>
+					<Item>code/completed-production.js</Item>
+					<Item>code/completed-production-header.js</Item>
+					<Item>code/production-panel-decorator.js</Item>
+				</UIScripts>
+				<UpdateText>
+					<Item>data/text.xml</Item>
+				</UpdateText>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+</Mod>

@@ -1,0 +1,15 @@
+[package]
+name = "modinfo-parser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+log = "0.4"
+quick-xml = { version = "0.37", features = ["serialize", "overlapped-lists"] }
+serde = { version = "1", features = ["derive"] }
+serde_with = "3"
+
+[dev-dependencies]
+indoc = "1"
+insta = { version = "1", features = ["glob"] }

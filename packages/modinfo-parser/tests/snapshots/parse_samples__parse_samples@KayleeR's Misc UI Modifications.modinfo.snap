@@ -1,0 +1,142 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: "packages/modinfo-parser/tests/samples/KayleeR's Misc UI Modifications.modinfo"
+---
+Mod {
+    id: "misc_ui_modifications",
+    version: Some(
+        "1.13",
+    ),
+    properties: Properties {
+        name: Some(
+            "KayleeR's Misc UI Modifications",
+        ),
+        description: Some(
+            "Miscellaneous modifications to improve the base game UI.",
+        ),
+        authors: Some(
+            "KayleeR",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "game-misc-ui-modifications-always",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    100,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/building-placement/building-placement-manager.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/interface-modes/interface-mode-place-building.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/lenses/layer/building-placement-layer.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/lenses/layer/resource-layer.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/plot-icon/plot-icons-root.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/plot-icon/plot-icon-resource.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/plot-icon/plot-icon-resource.css",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/plot-icon/plot-icon-discovery.css",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/resource-allocation/screen-resource-allocation.css",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/resource-allocation/screen-resource-allocation.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/resource-allocation/model-resource-allocation.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/production-chooser-helpers.js",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/lenses/layer/discovery-layer.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/plot-icon/plot-icon-discovery.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/mini-map/mini-map-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/panel-production-chooser-decorator.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/misc-ui-modifications-text.sql",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

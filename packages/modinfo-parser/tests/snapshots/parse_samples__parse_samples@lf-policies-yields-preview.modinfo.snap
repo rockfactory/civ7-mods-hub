@@ -1,0 +1,251 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/lf-policies-yields-preview.modinfo
+---
+Mod {
+    id: "lf-policies-yields-preview",
+    version: Some(
+        "1",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MOD_LF_YIELDS_MOD_NAME",
+        ),
+        description: Some(
+            "LOC_MOD_LF_YIELDS_MOD_DESC",
+        ),
+        authors: Some(
+            "leonardfactory",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: Some(
+            "0.7.1",
+        ),
+        compatibility: None,
+        url: Some(
+            "https://forums.civfanatics.com/resources/leonardfactorys-policy-yield-previews.32012/",
+        ),
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/de_DE/ModInfoText.xml",
+        "text/en_US/ModInfoText.xml",
+        "text/it_IT/ModInfoText.xml",
+        "text/ko_KR/ModInfoText.xml",
+        "text/ru_RU/ModInfoText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "shell-lf-policies-ui",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    500,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "scripts/core/settings.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/settings-init.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/de_DE/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/en_US/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/it_IT/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/ko_KR/InGameText.xml",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "game-lf-policies-ui",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    500,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "scripts/core/settings.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/core/execution-context.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/render-yields-preview.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/yields-styles.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/policies/policy-chooser-item-yields-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/policies/screen-policies-yields-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/attributes/attribute-card-yields-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/tech-civic/tech-civic-tooltip-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/ui/settings-init.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/effects/apply-effects.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/effects/yields.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/adjacency.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/city.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/constructibles.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/helpers.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/player.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/plot.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/units.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/game/warehouse.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/requirements/requirement.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/requirements/resolve-subjects.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/requirements/assert-subject.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/preview-yields.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/fetch-modifiers.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/modifiers.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "scripts/cache.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/de_DE/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/en_US/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/it_IT/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/ko_KR/InGameText.xml",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

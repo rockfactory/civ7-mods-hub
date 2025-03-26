@@ -1,0 +1,85 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/TownFocusBoostInfo.modinfo
+---
+Mod {
+    id: "YMD_TownFocusBoostInfo",
+    version: Some(
+        "1.1",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MOD_YMD_TOWNFOCUSBOOSTINFO",
+        ),
+        description: Some(
+            "LOC_MOD_YMD_TOWNFOCUSBOOSTINFO_DESCRIPTION",
+        ),
+        authors: Some(
+            "Yamada",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/ModuleText.xml",
+        "l10n/ja_JP_Text.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "town_focus-boost-info-actions",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "script/TownFocusCityYields.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "script/TownFocusWarehouse.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "script/TownFocusBoostInfo.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [],
+                },
+            ],
+        },
+    ],
+}

@@ -1,0 +1,258 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/bz-city-hall.modinfo
+---
+Mod {
+    id: "bz-city-hall",
+    version: Some(
+        "10802",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MOD_BZ_CITY_HALL_NAME",
+        ),
+        description: Some(
+            "LOC_MOD_BZ_CITY_HALL_DESCRIPTION",
+        ),
+        authors: Some(
+            "beezany",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: Some(
+            "1.8.2",
+        ),
+        compatibility: None,
+        url: Some(
+            "https://forums.civfanatics.com/resources/city-hall.31946/",
+        ),
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/ModInfoText.xml",
+        "text/de_DE/ModInfoText.xml",
+        "text/it_IT/ModInfoText.xml",
+        "text/ko_KR/ModInfoText.xml",
+        "text/pl_PL/ModInfoText.xml",
+        "text/ru_RU/ModInfoText.xml",
+        "text/zh_Hans_CN/ModInfoText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "bz-city-hall-menu",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1000,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/options/bz-city-hall-options.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/options/mod-options-decorator.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_DE/InGameText.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_IT/InGameText.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_KR/InGameText.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pl_PL/InGameText.xml",
+                            locale: Some(
+                                "pl_PL",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_RU/InGameText.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hans_CN/InGameText.xml",
+                            locale: Some(
+                                "zh_Hans_CN",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hant_HK/InGameText.xml",
+                            locale: Some(
+                                "zh_Hant_HK",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "bz-city-hall-ui",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1000,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/building-placement/building-placement-manager.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/interface-modes/interface-mode-place-building.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/interface-modes/support-city-decoration.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/lenses/layer/building-placement-layer.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/options/bz-city-hall-options.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/options/mod-options-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/production-chooser-helpers.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/production-chooser-item.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/production-chooser-unique-quarter.js",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/city-details/bz-model-city-details.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/city-details/bz-panel-city-details.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/bz-panel-production-chooser.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_DE/InGameText.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_IT/InGameText.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_KR/InGameText.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pl_PL/InGameText.xml",
+                            locale: Some(
+                                "pl_PL",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_RU/InGameText.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hans_CN/InGameText.xml",
+                            locale: Some(
+                                "zh_Hans_CN",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hant_HK/InGameText.xml",
+                            locale: Some(
+                                "zh_Hant_HK",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

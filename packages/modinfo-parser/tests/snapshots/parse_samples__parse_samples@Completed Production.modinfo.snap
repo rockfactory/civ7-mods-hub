@@ -1,0 +1,89 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/Completed Production.modinfo
+---
+Mod {
+    id: "completed-production",
+    version: Some(
+        "1.0",
+    ),
+    properties: Properties {
+        name: Some(
+            "Completed Production",
+        ),
+        description: Some(
+            "Display the object completed this turn in the city production screen.",
+        ),
+        authors: Some(
+            "KayleeR",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "game-misc-ui-modifications-always",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    100,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "code/completed-production.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "code/completed-production-header.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "code/production-panel-decorator.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "data/text.xml",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}
