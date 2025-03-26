@@ -1,0 +1,285 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/ai.modinfo
+---
+Mod {
+    id: "rhq",
+    version: Some(
+        "2.03",
+    ),
+    properties: Properties {
+        name: Some(
+            "RHQ AI MOD 2.03",
+        ),
+        description: Some(
+            "A joint project between RomanHoliday, AndyNemmity that enhances AI behavior, long-term strategy and decision making! Version 2. In Beta Testing.",
+        ),
+        authors: Some(
+            "RomanHoliday, AndyNemmity, Slothoth, Desucrate",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: true,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+        Dependency {
+            id: "age-antiquity",
+            title: Some(
+                "LOC_MODULE_AGE_ANTIQUITY_NAME",
+            ),
+        },
+        Dependency {
+            id: "age-exploration",
+            title: Some(
+                "LOC_MODULE_AGE_EXPLORATION_NAME",
+            ),
+        },
+        Dependency {
+            id: "age-modern",
+            title: Some(
+                "LOC_MODULE_AGE_MODERN_NAME",
+            ),
+        },
+    ],
+    localized_text: [],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+        ActionCriterion {
+            id: "rhq-antiquity-age-only",
+            always_met: false,
+            age_in_use: Some(
+                "AGE_ANTIQUITY",
+            ),
+            mod_in_use: None,
+        },
+        ActionCriterion {
+            id: "rhq-exploration-age-only",
+            always_met: false,
+            age_in_use: Some(
+                "AGE_EXPLORATION",
+            ),
+            mod_in_use: None,
+        },
+        ActionCriterion {
+            id: "rhq-modern-age-only",
+            always_met: false,
+            age_in_use: Some(
+                "AGE_MODERN",
+            ),
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "rhq-base-xml",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    0,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "modules/behaviortrees/ai_trees.xml",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "rhq-base-sql",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "modules/data/art_intelligence_core.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/ops/all_ops.sql",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "rhq-all-victs",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    2,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "modules/vict/all_vict.sql",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "rhq-main-antiquity",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "rhq-antiquity-age-only",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    3,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "modules/behaviortrees/ant_ai_trees.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/vict/ant_vict.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/vict/sovereign_and_above/ant_vict_sovereign_plus.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/ops/ant_ops.sql",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "rhq-exploration-age",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "rhq-exploration-age-only",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    4,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "modules/vict/exploration_vict.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/vict/sovereign_and_above/exploration_vict_sovereign_plus.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/ops/exploration_ops.sql",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "rhq-modern-age",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "rhq-modern-age-only",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    5,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "modules/vict/modern_vict.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/vict/sovereign_and_above/modern_vict_sovereign_plus.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "modules/ops/modern_ops.sql",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+    ],
+}

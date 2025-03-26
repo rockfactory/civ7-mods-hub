@@ -1,0 +1,76 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/nasuellia-non-sticky-selection.modinfo
+---
+Mod {
+    id: "nasuellia-non-sticky-selection",
+    version: Some(
+        "9",
+    ),
+    properties: Properties {
+        name: Some(
+            "nasuellia-non-sticky-selection",
+        ),
+        description: Some(
+            "implements non-sticky selection",
+        ),
+        authors: Some(
+            "nasuellia",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "core",
+            title: Some(
+                "LOC_MODULE_CORE_NAME",
+            ),
+        },
+    ],
+    localized_text: [],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "nasuellia-non-sticky-selection-scripts",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    101,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "core/ui/input/action-handler.js",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [],
+                    update_database: [],
+                    update_text: [],
+                },
+            ],
+        },
+    ],
+}

@@ -20,6 +20,10 @@ impl Mod {
         quick_xml::de::from_str(&sanitized)
     }
 
+    pub fn to_string(&self) -> Result<String, quick_xml::SeError> {
+        quick_xml::se::to_string(self)
+    }
+
     fn sanitize(reader: impl Read, writer: impl Write) -> quick_xml::Result<()> {
         let mut reader = Reader::from_reader(BufReader::new(reader));
         let mut writer = Writer::new(writer);
@@ -62,13 +66,5 @@ mod tests {
             String::from_utf8_lossy(&output),
             r#"<Item>ui/shell/extras/screen-extras.js</Item>"#,
         );
-    }
-
-    #[test]
-    fn test_parse_mod_xml() {
-        // NOTE: This is not a valid ModInfo XML
-        let xml = r#"<Mod id="a_mod"><Item>ui/shell/extras/screen-extras.js</item></Mod>"#;
-        let mod_xml = Mod::parse(xml.as_bytes()).unwrap();
-        assert_eq!(mod_xml.id, Some("a_mod".to_string()));
     }
 }

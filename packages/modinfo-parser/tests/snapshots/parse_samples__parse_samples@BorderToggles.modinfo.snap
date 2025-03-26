@@ -1,0 +1,257 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/BorderToggles.modinfo
+---
+Mod {
+    id: "finwickle-border-boggles",
+    version: Some(
+        "2.5",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MOD_BORDER_TOGGLES_NAME",
+        ),
+        description: Some(
+            "LOC_MOD_BORDER_TOGGLES_DESCRIPTION",
+        ),
+        authors: Some(
+            "Finwickle",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: Some(
+            "LOC_MOD_BORDER_TOGGLES_SPECIALTHANKS",
+        ),
+        version: Some(
+            "2.5",
+        ),
+        compatibility: Some(
+            "LOC_MOD_BORDER_TOGGLES_COMPATIBILITY",
+        ),
+        url: Some(
+            "https://forums.civfanatics.com/resources/border-toggles.32008/",
+        ),
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/ModuleText.xml",
+        "text/de_de/ModuleText.xml",
+        "text/es_es/ModuleText.xml",
+        "text/fr_fr/ModuleText.xml",
+        "text/it_it/ModuleText.xml",
+        "text/ja_jp/ModuleText.xml",
+        "text/ko_kr/ModuleText.xml",
+        "text/pl_pl/ModuleText.xml",
+        "text/pt_br/ModuleText.xml",
+        "text/ru_ru/ModuleText.xml",
+        "text/zh_hans_cn/ModuleText.xml",
+        "text/zh_hant_hk/ModuleText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "border-toggles-shell-actions",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/ModuleText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_de/ModuleText.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/es_es/ModuleText.xml",
+                            locale: Some(
+                                "es_ES",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/fr_fr/ModuleText.xml",
+                            locale: Some(
+                                "fr_FR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_it/ModuleText.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ja_jp/ModuleText.xml",
+                            locale: Some(
+                                "ja_JP",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_kr/ModuleText.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pl_pl/ModuleText.xml",
+                            locale: Some(
+                                "pl_PL",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pt_br/ModuleText.xml",
+                            locale: Some(
+                                "pt_BR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_ru/ModuleText.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_hans_cn/ModuleText.xml",
+                            locale: Some(
+                                "zh_Hans_CN",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_hant_hk/ModuleText.xml",
+                            locale: Some(
+                                "zh_Hant_HK",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "border-toggles-actions",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/mini-map/border-toggles-panel-mini-map.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/UIText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_de/UIText.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/es_es/UIText.xml",
+                            locale: Some(
+                                "es_ES",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/fr_fr/UIText.xml",
+                            locale: Some(
+                                "fr_FR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_it/UIText.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ja_jp/UIText.xml",
+                            locale: Some(
+                                "ja_JP",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_kr/UIText.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pl_pl/UIText.xml",
+                            locale: Some(
+                                "pl_PL",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pt_br/UIText.xml",
+                            locale: Some(
+                                "pt_BR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_ru/UIText.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_hans_cn/UIText.xml",
+                            locale: Some(
+                                "zh_Hans_CN",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_hant_hk/UIText.xml",
+                            locale: Some(
+                                "zh_Hant_HK",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

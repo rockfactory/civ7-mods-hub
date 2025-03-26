@@ -1,0 +1,85 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/better-main-menu.modinfo
+---
+Mod {
+    id: "cyberdisc-better-main-menu",
+    version: Some(
+        "1.1",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_BETTER_MAIN_MENU_NAME",
+        ),
+        description: Some(
+            "LOC_BETTER_MAIN_MENU_DESCRIPTION",
+        ),
+        authors: Some(
+            "Cyberdisc",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "core",
+            title: Some(
+                "LOC_MODULE_CORE_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/ModuleText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "better-main-menu",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/shell/extras/screen-extras.html",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/shell/main-menu/main-menu.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/shell/extras/screen-extras.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [],
+                },
+            ],
+        },
+    ],
+}
