@@ -1,3 +1,5 @@
+use std::{fs, path::PathBuf};
+
 use logger::{redact_path, redact_path_for_logs};
 use mods::{
     backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp},
@@ -59,6 +61,9 @@ pub fn run() {
         .plugin(
             tauri_plugin_log::Builder::new()
             .max_file_size(5_000_000) // 5MB in bytes
+            .clear_targets()
+            .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout))
+            .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir { file_name: Some("CivMods.v2".to_string()) }),)
             .format(move |out, message, record| {
                 let msg = format!("{}", message);
                 let redacted = redact_path_for_logs(&msg);
@@ -94,6 +99,17 @@ pub fn run() {
             // flickering due to window_state plugin changing the window 
             // position after it's shown
             let _ = app.get_webview_window("main").expect("no main  window").show();
+
+            // Delete previous logs in app_log_dir CivMods.log if they exist
+            let log_dir = app.path().app_log_dir();
+            if let Ok(dir) = log_dir {
+                let log_file = dir.join("CivMods.log");
+
+                if log_file.exists() {
+                    fs::remove_file(&log_file)?;
+                    log::debug!("Deleted old log file at: {}", log_file.display());
+                }
+            }
 
             Ok(())
         })
