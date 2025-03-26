@@ -3,6 +3,7 @@ import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { LazyStore, Store } from '@tauri-apps/plugin-store';
 import { resolve, appDataDir } from '@tauri-apps/api/path';
 import { ModProfile } from '../profiles/ModProfile';
+import { omit } from 'es-toolkit';
 
 const persistStore = new LazyStore('civStorage.json', { autoSave: true });
 console.log();
@@ -13,15 +14,15 @@ appDataDir().then((dir) => {
 const storage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
     const value = (await persistStore.get(name)) || null;
-    console.log(`storage.getItem`, name, value);
+    console.log(`storage.getItem`, name);
     return value as string;
   },
   setItem: async (name: string, value: string): Promise<void> => {
-    console.log(`storage.setItem`, name, value);
+    console.log(`storage.setItem`, name);
     await persistStore.set(name, value);
   },
   removeItem: async (name: string): Promise<void> => {
-    console.log(name);
+    console.log(`storage.remove`, name);
     await persistStore.delete(name);
   },
 };
@@ -68,6 +69,8 @@ export const useAppStore = create<AppState>()(
         } else {
           set({ lockedModIds: lockedModIds.filter((i) => i !== id) });
         }
+
+        console.log('[store.setModLock] Locked mods:', get().lockedModIds);
       },
 
       profiles: [],
@@ -97,7 +100,13 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => storage),
       onRehydrateStorage() {
         return (state) => {
-          if (state) state.setHydrated(true);
+          if (state) {
+            state.setHydrated(true);
+            console.log(
+              '[store.onRehydrateStorage] Rehydrated state:',
+              omit(state, ['modFolder'])
+            );
+          }
         };
       },
     }

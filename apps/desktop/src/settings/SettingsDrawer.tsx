@@ -28,26 +28,54 @@ import { appDataDir, appLogDir, resolve } from '@tauri-apps/api/path';
 import { getVersion } from '@tauri-apps/api/app';
 import styles from './SettingsDrawer.module.css';
 import { checkForAppUpdates } from './autoUpdater';
+import { invoke } from '@tauri-apps/api/core';
 
 export interface ISettingsDrawerProps {}
+
+async function redactPath(path: string | null) {
+  if (!path) {
+    return null;
+  }
+  return await invoke<string>('redact_path', { path });
+}
+
+interface DisplayedFolder {
+  full: string | null;
+  redacted: string | null;
+}
 
 export function SettingsDrawer(props: ISettingsDrawerProps) {
   const [opened, handlers] = useDisclosure();
   const { chooseModFolder, getModsFolder, mods } = useModsContext();
 
   const [displayedFolders, setDisplayedFolders] = useState<{
-    mods: string | null;
-    logs: string | null;
+    mods: DisplayedFolder | null;
+    logs: DisplayedFolder | null;
   }>({
     mods: null,
     logs: null,
   });
   useEffect(() => {
-    getModsFolder().then(async (folder) => {
+    async function updateFolders() {
+      const modsFolder = await getModsFolder();
+      const logsFolder = modsFolder
+        ? await resolve(modsFolder, '..', 'Logs')
+        : '';
+
       setDisplayedFolders({
-        mods: folder,
-        logs: folder ? await resolve(folder, '..', 'Logs') : '',
+        mods: {
+          full: modsFolder,
+          redacted: await redactPath(modsFolder),
+        },
+        logs: {
+          full: logsFolder,
+          redacted: await redactPath(logsFolder),
+        },
       });
+    }
+
+    updateFolders().catch((err) => {
+      console.error('Failed to update folders:', err);
     });
   }, [open, getModsFolder, mods]);
 
@@ -89,7 +117,7 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             leftSection={<IconExternalLink size={16} />}
             color="blue"
             variant="light"
-            onClick={() => open(displayedFolders.mods || '')}
+            onClick={() => open(displayedFolders.mods?.full || '')}
           >
             Open
           </Button>
@@ -97,7 +125,7 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
         <Text c="dimmed" size="sm" mt="xs">
           Current mods folder:
           <br />
-          <Code>{displayedFolders.mods}</Code>{' '}
+          <Code>{displayedFolders.mods?.redacted}</Code>{' '}
         </Text>
 
         <Title order={3} mt="lg">
@@ -148,9 +176,9 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             leftSection={<IconLogs size={12} />}
             size="xs"
             color="blue"
-            disabled={!displayedFolders.logs}
+            disabled={!displayedFolders.logs?.full}
             onClick={async () => {
-              open(displayedFolders.logs || '');
+              open(displayedFolders.logs?.full || '');
             }}
           >
             Open Civilization7 logs folder
