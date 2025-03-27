@@ -9,6 +9,7 @@ import { ModsRecord, ModVersionsRecord } from '@civmods/parser';
 import { ScrapeModsOptions, SyncModVersion } from './scrapeMods';
 import { pb } from '../../core/pocketbase';
 import { DiscordLog } from '../../integrations/discord/DiscordLog';
+import { upsertVersionMetadata } from './upsertVersionMetadata';
 
 const ARCHIVE_DIR = './apps/api/data/archives/';
 export const EXTRACTED_DIR = './apps/api/data/extracted/';
@@ -116,6 +117,19 @@ export async function extractAndStoreModVersionMetadata(
 
     // Update PocketBase record
     await pb.collection('mod_versions').update(version.id, versionUpdate);
+
+    // Store metadata
+    try {
+      await upsertVersionMetadata(options, {
+        modId: mod.id,
+        versionId: version.id,
+        modInfo,
+        archivePath,
+      });
+    } catch (error) {
+      console.error(`Failed to store metadata for ${version.name}: ${error}`);
+      if (process.env.NODE_ENV === 'development') throw error;
+    }
 
     console.log(`Updated PocketBase for: ${version.name}`);
     DiscordLog.onVersionProcessed(mod, { ...version, ...versionUpdate });

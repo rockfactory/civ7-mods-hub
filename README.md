@@ -12,6 +12,9 @@ Download and Start Pocketbase v0.25.9 in `./apps/backend`:
 ./apps/backend/pocketbase.exe serve
 ```
 
+> [!TIP]
+> Use `--dev` flag to debug SQL statements and 400 errors
+
 Start the server
 
 ```bash

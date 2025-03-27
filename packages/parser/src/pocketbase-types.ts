@@ -12,6 +12,7 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	ModVersions = "mod_versions",
+	ModVersionsMetadata = "mod_versions_metadata",
 	Mods = "mods",
 	ScheduledTasks = "scheduled_tasks",
 	Users = "users",
@@ -88,15 +89,15 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type ModVersionsRecord = {
+export type ModVersionsRecord<Tdependencies = unknown> = {
 	affect_saves?: boolean
 	archive_hash?: string
 	archive_size?: number
 	cf_id?: string
 	created?: IsoDateString
+	dependencies?: null | Tdependencies
 	download_error?: boolean
 	download_url?: string
-	hash?: string
 	hash_stable?: string
 	id: string
 	is_external_download?: boolean
@@ -110,6 +111,15 @@ export type ModVersionsRecord = {
 	released?: IsoDateString
 	skip_install?: boolean
 	updated?: IsoDateString
+}
+
+export type ModVersionsMetadataRecord<Tcontent = unknown> = {
+	archive_file?: string
+	content?: null | Tcontent
+	created?: IsoDateString
+	id: string
+	updated?: IsoDateString
+	version_id: RecordIdString
 }
 
 export type ModsRecord = {
@@ -160,7 +170,8 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type ModVersionsResponse<Texpand = unknown> = Required<ModVersionsRecord> & BaseSystemFields<Texpand>
+export type ModVersionsResponse<Tdependencies = unknown, Texpand = unknown> = Required<ModVersionsRecord<Tdependencies>> & BaseSystemFields<Texpand>
+export type ModVersionsMetadataResponse<Tcontent = unknown, Texpand = unknown> = Required<ModVersionsMetadataRecord<Tcontent>> & BaseSystemFields<Texpand>
 export type ModsResponse<Texpand = unknown> = Required<ModsRecord> & BaseSystemFields<Texpand>
 export type ScheduledTasksResponse<Toptions = unknown, Texpand = unknown> = Required<ScheduledTasksRecord<Toptions>> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
@@ -174,6 +185,7 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	mod_versions: ModVersionsRecord
+	mod_versions_metadata: ModVersionsMetadataRecord
 	mods: ModsRecord
 	scheduled_tasks: ScheduledTasksRecord
 	users: UsersRecord
@@ -186,6 +198,7 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	mod_versions: ModVersionsResponse
+	mod_versions_metadata: ModVersionsMetadataResponse
 	mods: ModsResponse
 	scheduled_tasks: ScheduledTasksResponse
 	users: UsersResponse
@@ -201,6 +214,7 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: '_otps'): RecordService<OtpsResponse>
 	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
 	collection(idOrName: 'mod_versions'): RecordService<ModVersionsResponse>
+	collection(idOrName: 'mod_versions_metadata'): RecordService<ModVersionsMetadataResponse>
 	collection(idOrName: 'mods'): RecordService<ModsResponse>
 	collection(idOrName: 'scheduled_tasks'): RecordService<ScheduledTasksResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>
