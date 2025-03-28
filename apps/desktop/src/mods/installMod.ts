@@ -12,11 +12,14 @@ import { ModData, ModInfo } from '../home/IModInfo';
 import { useAppStore } from '../store/store';
 import { getModFolderPath } from './commands/getModFolderPath';
 import { getActiveModsFolder } from './getModsFolder';
+import dayjs from 'dayjs';
 import {
   invokeBackupModToTemp,
   invokeCleanupModBackup,
+  invokeExtractModArchive,
   invokeRestoreModFromTemp,
 } from './commands/modsRustBindings';
+import { cleanCategoryName } from './modCategory';
 
 function parseContentDisposition(contentDisposition: string | null): {
   filename?: string;
@@ -90,7 +93,7 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
       await uninstallMod(mod.local);
     }
 
-    await runLowLevelInstallMod(version, { modsFolderPath: modsFolder });
+    await runLowLevelInstallMod(mod, version, { modsFolderPath: modsFolder });
 
     // This is a delicate moment where mod is installed and backup would be restored
     // if something goes wrong. If we reach this point, we _Need_ to cleanup the backup.
@@ -120,20 +123,21 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
  * This should be called only internally, as it doesn't check if the mod is locked,
  * nor implements backups.
  */
-export async function runLowLevelInstallMod(
-  mod: ModVersionsRecord,
+async function runLowLevelInstallMod(
+  mod: ModData,
+  version: ModVersionsRecord,
   options: InstallModOptions
 ) {
-  if (!mod.download_url) {
-    throw new Error(`Mod ${mod.id} has no download URL`);
+  if (!version.download_url) {
+    throw new Error(`Mod ${version.id} has no download URL`);
   }
 
   if (!options.modsFolderPath) {
     throw new Error('No mods folder provided. Please set it in the settings.');
   }
 
-  console.log('Downloading mod from:', mod.download_url);
-  let response = await fetch(mod.download_url);
+  console.log('Downloading mod from:', version.download_url);
+  let response = await fetch(version.download_url);
   if (!response.ok) {
     throw new Error(`Failed to download mod: ${response.statusText}`);
   }
@@ -182,7 +186,7 @@ export async function runLowLevelInstallMod(
   console.log('Mods folder:', modsFolderPath);
   const tempArchivePath = await path.join(
     modsFolderPath,
-    `${mod.id}_${filename}`
+    `${version.id}_${filename}`
   );
 
   console.log('Saving mod to:', tempArchivePath);
@@ -191,16 +195,22 @@ export async function runLowLevelInstallMod(
   console.log('Writing mod archive to disk..');
   const extractPath = await path.join(
     modsFolderPath,
-    `civmods-${mod.modinfo_id ?? mod.mod_id}-${mod.cf_id}`
+    `civmods-${version.modinfo_id ?? version.mod_id}-${version.cf_id}`
   );
 
   try {
     await fs.writeFile(tempArchivePath, new Uint8Array(buffer));
 
     console.log('Extracting mod to:', extractPath);
-    const result = await invoke<string>('extract_mod_archive', {
+    const result = await invokeExtractModArchive({
       archivePath: tempArchivePath,
-      extractTo: extractPath,
+      extractPath,
+      properties: {
+        mod_url: mod.fetched!.url,
+        mod_version: version.name,
+        mod_category: cleanCategoryName(mod.fetched!.category),
+        mod_version_date: dayjs(version.released).toISOString(),
+      },
     });
 
     console.log('Mod installed!', result);

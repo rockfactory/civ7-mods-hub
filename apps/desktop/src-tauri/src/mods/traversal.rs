@@ -5,6 +5,8 @@ use std::io::{BufReader, Read, Write};
 use std::path::Path;
 use walkdir::WalkDir;
 
+use crate::mods::patch_modinfo::restore_patched_modinfo_xml;
+
 #[derive(Serialize)]
 pub struct ModInfo {
     mod_name: String,
@@ -49,33 +51,33 @@ fn compute_folder_hash(directory: &Path) -> Result<String, String> {
 
     for entry in iter {
         if entry.file_type().is_file() {
-            // println!(" -> Hashing: {}", entry.path().display());
+            let path = entry.path();
 
-            // Skipping file name for now.
-            // Get relative path (relative to the given directory)
-            // let relative_path = entry
-            //     .path()
-            //     .strip_prefix(directory)
-            //     .map_err(|e| format!("Failed to get relative path: {}", e))?
-            //     .to_string_lossy();
+            // Try to restore unpatched version if it's a .modinfo file
+            let content: Vec<u8> = if path.extension().map_or(false, |ext| ext == "modinfo") {
+                match restore_patched_modinfo_xml(path)? {
+                    Some(reverted) => reverted,
+                    None => read_file_to_vec(path)?,
+                }
+            } else {
+                read_file_to_vec(path)?
+            };
 
-            // // Update the hash with the relative path
-            // hasher.update(relative_path.as_bytes());
-            // println!("Hashing: {}", relative_path);
-
-            // Read file content and update hash
-            let mut file =
-                File::open(entry.path()).map_err(|e| format!("Failed to open file: {}", e))?;
-            let mut buffer = Vec::new();
-            file.read_to_end(&mut buffer)
-                .map_err(|e| format!("Failed to read file: {}", e))?;
-
-            hasher.update(&buffer);
+            hasher.update(&content);
         }
     }
 
     let hash_result = hasher.finalize();
     Ok(format!("{:x}", hash_result))
+}
+
+fn read_file_to_vec(path: &Path) -> Result<Vec<u8>, String> {
+    let mut buffer = Vec::new();
+    File::open(path)
+        .map_err(|e| format!("Failed to open file: {e}"))?
+        .read_to_end(&mut buffer)
+        .map_err(|e| format!("Failed to read file: {e}"))?;
+    Ok(buffer)
 }
 
 /// Parses the .modinfo XML and extracts the `id` attribute
