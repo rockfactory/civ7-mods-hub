@@ -25,7 +25,7 @@ import { computeModsData } from './commands/computeModsData';
 import { getVersion } from '@tauri-apps/api/app';
 
 const pb = new PocketBase(
-  'https://backend.civmods.com'
+  import.meta.env.VITE_POCKETBASE_URL || 'https://backend.civmods.com'
   // 'http://localhost:8090'
 ) as TypedPocketBase;
 
