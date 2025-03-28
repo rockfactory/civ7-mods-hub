@@ -5,7 +5,7 @@ const singleModUrl =
 
 const forceExtractAndStore = true;
 const maxPages = 1; // 15 full
-const stopAfterLastModVersion = true;
+const stopAfterLastModVersion = false;
 const onlyListData = false;
 
 // Main entry point
@@ -16,7 +16,7 @@ scrapeMods({
   forceExtractAndStore,
   stopAfterLastModVersion,
   onlyListData,
-  stopAfterFirstMod: true,
+  stopAfterFirstMod: false,
 })
   .then((mods) => {
     // fs.writeFileSync('civ7_mods.json', JSON.stringify(mods, null, 2));
