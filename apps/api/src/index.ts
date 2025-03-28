@@ -1,17 +1,20 @@
 import express from 'express';
-import fs from 'fs/promises';
 import fsSync from 'fs';
 import { engine } from 'express-handlebars';
 import { pb } from './core/pocketbase.js';
 import { safeAsync } from './core/async.js';
 import { getCachedGithubRelease, Release } from './download/downloadLinks.js';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 import Handlebars from 'handlebars';
 import { IShareableProfile, unhashProfileCodes } from '@civmods/parser';
 import { logResponseTime } from './middlewares/logResponseTime.js';
+import markedAlert from 'marked-alert';
+import { renderSocialImage } from './mods/images/socialShare.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const markedRenderer = new Marked().use(markedAlert() as any);
 
 app.use('/static', express.static('public'));
 app.use(logResponseTime);
@@ -27,7 +30,7 @@ app.engine(
       },
       markdown: function (content: string) {
         return new Handlebars.SafeString(
-          marked.parse(content, { async: false })
+          markedRenderer.parse(content, { async: false })
         );
       },
       icon: function (name: string, size: number = 24) {
@@ -122,13 +125,29 @@ app.get(
 
     try {
       const mod = await pb.collection('mods').getFirstListItem(filter);
-      res.render('install', { title: 'Install mod', mod });
+      res.render('install', {
+        title: 'Install mod ' + mod.name,
+        mod,
+        instant: req.query.instant !== 'false', // Opt-out of instant install
+        og: {
+          title: `Install ${mod.name}`,
+          url: `install?modId=${mod.id}`,
+          image: `mods/${mod.id}/social-image.png`,
+        },
+      });
     } catch (err) {
       return res.status(404).render('error', {
         title: 'Mod not found',
         error: "We couldn't find the mod you're looking for",
       });
     }
+  })
+);
+
+app.get(
+  '/mods/:id/social-image.png',
+  safeAsync(async (req, res) => {
+    await renderSocialImage(req, res);
   })
 );
 
@@ -177,6 +196,10 @@ app.get('/profile', async (req, res) => {
 
 app.get('/modders', async (req, res) => {
   res.render('modders', { title: 'Modders' });
+});
+
+app.get('/discord', async (req, res) => {
+  res.redirect('https://discord.gg/kdsBHSAMDG');
 });
 
 app.get('/privacy-policy', async (req, res) => {

@@ -7,6 +7,7 @@ import { pb } from '../../core/pocketbase';
 import { getModIdFromUrl, getVersionIdFromUrl } from './cfIds';
 import { extractAndStoreModVersionMetadata } from './extractAndStoreModVersionMetadata';
 import { ScrapeModsOptions, SyncMod } from './scrapeMods';
+import { DiscordLog } from '../../integrations/discord/DiscordLog';
 
 function syncModToModRecord(syncMod: SyncMod): Partial<ModsRecord> {
   return {
@@ -53,9 +54,12 @@ export async function saveModToDatabase(
       ...syncModToModRecord(syncMod),
     } as Partial<ModsRecord>);
   } else {
-    console.log(
-      `Mod already exists, updating: ${syncMod.modName} (${syncMod.modPageUrl})`
-    );
+    if (mod.is_hidden) {
+      console.log(`Mod is hidden, skipping: ${syncMod.modName} (${syncMod.modPageUrl})`); // prettier-ignore
+      return;
+    }
+
+    console.log(`Mod already exists, updating: ${syncMod.modName} (${syncMod.modPageUrl})`); // prettier-ignore
     mod = await pb.collection('mods').update(mod.id, {
       ...syncModToModRecord(syncMod),
     } as Partial<ModsRecord>);
@@ -69,7 +73,6 @@ export async function saveModToDatabase(
   if (options.onlyListData) return;
 
   // Process versions
-  let isNewVersionsAvailable = false;
   let processableVersions: ModVersionsResponse[] = [];
 
   const syncVersions = syncMod.versions || [];
@@ -90,7 +93,6 @@ export async function saveModToDatabase(
       );
 
     if (!version) {
-      isNewVersionsAvailable = true;
       console.log(
         `Creating new version: ${syncVersion.version} for mod ${syncMod.modName}`
       );
@@ -131,18 +133,18 @@ export async function saveModToDatabase(
 
       if (version.is_processing || options.forceExtractAndStore) {
         // Stuck
-        console.log(`Version is stuck, reprocessing: ${syncVersion.version}`);
+        console.log(`Version is ${version.is_processing ? 'stuck' : 'forced'}, reprocessing: ${syncVersion.version}`); // prettier-ignore
         processableVersions.push(version);
       }
     }
   }
 
-  if (
-    (isNewVersionsAvailable && !options.skipExtractAndStore) ||
-    options.forceExtractAndStore
-  ) {
+  const isNewVersionsAvailable = processableVersions.length > 0;
+
+  if (isNewVersionsAvailable && !options.skipExtractAndStore) {
     for (const version of processableVersions) {
-      console.log(`[mod=${mod.name}] Processing new version: ${version.name}`);
+      console.log(`[mod=${mod.name}] Processing version: ${version.name}`);
+      DiscordLog.onVersionProcessing(mod, version);
       await extractAndStoreModVersionMetadata(options, mod, version);
     }
   }

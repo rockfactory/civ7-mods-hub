@@ -1,0 +1,225 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: "packages/modinfo-parser/tests/samples/Sukritact's Simple UI Adjustments.modinfo"
+---
+Mod {
+    id: "sukritacts_simple_ui_adjustments",
+    version: Some(
+        "1",
+    ),
+    properties: Properties {
+        name: Some(
+            "Sukritact's Simple UI Adjustments",
+        ),
+        description: Some(
+            "Makes simple QoL changes to the UI.",
+        ),
+        authors: Some(
+            "Sukritact",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+        ActionCriterion {
+            id: "plot-tooltip-compat",
+            always_met: false,
+            age_in_use: None,
+            mod_in_use: Some(
+                ActionCriterionModInUse {
+                    mod_id: "tcs-ui-improved-plot-tooltip",
+                    inverse: true,
+                },
+            ),
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "game-suk-simple-ui-plot-tooltip",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "plot-tooltip-compat",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    10,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/tooltips/plot-tooltip.js",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/Suk_Simple_UI_Adjustments_Text.sql",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "game-suk-simple-ui-building-placement",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/place-building/model-place-building.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/place-building/panel-place-building.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/lenses/layer/building-placement-layer.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_WarehouseBonus",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_ToOthers.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_SpecialistBonus",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_BaseYield",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_AdjacencyBonus.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_PotentialLoss.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_DevelopmentLoss.png",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [],
+                    update_database: [],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "game-suk-simple-ui-always",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    10,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/lenses/lens/founder-lens.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/utilities/utilities-core-textprovider.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/utilities/utilities-textprovider.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_TurnCounter_Backing.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_UnlockGreatWork.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/Suk_SUA_UnlockReligion.png",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/unit-flags/suk-unit-flags.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/sub-system-dock/suk-celebration-turncounter.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/city-banners/suk-city-banners-decorator.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [
+                        ActionItem {
+                            path: "data/Suk_Simple_UI_Adjustments_Data.sql",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [
+                        ActionItem {
+                            path: "text/Suk_Simple_UI_Adjustments_Text.sql",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

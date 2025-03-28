@@ -120,6 +120,7 @@ export type ModsRecord = {
 	downloads_count?: number
 	icon_url?: string
 	id: string
+	is_hidden?: boolean
 	mod_released?: IsoDateString
 	mod_updated?: IsoDateString
 	modinfo_id?: string

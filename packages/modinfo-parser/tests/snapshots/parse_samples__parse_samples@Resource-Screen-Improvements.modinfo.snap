@@ -1,0 +1,85 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/Resource-Screen-Improvements.modinfo
+---
+Mod {
+    id: "resource-fixes-deadbeef",
+    version: Some(
+        "1",
+    ),
+    properties: Properties {
+        name: Some(
+            "Resource Screen Improvements",
+        ),
+        description: Some(
+            "Improves the Trade Panel with extra filters",
+        ),
+        authors: Some(
+            "Slothoth",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "game-sloth-resource-always",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    100,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/trade-route-chooser/trade-route-chooser.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/trade-route-chooser/trade-routes-model.js",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/loc.sql",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

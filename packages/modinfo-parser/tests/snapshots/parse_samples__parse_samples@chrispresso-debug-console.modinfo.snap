@@ -1,0 +1,108 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/chrispresso-debug-console.modinfo
+---
+Mod {
+    id: "chrispresso-debug-console",
+    version: Some(
+        "1.0.0",
+    ),
+    properties: Properties {
+        name: Some(
+            "Chrispresso's Debug Console (CDC)",
+        ),
+        description: Some(
+            "A better debug console",
+        ),
+        authors: Some(
+            "Chrispresso",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: true,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+        Dependency {
+            id: "core",
+            title: Some(
+                "Core",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/UnitActions.xml",
+        "text/en_us/InputText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "core-game",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/debug-console/debug-console.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "core-shell",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "config/input.xml",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+    ],
+}

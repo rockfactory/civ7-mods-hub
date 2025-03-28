@@ -1,0 +1,186 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/bz-map-trix.modinfo
+---
+Mod {
+    id: "bz-map-trix",
+    version: Some(
+        "10801",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MOD_BZ_MAP_TRIX_NAME",
+        ),
+        description: Some(
+            "LOC_MOD_BZ_MAP_TRIX_DESCRIPTION",
+        ),
+        authors: Some(
+            "beezany",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: Some(
+            "1.8.1",
+        ),
+        compatibility: None,
+        url: Some(
+            "https://forums.civfanatics.com/resources/map-trix.31950/",
+        ),
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/ModInfoText.xml",
+        "text/de_DE/ModInfoText.xml",
+        "text/it_IT/ModInfoText.xml",
+        "text/ko_KR/ModInfoText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "bz-map-trix-menu",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1000,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/options/bz-map-trix-options.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/options/mod-options-decorator.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_DE/InGameText.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_IT/InGameText.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_kr/InGameText.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_RU/InGameText.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "bz-map-trix-ui",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1000,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/diplo-ribbon/bz-panel-yield-banner.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/options/bz-map-trix-options.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/options/mod-options-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/tooltips/bz-plot-tooltip.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_DE/InGameText.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_IT/InGameText.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_kr/InGameText.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_RU/InGameText.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

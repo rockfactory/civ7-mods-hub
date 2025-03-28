@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="cyberdisc-better-main-menu" version="1.1"
+	xmlns="ModInfo">
+	<Properties>
+		<Name>LOC_BETTER_MAIN_MENU_NAME</Name>
+		<Description>LOC_BETTER_MAIN_MENU_DESCRIPTION</Description>
+		<Authors>Cyberdisc</Authors>
+		<Package>Mod</Package>
+		<AffectsSavedGames>0</AffectsSavedGames>
+	</Properties>
+	<Dependencies>
+		<Mod id="core" title="LOC_MODULE_CORE_NAME"/>
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet></AlwaysMet>
+		</Criteria>
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="better-main-menu" scope="shell" criteria="always">
+			<Actions>
+				<ImportFiles>
+					<Item>ui/shell/extras/screen-extras.html</Item>
+				</ImportFiles>
+				<UIScripts>
+					<Item>ui/shell/main-menu/main-menu.js</Item>
+					<Item>ui/shell/extras/screen-extras.js</item>
+				</UIScripts>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+	<LocalizedText>
+		<File>text/en_us/ModuleText.xml</File>
+	</LocalizedText>
+</Mod>

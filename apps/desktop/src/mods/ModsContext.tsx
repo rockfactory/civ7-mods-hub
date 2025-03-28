@@ -22,10 +22,11 @@ import { openConfirmModal } from '@mantine/modals';
 import { getActiveModsFolder } from './getModsFolder';
 import { invokeScanCivMods } from './commands/modsRustBindings';
 import { computeModsData } from './commands/computeModsData';
+import { getVersion } from '@tauri-apps/api/app';
 
 const pb = new PocketBase(
   'https://backend.civmods.com'
-  /*'http://localhost:8090'*/
+  // 'http://localhost:8090'
 ) as TypedPocketBase;
 
 export type ModsContextType = {
@@ -38,6 +39,7 @@ export type ModsContextType = {
   getModsFolder: () => Promise<string | null>;
   isFetching: boolean;
   isLoadingInstalled: boolean;
+  lastFetch: Date | null;
 };
 
 export const ModsContext = createContext({} as ModsContextType);
@@ -49,6 +51,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
   const [isLoadingInstalled, setIsLoadingInstalled] = useState(false);
   const [modsInfo, setModsInfo] = useState<ModInfo[]>([]);
   const [reloadIndex, setReloadIndex] = useState(0);
+  const [lastFetch, setLastFetch] = useState<Date | null>(null);
 
   const getModsFolder = useCallback(async () => {
     return await getActiveModsFolder();
@@ -95,10 +98,12 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
     async function fetchMods() {
       setIsFetching(true);
       try {
+        const version = await getVersion();
         const records = await pb.collection('mods').getFullList<FetchedMod>({
-          filter: 'cf_id != "32088"',
+          filter: 'is_hidden != true',
           expand: 'mod_versions_via_mod_id',
           sort: '-mod_updated',
+          headers: { 'x-version': `CivMods/v${version}` },
         });
 
         const data = records.map((record) => {
@@ -115,6 +120,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
 
         console.log('Mods data:', data.length);
         setFetchedMods(data ?? []);
+        setLastFetch(new Date());
       } catch (error) {
         if (error instanceof ClientResponseError && error.isAbort) {
           console.log('Request aborted');
@@ -243,6 +249,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       isLoadingInstalled,
       getModsFolder,
       fetchedMods,
+      lastFetch,
     }),
     [
       mods,
@@ -254,6 +261,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       isLoadingInstalled,
       getModsFolder,
       fetchedMods,
+      lastFetch,
     ]
   );
 

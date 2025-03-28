@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="rhq" version="2.03"
+	xmlns="ModInfo">
+	<Properties>
+		<Name>RHQ AI MOD 2.03</Name>
+		<Description>A joint project between RomanHoliday, AndyNemmity that enhances AI behavior, long-term strategy and decision making! Version 2. In Beta Testing.</Description>
+		<Authors>RomanHoliday, AndyNemmity, Slothoth, Desucrate</Authors>
+		<Package>Mod</Package>
+		<AffectsSavedGames>1</AffectsSavedGames>
+		<ShowInBrowser>1</ShowInBrowser>
+	</Properties>
+	<Dependencies>
+		<Mod id="base-standard" title="LOC_MODULE_BASE_STANDARD_NAME"/>
+        <Mod id="age-antiquity" title="LOC_MODULE_AGE_ANTIQUITY_NAME"/>
+        <Mod id="age-exploration" title="LOC_MODULE_AGE_EXPLORATION_NAME"/>
+        <Mod id="age-modern" title="LOC_MODULE_AGE_MODERN_NAME"/>
+	</Dependencies>
+	<ActionCriteria>
+		<Criteria id="always">
+			<AlwaysMet/>
+		</Criteria>
+
+		<Criteria id="rhq-antiquity-age-only">
+			<AgeInUse>AGE_ANTIQUITY</AgeInUse>
+		</Criteria>
+
+		<Criteria id="rhq-exploration-age-only">
+			<AgeInUse>AGE_EXPLORATION</AgeInUse>
+		</Criteria>
+
+		<Criteria id="rhq-modern-age-only">
+			<AgeInUse>AGE_MODERN</AgeInUse>
+		</Criteria>
+
+	</ActionCriteria>
+	<ActionGroups>
+		<ActionGroup id="rhq-base-xml" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>0</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>modules/behaviortrees/ai_trees.xml</Item>
+				</UpdateDatabase>
+			</Actions>
+		</ActionGroup>
+		<ActionGroup id="rhq-base-sql" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>1</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>modules/data/art_intelligence_core.sql</Item>
+					<Item>modules/ops/all_ops.sql</Item>
+				</UpdateDatabase>
+			</Actions>
+		</ActionGroup>
+
+		<ActionGroup id="rhq-all-victs" scope="game" criteria="always">
+			<Properties>
+				<LoadOrder>2</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>modules/vict/all_vict.sql</Item>
+				</UpdateDatabase>
+			</Actions>
+		</ActionGroup>
+
+
+		<ActionGroup id="rhq-main-antiquity" scope="game" criteria="rhq-antiquity-age-only">
+			<Properties>
+				<LoadOrder>3</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>modules/behaviortrees/ant_ai_trees.xml</Item>
+					<Item>modules/vict/ant_vict.sql</Item>
+					<Item>modules/vict/sovereign_and_above/ant_vict_sovereign_plus.sql</Item>
+					<Item>modules/ops/ant_ops.sql</Item>
+				</UpdateDatabase>
+			</Actions>
+		</ActionGroup>
+
+		<ActionGroup id="rhq-exploration-age" scope="game" criteria="rhq-exploration-age-only">
+			<Properties>
+				<LoadOrder>4</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>modules/vict/exploration_vict.sql</Item>
+					<Item>modules/vict/sovereign_and_above/exploration_vict_sovereign_plus.sql</Item>
+					<Item>modules/ops/exploration_ops.sql</Item>
+				</UpdateDatabase>
+			</Actions>
+		</ActionGroup>
+
+		<ActionGroup id="rhq-modern-age" scope="game" criteria="rhq-modern-age-only">
+			<Properties>
+				<LoadOrder>5</LoadOrder>
+			</Properties>
+			<Actions>
+				<UpdateDatabase>
+					<Item>modules/vict/modern_vict.sql</Item>
+					<Item>modules/vict/sovereign_and_above/modern_vict_sovereign_plus.sql</Item>
+					<Item>modules/ops/modern_ops.sql</Item>
+				</UpdateDatabase>
+			</Actions>
+		</ActionGroup>
+	</ActionGroups>
+</Mod>

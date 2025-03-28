@@ -35,6 +35,7 @@ import {
   IconExternalLink,
   IconFileDescription,
   IconFolder,
+  IconHexagonPlus,
   IconLink,
   IconLock,
   IconSettings,
@@ -384,6 +385,25 @@ export function ModBox(props: IModBoxProps) {
                       onClick={() => open(mod.fetched!.url)}
                     >
                       See on CivFanatics
+                    </Menu.Item>
+                  )}
+                  {mod.fetched && (
+                    <Menu.Item
+                      leftSection={<IconHexagonPlus size={16} />}
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `https://civmods.com/install?modId=${encodeURIComponent(
+                            mod.fetched!.id
+                          )}&instant=false`
+                        );
+                        notifications.show({
+                          title: 'Mod installation link copied',
+                          message: `Link for mod ${mod.name} copied to clipboard`,
+                          color: 'blue',
+                        });
+                      }}
+                    >
+                      Copy install link
                     </Menu.Item>
                   )}
                   <ModLockActionItem mod={mod} />

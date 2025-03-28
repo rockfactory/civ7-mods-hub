@@ -1,4 +1,4 @@
-name: 'publish'
+name: 'Publish Desktop App'
 
 on:
   workflow_dispatch:
@@ -94,9 +94,15 @@ jobs:
           WINDOWS_SIGN_COMMAND: trusted-signing-cli -e https://weu.codesigning.azure.net/ -a ${{secrets.AZURE_CODE_SIGNING_NAME}} -c ${{secrets.AZURE_CERT_PROFILE_NAME}} -d CivMods %1
         run: |
           cd "$GITHUB_WORKSPACE/apps/desktop"
-          # cat './src-tauri/tauri.conf.json' | jq '.bundle .windows += {"signCommand": env.WINDOWS_SIGN_COMMAND}' > './src-tauri/temp.json' && mv './src-tauri/temp.json' './src-tauri/tauri.conf.json'
+          cat './src-tauri/tauri.conf.json' | jq '.bundle .windows += {"signCommand": env.WINDOWS_SIGN_COMMAND}' > './src-tauri/temp.json' && mv './src-tauri/temp.json' './src-tauri/tauri.conf.json'
           curl -L -o "$USERPROFILE/.cargo/bin/trusted-signing-cli.exe" \
             https://github.com/Levminer/trusted-signing-cli/releases/download/0.5.0/trusted-signing-cli.exe
+
+          # Extract and convert version to Windows/MSI-friendly format
+          RAW_VERSION=$(jq -r .version package.json)
+          WIN_VERSION=$(echo "$RAW_VERSION" | sed 's/[^0-9]/./g' | sed 's/\.\+/\./g' | sed 's/^\.//; s/\.$//')
+          echo "Using Windows-compatible version for MSI: $WIN_VERSION"
+          cat './src-tauri/tauri.conf.json' | jq --arg winver "$WIN_VERSION" '.bundle .windows .wix += { "version": $winver }' > './src-tauri/temp.json' && mv './src-tauri/temp.json' './src-tauri/tauri.conf.json'
 
       - name: Build and publish with Tauri
         uses: tauri-apps/tauri-action@v0

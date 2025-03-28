@@ -1,0 +1,309 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/ynamp.modinfo
+---
+Mod {
+    id: "ged-ynamp",
+    version: Some(
+        "1",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MODULE_YNAMP_NAME",
+        ),
+        description: Some(
+            "LOC_MODULE_YNAMP_DESCRIPTION",
+        ),
+        authors: Some(
+            "Gedemon",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: true,
+        special_thanks: None,
+        version: None,
+        compatibility: None,
+        url: None,
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/ModuleText.xml",
+        "text/ModuleText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "base-game-init-ynamp",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    -1000,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "data/tables.sql",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "base-game-main-ynamp",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "icons/happy_cat.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "icons/civ6_earth.png",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "version.sql",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "data/maps.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "maps/giant-earth-map/giant-earth.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "maps/giant-earth-map/giant-earth-city.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "maps/greatest-earth-map/greatest-earth.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "maps/greatest-earth-map/greatest-earth-city.xml",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/MapText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_DE_Text.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/es_ES_Text.xml",
+                            locale: Some(
+                                "es_ES",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/fr_FR_Text.xml",
+                            locale: Some(
+                                "fr_FR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_IT_Text.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ja_JP_Text.xml",
+                            locale: Some(
+                                "ja_JP",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_KR_Text.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pl_PL_Text.xml",
+                            locale: Some(
+                                "pl_PL",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pt_BR_Text.xml",
+                            locale: Some(
+                                "pt_BR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_RU_Text.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hans_CN_Text.xml",
+                            locale: Some(
+                                "zh_Hans_CN",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hant_HK_Text.xml",
+                            locale: Some(
+                                "zh_Hant_HK",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "shell-ynamp",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: None,
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "icons/happy_cat.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "icons/civ6_earth.png",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [],
+                    update_database: [
+                        ActionItem {
+                            path: "config/config.xml",
+                            locale: None,
+                        },
+                    ],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/MapText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/de_DE_Text.xml",
+                            locale: Some(
+                                "de_DE",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/es_ES_Text.xml",
+                            locale: Some(
+                                "es_ES",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/fr_FR_Text.xml",
+                            locale: Some(
+                                "fr_FR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_IT_Text.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ja_JP_Text.xml",
+                            locale: Some(
+                                "ja_JP",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_KR_Text.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pl_PL_Text.xml",
+                            locale: Some(
+                                "pl_PL",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/pt_BR_Text.xml",
+                            locale: Some(
+                                "pt_BR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_RU_Text.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hans_CN_Text.xml",
+                            locale: Some(
+                                "zh_Hans_CN",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/zh_Hant_HK_Text.xml",
+                            locale: Some(
+                                "zh_Hant_HK",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

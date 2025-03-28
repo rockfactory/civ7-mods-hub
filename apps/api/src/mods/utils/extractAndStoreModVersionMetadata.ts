@@ -8,9 +8,28 @@ import sleep from 'sleep-promise';
 import { ModsRecord, ModVersionsRecord } from '@civmods/parser';
 import { ScrapeModsOptions, SyncModVersion } from './scrapeMods';
 import { pb } from '../../core/pocketbase';
+import { DiscordLog } from '../../integrations/discord/DiscordLog';
 
 const ARCHIVE_DIR = './apps/api/data/archives/';
 export const EXTRACTED_DIR = './apps/api/data/extracted/';
+
+/**
+ * If this error is thrown, the mod version will be skipped and not processed further
+ * again, as it's impossible to install it.
+ */
+class SkipInstallError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SkipInstallError';
+  }
+}
+
+class DownloadError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DownloadError';
+  }
+}
 
 export async function extractAndStoreModVersionMetadata(
   options: ScrapeModsOptions,
@@ -61,14 +80,7 @@ export async function extractAndStoreModVersionMetadata(
     // Find .modinfo file
     const modInfoPath = await findModInfoFile(extractPath);
     if (!modInfoPath) {
-      console.warn(`No .modinfo found in ${version.name}`);
-      await pb
-        .collection('mod_versions')
-        .update<ModVersionsRecord>(version.id, {
-          skip_install: true,
-          is_processing: false,
-        } as ModVersionsRecord);
-      return;
+      throw new SkipInstallError(`No .modinfo file found in ${version.name}`);
     }
 
     // Compute extracted folder hash
@@ -82,20 +94,12 @@ export async function extractAndStoreModVersionMetadata(
     try {
       modInfo = parser.parse(modInfoXML);
     } catch (error) {
-      console.error(
-        `Failed to parse .modinfo XML for ${version.name}: ${error}`
+      throw new SkipInstallError(
+        `Failed to parse .modinfo XML for ${version.name}. Make sure it's a valid XML: ${error}`
       );
-      await pb
-        .collection('mod_versions')
-        .update<ModVersionsRecord>(version.id, {
-          skip_install: true,
-          is_processing: false,
-        } as Partial<ModVersionsRecord>);
-      return;
     }
 
-    // Update PocketBase record
-    await pb.collection('mod_versions').update(version.id, {
+    const versionUpdate = {
       archive_hash: archiveHash,
       hash_stable: folderHash,
       modinfo_url: modInfo?.Mod?.Properties?.URL || null,
@@ -108,12 +112,41 @@ export async function extractAndStoreModVersionMetadata(
       skip_install: false,
       download_error: false,
       is_processing: false,
-    } as Partial<ModVersionsRecord>);
+    } as Partial<ModVersionsRecord>;
+
+    // Update PocketBase record
+    await pb.collection('mod_versions').update(version.id, versionUpdate);
 
     console.log(`Updated PocketBase for: ${version.name}`);
+    DiscordLog.onVersionProcessed(mod, { ...version, ...versionUpdate });
   } catch (error) {
     console.error(`Failed to process ${version.name}: ${error}`);
     console.error(error);
+    DiscordLog.onVersionError(mod, version, error);
+
+    /**
+     * If the error is a SkipInstallError, mark the version as skipped and not
+     * processing further. This is useful for mods that are impossible to install.
+     * In all other cases, the version will be kept in processing state and
+     * re-processed on the next run.
+     */
+    if (error instanceof SkipInstallError) {
+      await pb
+        .collection('mod_versions')
+        .update<ModVersionsRecord>(version.id, {
+          skip_install: true,
+          is_processing: false,
+        } as ModVersionsRecord);
+    }
+
+    if (error instanceof DownloadError) {
+      await pb
+        .collection('mod_versions')
+        .update<ModVersionsRecord>(version.id, {
+          download_error: true,
+          is_processing: false,
+        } as ModVersionsRecord);
+    }
   } finally {
     if (process.env.NODE_ENV !== 'development') {
       console.log(`Cleaning up: ${version.name}, NODE_ENV: ${process.env.NODE_ENV}`); // prettier-ignore
@@ -256,7 +289,7 @@ async function extractArchive(
   } else if (archivePath.endsWith('.rar')) {
     await extractRar(archivePath, extractTo);
   } else {
-    throw new Error(`Unsupported archive format: ${archivePath}`);
+    throw new SkipInstallError(`Unsupported archive format: ${archivePath}`);
   }
 
   // Ensure all files have sufficient permissions
@@ -337,11 +370,9 @@ async function downloadFile(url: string, id: string): Promise<string | null> {
 
   if (extension == null) {
     console.warn(`No extension found for ${url}`, { filename, extension });
-    await pb.collection('mod_versions').update(id, {
-      download_error: true,
-      is_processing: false,
-    } as Partial<ModVersionsRecord>);
-    return null;
+    throw new DownloadError(
+      `No extension found for ${url}. Filename: ${filename}, Extension: ${extension}`
+    );
   }
 
   await fs.writeFile(

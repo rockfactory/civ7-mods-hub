@@ -1,0 +1,203 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/f1rstdan-cool-ui.modinfo
+---
+Mod {
+    id: "f1rstdan-cool-ui",
+    version: Some(
+        "1",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MOD_F1RSTDAN_COOL_UI_NAME",
+        ),
+        description: Some(
+            "LOC_MOD_F1RSTDAN_COOL_UI_DESCRIPTION",
+        ),
+        authors: Some(
+            "F1rstDan",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: None,
+        version: Some(
+            "1.7.4",
+        ),
+        compatibility: None,
+        url: Some(
+            "https://forums.civfanatics.com/resources/31961/",
+        ),
+    },
+    dependencies: [
+        Dependency {
+            id: "base-standard",
+            title: Some(
+                "LOC_MODULE_BASE_STANDARD_NAME",
+            ),
+        },
+    ],
+    localized_text: [
+        "text/en_us/ModInfoText.xml",
+        "text/zh_Hans_CN/ModInfoText.xml",
+        "text/ko_KR/ModInfoText.xml",
+        "text/ru_RU/ModInfoText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "f1rstdan-menu",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1111,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/options/f1rstdan-cool-ui-options.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/options/mod-options-decorator.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/zh_Hans_CN/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/ko_KR/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/ru_RU/InGameText.xml",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "f1rstdan-cool-ui-city",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1111,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/production-chooser/panel-production-chooser.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/production-chooser-unique-quarter.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/production-chooser/dan-quick-buy-item.js",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/dan-city-production/dan-item-layout-decorator.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/zh_Hans_CN/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/ko_KR/InGameText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/ru_RU/InGameText.xml",
+                            locale: None,
+                        },
+                    ],
+                },
+            ],
+        },
+        ActionGroup {
+            id: "f1rstdan-cool-ui-city-yields",
+            scope: Some(
+                "game",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    1111,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "textures/F1dan_city_population.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "textures/F1dan_city_connectivity.png",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [
+                        ActionItem {
+                            path: "ui/dan-city-yields/dan-city-yields-decorator.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "ui/dan-city-yields/dan-city-yields-tooltip.js",
+                            locale: None,
+                        },
+                    ],
+                    update_database: [],
+                    update_text: [],
+                },
+            ],
+        },
+    ],
+}

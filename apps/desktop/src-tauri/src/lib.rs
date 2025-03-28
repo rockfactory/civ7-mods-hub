@@ -1,11 +1,17 @@
-use mods::backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp};
-use mods::profiles::{create_empty_profile, delete_profile, list_profiles};
-use mods::traversal::scan_civ_mods;
+use logger::{redact_path, redact_path_for_logs};
 use mods::extract_archive::extract_mod_archive;
 use mods::patch_modinfo::patch_modinfo_xml_command;
+use mods::{
+    backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp},
+    extract_archive,
+    profiles::{create_empty_profile, delete_profile, list_profiles},
+    traversal::scan_civ_mods,
+};
+use std::{fs, path::PathBuf};
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
+mod logger;
 mod mods;
 use crate::mods::get_civ_mods_folder;
 use mods::profiles::{copy_mods_to_profile, restore_mods_from_profile};
@@ -33,7 +39,10 @@ async fn get_mods_folder(app_handle: tauri::AppHandle) -> Result<Option<String>,
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()        
+    let time_log_format =
+        time::format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
+
+    tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             println!("a new app instance was opened with {argv:?} and the deep link event was already triggered");
             // when defining deep link schemes at runtime, you must also check `argv` here
@@ -43,10 +52,24 @@ pub fn run() {
                        .expect("no main window")
                        .set_focus();
         }))
-        .plugin(tauri_plugin_deep_link::init())        
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(
             tauri_plugin_log::Builder::new()
             .max_file_size(5_000_000) // 5MB in bytes
+            .clear_targets()
+            .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout))
+            .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir { file_name: Some("CivMods.v2".to_string()) }),)
+            .format(move |out, message, record| {
+                let msg = format!("{}", message);
+                let redacted = redact_path_for_logs(&msg);
+                out.finish(format_args!(
+                  "[{}][{}][{}] {}",
+                  time::OffsetDateTime::now_utc().format(&time_log_format).unwrap(),
+                  record.level(),
+                  record.target(),
+                  redacted
+                ))
+            })
             .build(),
         )
         .plugin(tauri_plugin_window_state::Builder::new().build())
@@ -67,11 +90,21 @@ pub fn run() {
             }
 
             log::info!("[CivMods] Tauri app setup complete");
-            
             // We show the main window manually in order to avoid 
             // flickering due to window_state plugin changing the window 
             // position after it's shown
             let _ = app.get_webview_window("main").expect("no main  window").show();
+
+            // Delete previous logs in app_log_dir CivMods.log if they exist
+            let log_dir = app.path().app_log_dir();
+            if let Ok(dir) = log_dir {
+                let log_file = dir.join("CivMods.log");
+
+                if log_file.exists() {
+                    fs::remove_file(&log_file)?;
+                    log::debug!("Deleted old log file at: {}", log_file.display());
+                }
+            }
 
             Ok(())
         })
@@ -81,6 +114,8 @@ pub fn run() {
             extract_mod_archive,
             scan_civ_mods,
             patch_modinfo_xml_command,
+            // Security
+            redact_path,
             // Profiles
             list_profiles,
             restore_mods_from_profile,

@@ -1,0 +1,176 @@
+---
+source: packages/modinfo-parser/tests/parse_samples.rs
+expression: parsed
+input_file: packages/modinfo-parser/tests/samples/tcs-ui-improved-mod-page.modinfo
+---
+Mod {
+    id: "tcs-ui-improved-mod-page",
+    version: Some(
+        "3",
+    ),
+    properties: Properties {
+        name: Some(
+            "LOC_MOD_TCS_IMPROVED_MOD_PAGE_NAME",
+        ),
+        description: Some(
+            "LOC_MOD_TCS_IMPROVED_MOD_PAGE_DESCRIPTION",
+        ),
+        authors: Some(
+            "LOC_MOD_TCS_IMPROVED_MOD_PAGE_AUTHORS",
+        ),
+        package: Some(
+            "Mod",
+        ),
+        affects_saved_games: false,
+        special_thanks: Some(
+            "LOC_MOD_TCS_IMPROVED_MOD_PAGE_THANKS",
+        ),
+        version: Some(
+            "3",
+        ),
+        compatibility: Some(
+            "LOC_MOD_TCS_IMPROVED_MOD_PAGE_COMPATIBILITY",
+        ),
+        url: Some(
+            "LOC_MOD_TCS_IMPROVED_MOD_PAGE_URL",
+        ),
+    },
+    dependencies: [],
+    localized_text: [
+        "text/en_us/ShellText.xml",
+        "text/pt_br/ShellText.xml",
+        "text/it_it/ShellText.xml",
+        "text/ko_kr/ShellText.xml",
+        "text/ru_ru/ShellText.xml",
+    ],
+    action_criteria: [
+        ActionCriterion {
+            id: "always",
+            always_met: true,
+            age_in_use: None,
+            mod_in_use: None,
+        },
+    ],
+    action_groups: [
+        ActionGroup {
+            id: "shell-tcs-ui-improved-mod-page",
+            scope: Some(
+                "shell",
+            ),
+            criteria: Some(
+                "always",
+            ),
+            properties: ActionGroupProperties {
+                load_order: Some(
+                    9999,
+                ),
+            },
+            actions: [
+                ActionGroupActions {
+                    import_files: [
+                        ActionItem {
+                            path: "ui/shell/mods-content.js",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-accept.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-add.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-chat.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-decline.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-forbidden.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-internet.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-key.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-lock.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-main-page.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-minus.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-question.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-settings.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-smile.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-star.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-user.png",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "assets/tcs-ui-wrench.png",
+                            locale: None,
+                        },
+                    ],
+                    ui_scripts: [],
+                    update_database: [],
+                    update_text: [
+                        ActionItem {
+                            path: "text/en_us/ShellText.xml",
+                            locale: None,
+                        },
+                        ActionItem {
+                            path: "text/pt_br/ShellText.xml",
+                            locale: Some(
+                                "pt_BR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ko_kr/ShellText.xml",
+                            locale: Some(
+                                "ko_KR",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/it_it/ShellText.xml",
+                            locale: Some(
+                                "it_IT",
+                            ),
+                        },
+                        ActionItem {
+                            path: "text/ru_ru/ShellText.xml",
+                            locale: Some(
+                                "ru_RU",
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+    ],
+}

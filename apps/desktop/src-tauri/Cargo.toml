@@ -1,6 +1,6 @@
 [package]
 name = "CivMods"
-version = "0.7.0"
+version = "0.7.1"
 description = "Civ7 Mods Manager"
 authors = ["leonardfactory"]
 edition = "2021"
@@ -45,6 +45,7 @@ tauri-plugin-deep-link = "2"
 tauri-plugin-process = "2"
 diffy = "0.4.2"
 tempfile = "3"
+time = { version = "0.3", features = ["formatting"] }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }

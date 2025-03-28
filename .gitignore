@@ -138,3 +138,4 @@ pocketbase.exe
 /target
 /apps/api/data
 /apps/api/apps/api/data
+/apps/api/src/cache
