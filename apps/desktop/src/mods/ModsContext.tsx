@@ -13,7 +13,7 @@ import { sortVersionsByDate } from './fetchMods';
 import { TypedPocketBase } from '@civmods/parser';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 import { useAppStore } from '../store/store';
-import { installMod, runLowLevelInstallMod, uninstallMod } from './installMod';
+import { installMod, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
 import { open } from '@tauri-apps/plugin-dialog';
 import { isSameVersion } from './isSameVersion';

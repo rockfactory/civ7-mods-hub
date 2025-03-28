@@ -45,3 +45,35 @@ export async function invokeScanCivMods(modsFolderPath: string) {
     modsFolderPath,
   });
 }
+
+export interface CivModsProperties {
+  mod_url: string;
+  mod_version?: string;
+  mod_category?: string;
+  mod_version_date?: string;
+}
+
+/**
+ * Patches a modinfo XML file by injecting CivMods properties
+ * and creating a diff patch for later restoration.
+ *
+ * @param modinfoPath Absolute path to the modinfo.xml file.
+ * @param civProperties An object containing CivMods metadata to inject.
+ */
+export async function invokePatchModinfoXml(
+  modinfoPath: string,
+  civProperties: CivModsProperties
+): Promise<void> {
+  return await invoke('patch_modinfo_xml_command', {
+    modinfoPath,
+    civProperties,
+  });
+}
+
+export async function invokeExtractModArchive(data: {
+  archivePath: string;
+  extractPath: string;
+  properties: CivModsProperties;
+}): Promise<string> {
+  return await invoke<string>('extract_mod_archive', data);
+}
