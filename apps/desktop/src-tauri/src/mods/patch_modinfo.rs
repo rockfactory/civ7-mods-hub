@@ -16,6 +16,9 @@ pub struct CivModsProperties {
     pub mod_version: Option<String>,
 }
 
+/// Constant defining the patch XML file name.
+const PATCH_XML_FILE_NAME: &str = ".civmods-modinfo.diff";
+
 /// Tauri command to patch a modinfo XML with CivMods properties and generate a diff.
 #[tauri::command]
 pub async fn patch_modinfo_xml_command(
@@ -24,6 +27,15 @@ pub async fn patch_modinfo_xml_command(
     civ_properties: CivModsProperties,
 ) -> Result<(), String> {
     patch_modinfo_xml(modinfo_path, civ_properties)
+}
+
+fn map_props_to_xml(props: &CivModsProperties) -> BTreeMap<String, String> {
+    let mut props_map = BTreeMap::new();
+    props_map.insert("CivModsURL".to_string(), props.mod_url.clone());
+    if let Some(version) = &props.mod_version {
+        props_map.insert("CivModsVersion".to_string(), version.clone());
+    }
+    props_map
 }
 
 /// Applies a patch to the <Properties> section of a modinfo XML file.
@@ -36,19 +48,14 @@ pub fn patch_modinfo_xml<P: AsRef<Path>>(
         .map_err(|e| format!("Failed to read modinfo file: {e}"))?;
 
     let mut reader = Reader::from_str(&original);
-    // reader.config_mut();
     let mut writer = Writer::new(Cursor::new(Vec::new()));
     let mut buf = Vec::new();
 
+    let props_map = map_props_to_xml(&properties);
+
+    // Helpers for navigating XML
     let mut in_properties = false;
     let mut inserted = false;
-
-    let mut props_map = BTreeMap::new();
-    props_map.insert("CivModsURL".to_string(), properties.mod_url.clone());
-    if let Some(version) = properties.mod_version.as_ref() {
-        props_map.insert("CivModsVersion".to_string(), version.clone());
-    }
-
     let mut indent_prefix: Option<String> = None;
 
     loop {
@@ -96,9 +103,7 @@ pub fn patch_modinfo_xml<P: AsRef<Path>>(
 
     // Generate and save diff
     let patch = create_patch(&modified, &original);
-    let patch_path = modinfo_path
-        .as_ref()
-        .with_file_name("._modinfo_civmods.diff");
+    let patch_path = modinfo_path.as_ref().with_file_name(PATCH_XML_FILE_NAME);
 
     fs::write(patch_path, patch.to_string())
         .map_err(|e| format!("Failed to write patch file: {e}"))?;
@@ -145,7 +150,7 @@ fn insert_custom_properties<W: std::io::Write>(
 
 /// Restores a patched modinfo file (if a patch file exists) to its original content in memory.
 pub fn restore_patched_modinfo_xml(modinfo_path: &Path) -> Result<Option<Vec<u8>>, String> {
-    let patch_path = modinfo_path.with_file_name("._modinfo_civmods.diff");
+    let patch_path = modinfo_path.with_file_name(PATCH_XML_FILE_NAME);
 
     if !patch_path.exists() {
         return Ok(None); // No patch found
@@ -174,7 +179,7 @@ mod tests {
     fn test_patch_and_restore_modinfo_xml() {
         let dir = tempdir().unwrap();
         let modinfo_path = dir.path().join("TestMod.modinfo");
-        let patch_path = dir.path().join("._modinfo_civmods.diff");
+        let patch_path = dir.path().join(PATCH_XML_FILE_NAME);
 
         let original = r#"<Mod><Properties><Name>Original</Name></Properties></Mod>"#;
 
