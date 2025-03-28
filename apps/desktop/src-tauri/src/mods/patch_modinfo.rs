@@ -14,6 +14,8 @@ use tauri::AppHandle;
 pub struct CivModsProperties {
     pub mod_url: String,
     pub mod_version: Option<String>,
+    pub mod_category: Option<String>,
+    pub mod_version_date: Option<String>,
 }
 
 /// Constant defining the patch XML file name.
@@ -34,6 +36,12 @@ fn map_props_to_xml(props: &CivModsProperties) -> BTreeMap<String, String> {
     props_map.insert("CivModsURL".to_string(), props.mod_url.clone());
     if let Some(version) = &props.mod_version {
         props_map.insert("CivModsVersion".to_string(), version.clone());
+    }
+    if let Some(category) = &props.mod_category {
+        props_map.insert("CivModsCategory".to_string(), category.clone());
+    }
+    if let Some(version_date) = &props.mod_version_date {
+        props_map.insert("CivModsVersionDate".to_string(), version_date.clone());
     }
     props_map
 }
@@ -192,6 +200,8 @@ mod tests {
             CivModsProperties {
                 mod_url: "https://test.com".to_string(),
                 mod_version: Some("1.0".to_string()),
+                mod_category: Some("Test".to_string()),
+                mod_version_date: Some("2023-10-01T10:00:00".to_string()),
             },
         )
         .expect("Failed to patch");

@@ -11,6 +11,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@civmods/parser": "*",
     "@mantine/core": "^7.17.1",
     "@mantine/form": "^7.17.1",
     "@mantine/hooks": "^7.17.1",
@@ -29,6 +30,7 @@
     "@tauri-apps/plugin-store": "^2.2.0",
     "@tauri-apps/plugin-updater": "^2.6.0",
     "@tauri-apps/plugin-window-state": "^2.2.1",
+    "dayjs": "^1.11.13",
     "es-toolkit": "^1.33.0",
     "fast-xml-parser": "^5.0.8",
     "i18next": "^24.2.3",
@@ -38,8 +40,7 @@
     "react-dom": "^18.3.1",
     "react-i18next": "^15.4.1",
     "react-virtuoso": "^4.12.5",
-    "zustand": "^5.0.3",
-    "@civmods/parser": "*"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.3.1",

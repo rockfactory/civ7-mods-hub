@@ -12,12 +12,14 @@ import { ModData, ModInfo } from '../home/IModInfo';
 import { useAppStore } from '../store/store';
 import { getModFolderPath } from './commands/getModFolderPath';
 import { getActiveModsFolder } from './getModsFolder';
+import dayjs from 'dayjs';
 import {
   invokeBackupModToTemp,
   invokeCleanupModBackup,
   invokeExtractModArchive,
   invokeRestoreModFromTemp,
 } from './commands/modsRustBindings';
+import { cleanCategoryName } from './modCategory';
 
 function parseContentDisposition(contentDisposition: string | null): {
   filename?: string;
@@ -206,6 +208,8 @@ async function runLowLevelInstallMod(
       properties: {
         mod_url: mod.fetched!.url,
         mod_version: version.name,
+        mod_category: cleanCategoryName(mod.fetched!.category),
+        mod_version_date: dayjs(version.released).toISOString(),
       },
     });
 

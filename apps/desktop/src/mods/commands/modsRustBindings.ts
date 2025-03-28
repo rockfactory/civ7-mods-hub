@@ -49,6 +49,8 @@ export async function invokeScanCivMods(modsFolderPath: string) {
 export interface CivModsProperties {
   mod_url: string;
   mod_version?: string;
+  mod_category?: string;
+  mod_version_date?: string;
 }
 
 /**
