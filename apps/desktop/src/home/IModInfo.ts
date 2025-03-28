@@ -15,6 +15,10 @@ export interface ModInfo {
   folder_name: string;
 }
 
+export type ModDependency = {
+  id: string;
+};
+
 export type ModData = {
   fetched?: FetchedMod;
   local: ModInfo | null | undefined;
