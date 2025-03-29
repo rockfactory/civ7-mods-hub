@@ -15,13 +15,20 @@ export interface ModInfo {
   folder_name: string;
 }
 
+export type ModDependency = {
+  id: string;
+};
+
 export type ModData = {
   fetched?: FetchedMod;
   local: ModInfo | null | undefined;
   installedVersion?: ModVersionsRecord;
   isUnknown: boolean;
   isLocalOnly: boolean;
+  dependedBy: string[];
+  dependsOn: string[];
   id: string;
   name: string;
   modinfo_id?: string;
+  areDependenciesSatisfied: boolean;
 };

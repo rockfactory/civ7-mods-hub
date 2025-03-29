@@ -346,6 +346,8 @@ export default function ModsListPage() {
                         {update.fetched.name}:{' '}
                         {update.mod.installedVersion?.name} →{' '}
                         {update.targetVersion?.name}
+                        {!update.mod.areDependenciesSatisfied &&
+                          ` (will install missing dependencies)`}
                       </Text>
                     ))}
                   </Stack>

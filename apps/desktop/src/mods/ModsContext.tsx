@@ -23,9 +23,11 @@ import { getActiveModsFolder } from './getModsFolder';
 import { invokeScanCivMods } from './commands/modsRustBindings';
 import { computeModsData } from './commands/computeModsData';
 import { getVersion } from '@tauri-apps/api/app';
+import { installModDependencies } from './dependencies/installModDependencies';
+import { notifyAddedDependencies } from './dependencies/notifyAddedDependencies';
 
 const pb = new PocketBase(
-  'https://backend.civmods.com'
+  import.meta.env.VITE_POCKETBASE_URL || 'https://backend.civmods.com'
   // 'http://localhost:8090'
 ) as TypedPocketBase;
 
@@ -33,13 +35,21 @@ export type ModsContextType = {
   mods: ModData[];
   fetchedMods: FetchedMod[];
   uninstall: (mod: ModData) => Promise<void>;
-  install: (mod: ModData, version: ModVersionsRecord) => Promise<void>;
+  install: (
+    mod: ModData,
+    version: ModVersionsRecord,
+    options?: InstallModContextOptions
+  ) => Promise<void>;
   triggerReload: () => void;
   chooseModFolder: () => Promise<void>;
   getModsFolder: () => Promise<string | null>;
   isFetching: boolean;
   isLoadingInstalled: boolean;
   lastFetch: Date | null;
+};
+
+export type InstallModContextOptions = {
+  onlyDependencies?: boolean;
 };
 
 export const ModsContext = createContext({} as ModsContextType);
@@ -104,6 +114,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
           expand: 'mod_versions_via_mod_id',
           sort: '-mod_updated',
           headers: { 'x-version': `CivMods/v${version}` },
+          batch: 1000,
         });
 
         const data = records.map((record) => {
@@ -190,17 +201,31 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
    * Handles notifications
    */
   const install = useCallback(
-    async (mod: ModData, version: ModVersionsRecord) => {
+    async (
+      mod: ModData,
+      version: ModVersionsRecord,
+      options?: {
+        onlyDependencies?: boolean;
+      }
+    ) => {
       try {
-        await installMod(mod, version);
+        let dependencies = await installModDependencies(
+          [{ mod, version }],
+          mods
+        );
+
+        if (!options?.onlyDependencies) {
+          await installMod(mod, version);
+          notifications.show({
+            color: 'green',
+            title: 'Mod installed',
+            message: `${mod.name} ${version.name} installed successfully`,
+          });
+        }
 
         triggerReload();
 
-        notifications.show({
-          color: 'green',
-          title: 'Mod installed',
-          message: `${mod.name} ${version.name} installed successfully`,
-        });
+        notifyAddedDependencies(dependencies);
       } catch (error) {
         notifications.show({
           color: 'red',
@@ -209,7 +234,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         });
       }
     },
-    [triggerReload]
+    [triggerReload, mods]
   );
 
   const chooseModFolder = useCallback(async () => {

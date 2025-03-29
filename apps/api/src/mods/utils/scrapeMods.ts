@@ -267,14 +267,14 @@ export async function scrapeMods(
 
       console.log(`Mod JSON:`, JSON.stringify(mod, null, 2));
 
-      if (stopAfterFirstMod) {
-        process.exit(0); // Exit after first mod for testing
-      }
-
       // Save mod
       const shouldStop = await saveModToDatabase(options, mod);
       if (shouldStop) {
         return mods;
+      }
+
+      if (stopAfterFirstMod) {
+        process.exit(0); // Exit after first mod for testing
       }
 
       if (!options.onlyListData) {

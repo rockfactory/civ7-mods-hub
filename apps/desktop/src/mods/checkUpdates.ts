@@ -6,6 +6,8 @@ import { useCallback, useMemo, useState } from 'react';
 import { isSameVersion } from './isSameVersion';
 import { useAppStore } from '../store/store';
 import { installMod } from './installMod';
+import { getModDependencies } from './dependencies/getModDependencies';
+import { installModDependencies } from './dependencies/installModDependencies';
 
 export interface IModUpdate {
   mod: ModData;
@@ -69,6 +71,32 @@ export function useApplyUpdates() {
     const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
 
     let errors = [];
+
+    // 1. Install dependencies first (only new ones)
+    // If a dependency is already in the update list, it will be skipped
+    // because it will be installed in the next step
+    try {
+      const installedDeps = await installModDependencies(
+        availableUpdates.map((update) => ({
+          mod: update.mod,
+          version: update.targetVersion,
+        })),
+        mods
+      );
+      if (installedDeps.length > 0) {
+        notifications.show({
+          color: 'blue',
+          title: 'Installed dependencies',
+          message: `Installed ${installedDeps.length} missing dependencies`,
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      errors.push(error);
+      console.error('Failed to install dependencies:', error);
+    }
+
+    // 2. Install mods updates
     for (const update of availableUpdates) {
       console.log('Applying update:', update.fetched.id);
       try {

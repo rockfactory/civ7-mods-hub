@@ -2,9 +2,9 @@ import path from 'path';
 import { pb } from '../core/pocketbase';
 import {
   computeFolderHash,
-  EXTRACTED_DIR,
   findModInfoFile,
 } from '../mods/utils/extractAndStoreModVersionMetadata';
+import { EXTRACTED_DIR } from '../mods/utils/fs/extractionDirs';
 
 async function hashFolder() {
   const version = await pb

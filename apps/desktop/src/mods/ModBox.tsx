@@ -16,12 +16,16 @@ import {
   Modal,
   Loader,
   CopyButton,
+  Alert,
+  List,
+  ThemeIcon,
 } from '@mantine/core';
 import * as React from 'react';
 import type { ModVersionsRecord } from '@civmods/parser';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { open } from '@tauri-apps/plugin-shell';
 import {
+  IconAlertCircle,
   IconAlertHexagon,
   IconCategory,
   IconCheck,
@@ -40,6 +44,7 @@ import {
   IconLock,
   IconSettings,
   IconSettings2,
+  IconSettingsExclamation,
   IconStar,
   IconSwitch,
   IconTag,
@@ -60,6 +65,13 @@ import { useAppStore } from '../store/store';
 import { notifications } from '@mantine/notifications';
 import { cleanCategoryName } from './modCategory';
 import { SetModsQueryFn } from '../home/ModsQuery';
+import { ModIcon } from './components/ModIcon';
+import { ModSmallRow } from './components/ModSmallRow';
+import {
+  getInstalledDependedBy,
+  getNotInstalledDependsOn,
+} from './dependencies/getInstalledDependsOn';
+import { ModUnsatisfiedDependenciesRow } from './components/ModUnsatisfiedDependenciesRow';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -72,7 +84,7 @@ export function ModBox(props: IModBoxProps) {
 
   const [loading, setLoading] = useState(false);
 
-  const { install, uninstall } = useModsContext();
+  const { install, uninstall, mods } = useModsContext();
 
   const latestVersion = fetched?.expand?.mod_versions_via_mod_id[0];
   const isLatest = latestVersion && isSameVersion(latestVersion, local);
@@ -128,6 +140,8 @@ export function ModBox(props: IModBoxProps) {
 
   const handleUninstall = async () => {
     if (isLocked) return;
+    const installedDependedBy = getInstalledDependedBy(mod, mods);
+
     modals.openConfirmModal({
       title: 'Uninstall mod',
       children: (
@@ -145,6 +159,21 @@ export function ModBox(props: IModBoxProps) {
               This mod is not available in the mod repository. Uninstalling it
               will remove all the files from the disk.
             </Text>
+          )}
+          {installedDependedBy.length > 0 && (
+            <Alert
+              variant="light"
+              color="red"
+              title="This mod is a dependency"
+              icon={<IconAlertCircle size={24} />}
+            >
+              This mod is used by other mods. Uninstalling it will break them.
+              <Stack gap={'xs'} mt="xs">
+                {installedDependedBy.map((dep) => (
+                  <ModSmallRow key={dep.id} mod={dep} />
+                ))}
+              </Stack>
+            </Alert>
           )}
         </Stack>
       ),
@@ -177,25 +206,7 @@ export function ModBox(props: IModBoxProps) {
         <LoadingOverlay visible={loading} />
         <Flex justify="space-between" align="flex-start">
           <Group justify="normal" wrap="nowrap" w="100%">
-            {fetched?.icon_url ? (
-              <Image
-                width={40}
-                height={40}
-                style={{ borderRadius: '4px' }}
-                src={fetched.icon_url}
-                alt={fetched.name}
-              />
-            ) : (
-              <Box
-                className={
-                  styles.modIcon +
-                  ' ' +
-                  (mod.isLocalOnly ? styles.localOnly : '')
-                }
-              >
-                <IconSettings size={40} />
-              </Box>
-            )}
+            <ModIcon mod={mod} width={40} />
             <Flex justify="space-between" w="100%">
               <Stack gap={0} align="flex-start" w="100%">
                 <Text fw={600}>
@@ -414,6 +425,7 @@ export function ModBox(props: IModBoxProps) {
         </Flex>
 
         <Text c="dimmed">{fetched?.short_description ?? ''}</Text>
+        <ModUnsatisfiedDependenciesRow mod={mod} setLoading={setLoading} />
       </Card>
       {isChoosingVersion && fetched && (
         <Modal

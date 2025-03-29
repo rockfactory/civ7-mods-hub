@@ -144,7 +144,10 @@ export async function saveModToDatabase(
   if (isNewVersionsAvailable && !options.skipExtractAndStore) {
     for (const version of processableVersions) {
       console.log(`[mod=${mod.name}] Processing version: ${version.name}`);
-      DiscordLog.onVersionProcessing(mod, version);
+      if (!options.forceExtractAndStore) {
+        DiscordLog.onVersionProcessing(mod, version);
+      }
+
       await extractAndStoreModVersionMetadata(options, mod, version);
     }
   }
