@@ -9,12 +9,9 @@ export function notifyAddedDependencies(dependencies: DependencyInfo[]) {
     notifications.show({
       color: 'blue',
       title: 'Dependency installed',
-      message: (
-        <Group>
-          <ModIcon mod={dep.modData} width={24} />
-          {dep.modData!.name} {dep.targetVersion!.name} installed successfully
-        </Group>
-      ),
+      message: `${dep.modData!.name} ${
+        dep.targetVersion!.name
+      } installed successfully`,
     });
     if (i > 3) {
       notifications.show({

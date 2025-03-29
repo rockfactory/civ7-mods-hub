@@ -1,7 +1,13 @@
 import { scrapeMods } from '../mods/utils/scrapeMods';
 
+// Test for dependencies:
+// 'https://forums.civfanatics.com/resources/custom-alerts-framework.32005/';
+// 'https://forums.civfanatics.com/resources/purchase-alerts.32034/';
+// https://forums.civfanatics.com/resources/matts-leaders-oliver-cromwell.32128/
+// https://forums.civfanatics.com/resources/addon-leader-model-changer.32124/
+
 const singleModUrl =
-  'https://forums.civfanatics.com/resources/higher-relics-count-for-cultural-victory-in-exploration-age-by-rico.31926/';
+  'https://forums.civfanatics.com/resources/addon-leader-model-changer.32124/';
 
 const forceExtractAndStore = true;
 const maxPages = 1; // 15 full
@@ -12,7 +18,7 @@ const onlyListData = false;
 scrapeMods({
   firstPage: 1,
   maxPages,
-  // singleModUrl,
+  singleModUrl,
   forceExtractAndStore,
   stopAfterLastModVersion,
   onlyListData,
