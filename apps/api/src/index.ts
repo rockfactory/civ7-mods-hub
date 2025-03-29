@@ -184,6 +184,7 @@ app.get('/profile', async (req, res) => {
 
   const mods = await pb.collection('mods').getFullList(100, {
     filter: modsFilter,
+    sort: 'name',
   });
 
   res.render('profile', {
