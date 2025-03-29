@@ -25,7 +25,10 @@ export type ModData = {
   installedVersion?: ModVersionsRecord;
   isUnknown: boolean;
   isLocalOnly: boolean;
+  dependedBy: string[];
+  dependsOn: string[];
   id: string;
   name: string;
   modinfo_id?: string;
+  areDependenciesSatisfied: boolean;
 };
