@@ -60,6 +60,7 @@ import { useAppStore } from '../store/store';
 import { notifications } from '@mantine/notifications';
 import { cleanCategoryName } from './modCategory';
 import { SetModsQueryFn } from '../home/ModsQuery';
+import { ModIcon } from './components/ModIcon';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -177,25 +178,7 @@ export function ModBox(props: IModBoxProps) {
         <LoadingOverlay visible={loading} />
         <Flex justify="space-between" align="flex-start">
           <Group justify="normal" wrap="nowrap" w="100%">
-            {fetched?.icon_url ? (
-              <Image
-                width={40}
-                height={40}
-                style={{ borderRadius: '4px' }}
-                src={fetched.icon_url}
-                alt={fetched.name}
-              />
-            ) : (
-              <Box
-                className={
-                  styles.modIcon +
-                  ' ' +
-                  (mod.isLocalOnly ? styles.localOnly : '')
-                }
-              >
-                <IconSettings size={40} />
-              </Box>
-            )}
+            <ModIcon mod={mod} width={40} />
             <Flex justify="space-between" w="100%">
               <Stack gap={0} align="flex-start" w="100%">
                 <Text fw={600}>

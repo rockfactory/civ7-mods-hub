@@ -19,12 +19,6 @@
   border-color: #5a5c61;
 }
 
-.modIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-}
-
 .localOnly {
   /* background-color: var(--mantine-color-orange-8); */
 }
