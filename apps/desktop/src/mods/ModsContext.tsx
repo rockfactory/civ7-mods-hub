@@ -10,26 +10,18 @@ import type { ModsResponse, ModVersionsRecord } from '@civmods/parser';
 import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
 import { invoke } from '@tauri-apps/api/core';
 import { sortVersionsByDate } from './fetchMods';
-import { TypedPocketBase } from '@civmods/parser';
-import PocketBase, { ClientResponseError } from 'pocketbase';
+import { ClientResponseError } from 'pocketbase';
 import { useAppStore } from '../store/store';
 import { installMod, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
 import { open } from '@tauri-apps/plugin-dialog';
-import { isSameVersion } from './isSameVersion';
-import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
-import { openConfirmModal } from '@mantine/modals';
 import { getActiveModsFolder } from './getModsFolder';
 import { invokeScanCivMods } from './commands/modsRustBindings';
 import { computeModsData } from './commands/computeModsData';
 import { getVersion } from '@tauri-apps/api/app';
 import { installModDependencies } from './dependencies/installModDependencies';
 import { notifyAddedDependencies } from './dependencies/notifyAddedDependencies';
-
-const pb = new PocketBase(
-  import.meta.env.VITE_POCKETBASE_URL || 'https://backend.civmods.com'
-  // 'http://localhost:8090'
-) as TypedPocketBase;
+import { pb } from './network/pocketbase';
 
 export type ModsContextType = {
   mods: ModData[];
@@ -111,7 +103,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         const version = await getVersion();
         const records = await pb.collection('mods').getFullList<FetchedMod>({
           filter: 'is_hidden != true',
-          expand: 'mod_versions_via_mod_id',
+          expand: 'versions,mod_versions_via_mod_id',
           sort: '-mod_updated',
           headers: { 'x-version': `CivMods/v${version}` },
           batch: 1000,

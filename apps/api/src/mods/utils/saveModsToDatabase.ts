@@ -74,6 +74,7 @@ export async function saveModToDatabase(
 
   // Process versions
   let processableVersions: ModVersionsResponse[] = [];
+  let modVersions: string[] = [];
 
   const syncVersions = syncMod.versions || [];
   for (let i = 0; i < syncVersions.length; i++) {
@@ -112,11 +113,32 @@ export async function saveModToDatabase(
         );
       }
 
+      modVersions.push(version.id);
       processableVersions.push(version);
     } else {
       console.log(
         `Version already exists, updating: ${syncVersion.version} for mod ${syncMod.modName}`
       );
+
+      // FAKE
+      // You can uncomment this block to create fake versions for testing purposes.
+      // I used this to test the Back-relation expansion in Pocketbase.
+      // 1000 records is the limit for a _single record_ (a mod), so we don't need to worry.
+      // if (process.env.NODE_ENV === 'development') {
+      //   for (let i = 0; i < 800; i++) {
+      //     const fakeVersion = await pb.collection('mod_versions').create({
+      //       mod_id: mod.id,
+      //       name: `${syncVersion.version} (FAKE_VERSION)`,
+      //       rating: parseFloat(syncVersion.rating),
+      //       download_url: syncVersion.downloadUrl,
+      //       released: syncVersion.date,
+      //       is_processing: true,
+      //       cf_id: getVersionIdFromUrl(syncVersion.downloadUrl),
+      //     } as Partial<ModVersionsRecord>);
+      //     modVersions.push(fakeVersion.id);
+      //   }
+      // }
+
       version = await pb.collection('mod_versions').update(version.id, {
         name: syncVersion.version,
         rating: parseFloat(syncVersion.rating),
@@ -131,6 +153,7 @@ export async function saveModToDatabase(
         );
       }
 
+      modVersions.push(version.id);
       if (version.is_processing || options.forceExtractAndStore) {
         // Stuck
         console.log(`Version is ${version.is_processing ? 'stuck' : 'forced'}, reprocessing: ${syncVersion.version}`); // prettier-ignore
@@ -138,6 +161,11 @@ export async function saveModToDatabase(
       }
     }
   }
+
+  console.log(`Updating mod versions for ${syncMod.modName}: ${modVersions.join(', ')}`); // prettier-ignore
+  await pb.collection('mods').update(mod.id, {
+    versions: modVersions,
+  });
 
   const isNewVersionsAvailable = processableVersions.length > 0;
 

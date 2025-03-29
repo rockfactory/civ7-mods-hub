@@ -1,8 +1,8 @@
 import { ModsResponse, ModVersionsRecord } from '@civmods/parser';
 
-export type FetchedMod = ModsResponse<{
-  mod_versions_via_mod_id: ModVersionsRecord[];
-}>;
+export type FetchedMod = ModsResponse<{}> & {
+  versions: ModVersionsRecord[];
+};
 
 export interface ModInfo {
   /**
