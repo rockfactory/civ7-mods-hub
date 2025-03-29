@@ -138,6 +138,7 @@ async function downloadCachedVersion(
   }
 
   const downloadUrl = pb.files.getURL(metadata, metadata.archive_file);
+  console.log(`Downloading cached version from:`, downloadUrl);
   let response = await fetch(downloadUrl);
   if (!response.ok) {
     console.error('Failed to download cached version:', response.statusText);
@@ -206,10 +207,21 @@ async function runLowLevelInstallMod(
     }
 
     response = await fetch(updatedUrl);
-    if (!response.ok)
+    if (!response.ok) {
+      response = await downloadCachedVersion(
+        `Failed to download Google Drive link. Please download it manually. ${updatedUrl}`,
+        version
+      );
+    }
+    if (!response.ok) {
+      console.error(
+        'Failed to download mod from Google Drive:',
+        response.statusText
+      );
       throw new Error(
         `Failed to download Google Drive link. Please download it manually. ${updatedUrl}`
       );
+    }
   }
 
   const contentDisposition = response.headers.get('content-disposition');
