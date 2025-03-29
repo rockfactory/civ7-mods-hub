@@ -21,6 +21,9 @@ function syncModToModRecord(syncMod: SyncMod): Partial<ModsRecord> {
     mod_released: syncMod.releasedAt ? syncMod.releasedAt : undefined,
     category: syncMod.category,
     icon_url: syncMod.iconUrl,
+    is_hidden: syncMod.category?.includes('Utility Programs')
+      ? true
+      : undefined,
     cf_id: getModIdFromUrl(syncMod.modPageUrl),
   };
 }
@@ -53,6 +56,10 @@ export async function saveModToDatabase(
     mod = await pb.collection('mods').create({
       ...syncModToModRecord(syncMod),
     } as Partial<ModsRecord>);
+    if (mod?.is_hidden) {
+      console.log(`Mod created as hidden, skipping: ${syncMod.modName} (${syncMod.modPageUrl})`); // prettier-ignore
+      return;
+    }
   } else {
     if (mod.is_hidden) {
       console.log(`Mod is hidden, skipping: ${syncMod.modName} (${syncMod.modPageUrl})`); // prettier-ignore
