@@ -23,6 +23,8 @@ import { getActiveModsFolder } from './getModsFolder';
 import { invokeScanCivMods } from './commands/modsRustBindings';
 import { computeModsData } from './commands/computeModsData';
 import { getVersion } from '@tauri-apps/api/app';
+import { installModDependencies } from './dependencies/installModDependencies';
+import { notifyAddedDependencies } from './dependencies/notifyAddedDependencies';
 
 const pb = new PocketBase(
   import.meta.env.VITE_POCKETBASE_URL || 'https://backend.civmods.com'
@@ -192,6 +194,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
   const install = useCallback(
     async (mod: ModData, version: ModVersionsRecord) => {
       try {
+        let dependencies = await installModDependencies([mod], mods);
         await installMod(mod, version);
 
         triggerReload();
@@ -201,6 +204,8 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
           title: 'Mod installed',
           message: `${mod.name} ${version.name} installed successfully`,
         });
+
+        notifyAddedDependencies(dependencies);
       } catch (error) {
         notifications.show({
           color: 'red',
@@ -209,7 +214,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         });
       }
     },
-    [triggerReload]
+    [triggerReload, mods]
   );
 
   const chooseModFolder = useCallback(async () => {
