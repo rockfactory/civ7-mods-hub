@@ -114,7 +114,11 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
           expand: 'mod_versions_via_mod_id',
           sort: '-mod_updated',
           headers: { 'x-version': `CivMods/v${version}` },
-          batch: 1000,
+          // `getFullList` will automatically handle pagination for us
+          // and return all records in a single array.
+          // We set the batch size to 500 (which is the default)
+          // to avoid hitting the server too hard.
+          batch: 500,
         });
 
         const data = records.map((record) => {
