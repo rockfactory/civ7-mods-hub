@@ -27,9 +27,6 @@ async function checkForManualScheduledTasks() {
   console.log(`Found ${scheduledTasks.items.length} manual scheduled tasks`);
   for (const task of scheduledTasks.items) {
     console.log('Processing task:', task);
-    await pb.collection('scheduled_tasks').update(task.id, {
-      is_processed: true,
-    });
   }
 
   if (isRunning) {
@@ -38,6 +35,7 @@ async function checkForManualScheduledTasks() {
   }
 
   isRunning = true;
+  console.log('Processing task:', scheduledTasks.items[0]);
 
   try {
     const scheduleTask = scheduledTasks.items[0];
