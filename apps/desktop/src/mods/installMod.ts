@@ -20,6 +20,7 @@ import {
   invokeRestoreModFromTemp,
 } from './commands/modsRustBindings';
 import { cleanCategoryName } from './modCategory';
+import { pb } from '../network/pocketbase';
 
 function parseContentDisposition(contentDisposition: string | null): {
   filename?: string;
@@ -119,6 +120,33 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
   }
 }
 
+async function downloadCachedVersion(
+  originalError: string,
+  version: ModVersionsRecord
+) {
+  const metadata = await pb
+    .collection('mod_versions_metadata')
+    .getList(1, 1, {
+      filter: pb.filter('version_id = {:version_id}', {
+        version_id: version.id,
+      }),
+    })
+    .then((res) => res.items?.[0]);
+  if (!metadata) {
+    console.error('Failed to get mod version metadata:', originalError);
+    throw new Error(originalError);
+  }
+
+  const downloadUrl = pb.files.getURL(metadata, metadata.archive_file);
+  let response = await fetch(downloadUrl);
+  if (!response.ok) {
+    console.error('Failed to download cached version:', response.statusText);
+    throw new Error(originalError);
+  }
+
+  return response;
+}
+
 /**
  * This should be called only internally, as it doesn't check if the mod is locked,
  * nor implements backups.
@@ -138,9 +166,20 @@ async function runLowLevelInstallMod(
 
   console.log('Downloading mod from:', version.download_url);
   let response = await fetch(version.download_url);
+
+  // Fallback to cached version if download fails for 5xx errors
+  if (!response.ok && response.status >= 500) {
+    response = await downloadCachedVersion(
+      `Failed to download mod: ${response.statusText}`,
+      version
+    );
+  }
+
   if (!response.ok) {
+    console.error('Failed to download mod:', response.statusText);
     throw new Error(`Failed to download mod: ${response.statusText}`);
   }
+
   if (!response.url) {
     console.error(
       `Headers of failed download:`,
