@@ -47,7 +47,14 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
       isSameVersion(version, local)
     );
 
-    const deps = latestVersion.dependencies as { id: string }[] | undefined;
+    // We want to track the dependencies of the installed version, if it exists,
+    // since the user might have installed a specific version of the mod that has
+    // _different_ dependencies than the latest version.
+    // If the installed version is not found, we fall back to the latest version.
+    const deps = (installedVersion ?? latestVersion).dependencies as
+      | { id: string }[]
+      | undefined;
+
     if (deps && deps.length > 0) {
       for (const dep of deps) {
         // modinfo_id → modinfo_id

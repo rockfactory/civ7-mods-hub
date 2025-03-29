@@ -1,6 +1,11 @@
 import { ModVersionsRecord } from '@civmods/parser';
 import { ModData } from '../../home/IModInfo';
 
+export interface ModInstallTarget {
+  mod: ModData;
+  version: ModVersionsRecord | undefined;
+}
+
 export type DependencyInfo = {
   /**
    * Modinfo ID of the mod

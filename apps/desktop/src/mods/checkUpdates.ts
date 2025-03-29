@@ -77,7 +77,10 @@ export function useApplyUpdates() {
     // because it will be installed in the next step
     try {
       const installedDeps = await installModDependencies(
-        availableUpdates.map((update) => update.mod),
+        availableUpdates.map((update) => ({
+          mod: update.mod,
+          version: update.targetVersion,
+        })),
         mods
       );
       if (installedDeps.length > 0) {

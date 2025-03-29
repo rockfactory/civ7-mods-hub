@@ -1,10 +1,10 @@
 import { ModData } from '../../home/IModInfo';
 import { installMod } from '../installMod';
-import { DependencyInfo } from './DependencyInfo';
+import { DependencyInfo, ModInstallTarget } from './DependencyInfo';
 import { getModDependencies } from './getModDependencies';
 
 export async function installModDependencies(
-  desiredMods: ModData[],
+  desiredMods: ModInstallTarget[],
   allMods: ModData[]
 ): Promise<DependencyInfo[]> {
   const dependencies = getModDependencies(desiredMods, allMods);

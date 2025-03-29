@@ -1,5 +1,5 @@
 import { ModData, ModDependency } from '../../home/IModInfo';
-import { DependencyInfo } from './DependencyInfo';
+import { DependencyInfo, ModInstallTarget } from './DependencyInfo';
 
 function getModInfoId(mod: ModData): string | undefined {
   return mod.modinfo_id;
@@ -17,7 +17,7 @@ function createModDataMap(mods: ModData[]): Map<string, ModData> {
  * Get all dependencies of the given mods, excluding the mods themselves.
  */
 export function getModDependencies(
-  desiredMods: ModData[],
+  desiredMods: ModInstallTarget[],
   allMods: ModData[]
 ): DependencyInfo[] {
   const allModsMap = createModDataMap(allMods);
@@ -32,25 +32,30 @@ export function getModDependencies(
   const added = new Set<string>();
 
   const desiredModIds = new Set(
-    desiredMods.map(getModInfoId).filter((id): id is string => !!id)
+    desiredMods
+      .map((m) => m.version?.modinfo_id)
+      .filter((id): id is string => !!id)
   );
 
   // Let's use a queue to process FIFO the dependencies.
   // We process the dependencies of the mods we want to install first.
-  const queue: ModData[] = [...desiredMods];
+  const queue: ModInstallTarget[] = [...desiredMods];
 
   while (queue.length > 0) {
     const currentMod = queue.shift();
     if (!currentMod) continue;
 
-    const modinfoId = getModInfoId(currentMod);
+    const modinfoId =
+      currentMod.version?.modinfo_id ?? currentMod.mod.modinfo_id;
     if (!modinfoId || visited.has(modinfoId)) continue;
     visited.add(modinfoId);
 
-    const currentVersion =
-      currentMod.fetched?.expand?.mod_versions_via_mod_id?.[0];
+    const currentTargetVersion =
+      currentMod.version ??
+      currentMod.mod.installedVersion ??
+      currentMod.mod.fetched?.expand?.mod_versions_via_mod_id?.[0];
 
-    const dependencies = currentVersion?.dependencies as
+    const dependencies = currentTargetVersion?.dependencies as
       | ModDependency[]
       | undefined;
     if (!dependencies) continue;
@@ -84,7 +89,13 @@ export function getModDependencies(
       // If the dependency is not installed and is present in the DB,
       // we need to add it to the queue for processing.
       if (depMod) {
-        queue.push(depMod);
+        queue.push({
+          mod: depMod,
+          // We don't want to specify a version here, since we want to use
+          // the latest version available in the DB _or_ the installed version
+          // if it's already installed.
+          version: undefined,
+        });
       }
     }
   }

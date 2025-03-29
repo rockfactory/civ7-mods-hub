@@ -209,7 +209,10 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       }
     ) => {
       try {
-        let dependencies = await installModDependencies([mod], mods);
+        let dependencies = await installModDependencies(
+          [{ mod, version }],
+          mods
+        );
 
         if (!options?.onlyDependencies) {
           await installMod(mod, version);
