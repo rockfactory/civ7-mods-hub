@@ -1,0 +1,93 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-03-30 21:34+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+msgctxt "Suffix for update tooltip, if some dependencies are missing"
+msgid " (will install missing dependencies)"
+msgstr " (will install missing dependencies)"
+
+#. placeholder {0}: availableUpdates.length
+msgid "{0, plural, one {Update one mod} other {Update # mods}}"
+msgstr "{0, plural, one {Update one mod} other {Update # mods}}"
+
+msgctxt "Filter by state option"
+msgid "Affect Saves"
+msgstr "Affect Saves"
+
+msgid "All mods are updated"
+msgstr "All mods are updated"
+
+msgctxt "Header mods filter selection"
+msgid "Available Mods"
+msgstr "Available Mods"
+
+msgctxt "placeholder"
+msgid "Filter by category."
+msgstr "Filter by category."
+
+msgctxt "placeholder"
+msgid "Filter by state."
+msgstr "Filter by state."
+
+msgctxt "Filtering section title"
+msgid "Filter Mods"
+msgstr "Filter Mods"
+
+msgctxt "Header mods filter selection"
+msgid "Installed Mods"
+msgstr "Installed Mods"
+
+msgctxt "Filter by state option"
+msgid "Local Only"
+msgstr "Local Only"
+
+msgctxt "Filter by state option"
+msgid "Locked"
+msgstr "Locked"
+
+msgctxt "Filter by state option"
+msgid "Needs Update"
+msgstr "Needs Update"
+
+msgctxt "Filter by state option"
+msgid "Not Affect Saves"
+msgstr "Not Affect Saves"
+
+msgctxt "Filter by state option"
+msgid "Not Installed"
+msgstr "Not Installed"
+
+msgid "Refresh installed mods list and check for updates"
+msgstr "Refresh installed mods list and check for updates"
+
+msgctxt "Button text to reset filter"
+msgid "Reset Filters"
+msgstr "Reset Filters"
+
+msgctxt "placeholder"
+msgid "Search name, author..."
+msgstr "Search name, author..."
+
+msgctxt "Order by option"
+msgid "Sort by Downloads"
+msgstr "Sort by Downloads"
+
+msgctxt "Order by option"
+msgid "Sort by Last Update"
+msgstr "Sort by Last Update"
+
+msgctxt "Order by option"
+msgid "Sort by Name"
+msgstr "Sort by Name"
+
+msgctxt "Order by option"
+msgid "Sort by Rating"
+msgstr "Sort by Rating"
+
+msgid "Sort by..."
+msgstr "Sort by..."

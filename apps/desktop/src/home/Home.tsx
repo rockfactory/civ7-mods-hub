@@ -46,7 +46,7 @@ import ThrottledLoader from './ThrottledLoader';
 import { isSameVersion } from '../mods/isSameVersion';
 import { useAppStore } from '../store/store';
 import { useCheckForGlobalUpdates } from '../settings/autoUpdater';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
 
 export default function ModsListPage() {
   const {
@@ -246,11 +246,17 @@ export default function ModsListPage() {
                 size="sm"
                 data={[
                   {
-                    label: t`Installed Mods`,
+                    label: t({
+                      message: `Installed Mods`,
+                      context: 'Header mods filter selection',
+                    }),
                     value: 'installed',
                   },
                   {
-                    label: t`Available Mods`,
+                    label: t({
+                      message: `Available Mods`,
+                      context: 'Header mods filter selection',
+                    }),
                     value: 'available',
                   },
                 ]}
@@ -317,12 +323,48 @@ export default function ModsListPage() {
               clearable
               onChange={(value) => setQuery({ state: (value as any) ?? '' })}
               data={[
-                { label: t`Needs Update`, value: 'needsUpdate' },
-                { label: t`Locked`, value: 'locked' },
-                { label: t`Not Installed`, value: 'uninstalled' },
-                { label: t`Local Only`, value: 'localOnly' },
-                { label: t`Affect Saves`, value: 'affectSaves' },
-                { label: t`Not Affect Saves`, value: 'notAffectSaves' },
+                {
+                  label: t({
+                    message: `Needs Update`,
+                    context: 'Filter by state option',
+                  }),
+                  value: 'needsUpdate',
+                },
+                {
+                  label: t({
+                    message: `Locked`,
+                    context: 'Filter by state option',
+                  }),
+                  value: 'locked',
+                },
+                {
+                  label: t({
+                    message: `Not Installed`,
+                    context: 'Filter by state option',
+                  }),
+                  value: 'uninstalled',
+                },
+                {
+                  label: t({
+                    message: `Local Only`,
+                    context: 'Filter by state option',
+                  }),
+                  value: 'localOnly',
+                },
+                {
+                  label: t({
+                    message: `Affect Saves`,
+                    context: 'Filter by state option',
+                  }),
+                  value: 'affectSaves',
+                },
+                {
+                  label: t({
+                    message: `Not Affect Saves`,
+                    context: 'Filter by state option',
+                  }),
+                  value: 'notAffectSaves',
+                },
               ]}
             />
             {hasFilters && (
@@ -339,14 +381,38 @@ export default function ModsListPage() {
             <Select
               size="sm"
               leftSection={<IconSortDescending size={16} />}
-              placeholder="Sort by..."
+              placeholder={t`Sort by...`}
               value={sort}
               onChange={(value) => setSort(value as any)}
               data={[
-                { label: 'Sort by Name', value: 'name' },
-                { label: 'Sort by Last Update', value: 'updated' },
-                { label: 'Sort by Rating', value: 'rating' },
-                { label: 'Sort by Downloads', value: 'downloads' },
+                {
+                  label: t({
+                    message: 'Sort by Name',
+                    context: 'Order by option',
+                  }),
+                  value: 'name',
+                },
+                {
+                  label: t({
+                    message: 'Sort by Last Update',
+                    context: 'Order by option',
+                  }),
+                  value: 'updated',
+                },
+                {
+                  label: t({
+                    message: 'Sort by Rating',
+                    context: 'Order by option',
+                  }),
+                  value: 'rating',
+                },
+                {
+                  label: t({
+                    message: 'Sort by Downloads',
+                    context: 'Order by option',
+                  }),
+                  value: 'downloads',
+                },
               ]}
             />
           </Stack>
@@ -367,14 +433,22 @@ export default function ModsListPage() {
                 position="bottom-start"
                 label={
                   <Stack gap={2}>
-                    <Text fz="sm">Will update:</Text>
+                    <Text fz="sm">
+                      <Trans context="Mods update tooltip prefix">
+                        Will update:
+                      </Trans>
+                    </Text>
                     {availableUpdates.map((update) => (
                       <Text fz="sm" key={update.fetched.id}>
                         {update.fetched.name}:{' '}
                         {update.mod.installedVersion?.name} →{' '}
                         {update.targetVersion?.name}
-                        {!update.mod.areDependenciesSatisfied &&
-                          ` (will install missing dependencies)`}
+                        {!update.mod.areDependenciesSatisfied && (
+                          <Trans context="Suffix for update tooltip, if some dependencies are missing">
+                            {' '}
+                            (will install missing dependencies)
+                          </Trans>
+                        )}
                       </Text>
                     ))}
                   </Stack>
@@ -386,12 +460,16 @@ export default function ModsListPage() {
                   loading={isUpdating}
                   onClick={applyUpdates}
                 >
-                  Update {availableUpdates.length} mods
+                  <Plural
+                    value={availableUpdates.length}
+                    one="Update 1 mod"
+                    other="Update # mods"
+                  />
                 </Button>
               </Tooltip>
             ) : (
               <Button disabled leftSection={<IconChecks size={16} />}>
-                All mods are updated
+                <Trans>All mods are updated</Trans>
               </Button>
             )}
           </Stack>
@@ -399,13 +477,15 @@ export default function ModsListPage() {
           <Box p="sm" bg="dark.8" style={{ borderRadius: '8px' }}>
             {/* <BackgroundImage src="https://www.civfanatics.com/wp-content/uploads/2016/10/logo.png"> */}
             <Text fz="sm" c="dimmed">
-              All mods are the property of their respective creators.
-              <br />
-              Special thanks to{' '}
-              <a href="https://www.civfanatics.com/" target="_blank">
-                CivFanatics
-              </a>{' '}
-              for hosting and supporting the modding community.
+              <Trans>
+                All mods are the property of their respective creators.
+                <br />
+                Special thanks to{' '}
+                <a href="https://www.civfanatics.com/" target="_blank">
+                  CivFanatics
+                </a>{' '}
+                for hosting and supporting the modding community.
+              </Trans>
             </Text>
             {/* </BackgroundImage> */}
           </Box>
@@ -433,10 +513,14 @@ export default function ModsListPage() {
               <Box p="lg">
                 <Stack gap={'xs'} align="center">
                   <IconEyeQuestion size={40} />
-                  <Text>No mods found</Text>
+                  <Text>
+                    <Trans>No mods found</Trans>
+                  </Text>
                   <Text c="dimmed">
-                    Try changing your filters or open Settings and double check
-                    Mods folder
+                    <Trans context="Help text when no mods are found">
+                      Try changing your filters or open Settings and double
+                      check Mods folder
+                    </Trans>
                   </Text>
                 </Stack>
               </Box>

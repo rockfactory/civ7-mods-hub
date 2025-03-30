@@ -14,6 +14,9 @@ import { useStore } from 'zustand';
 import { useAppStore } from './store/store';
 import { ProfilesContextProvider } from './profiles/ProfilesContext';
 
+// Locales
+import { messages as enMessages } from './locales/en/messages.po';
+
 const pastelYellow: MantineColorsTuple = [
   '#fff7e8',
   '#f9edd5',
@@ -27,7 +30,8 @@ const pastelYellow: MantineColorsTuple = [
   '#996b0b',
 ];
 
-i18n.activate('en_US');
+i18n.load('en', enMessages);
+i18n.activate('en');
 
 const theme = createTheme({
   colors: {

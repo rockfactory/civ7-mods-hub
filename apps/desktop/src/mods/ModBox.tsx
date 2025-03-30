@@ -1,54 +1,33 @@
 import {
   Card,
   Group,
-  Badge,
-  Button,
   Text,
   LoadingOverlay,
-  Image,
   Stack,
   Box,
   Flex,
-  Grid,
   ActionIcon,
   Tooltip,
   Menu,
   Modal,
-  Loader,
-  CopyButton,
   Alert,
-  List,
-  ThemeIcon,
 } from '@mantine/core';
-import * as React from 'react';
 import type { ModVersionsRecord } from '@civmods/parser';
 import { ModData, ModInfo } from '../home/IModInfo';
 import { open } from '@tauri-apps/plugin-shell';
 import {
   IconAlertCircle,
-  IconAlertHexagon,
-  IconCategory,
-  IconCheck,
-  IconChecklist,
-  IconCircleCheckFilled,
-  IconCode,
   IconCopy,
   IconDeviceFloppy,
   IconDots,
   IconDownload,
   IconExternalLink,
-  IconFileDescription,
   IconFolder,
   IconHexagonPlus,
-  IconLink,
   IconLock,
-  IconSettings,
-  IconSettings2,
-  IconSettingsExclamation,
   IconStar,
   IconSwitch,
   IconTag,
-  IconTransitionBottom,
   IconTrash,
   IconUser,
 } from '@tabler/icons-react';
@@ -71,6 +50,7 @@ import {
   getInstalledDependedBy,
   getNotInstalledDependsOn,
 } from './dependencies/getInstalledDependsOn';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { ModUnsatisfiedDependenciesRow } from './components/ModUnsatisfiedDependenciesRow';
 
 export interface IModBoxProps {
@@ -93,6 +73,8 @@ export function ModBox(props: IModBoxProps) {
     state.lockedModIds?.includes(props.mod.local?.modinfo_id ?? '')
   );
 
+  const { t } = useLingui();
+
   const handleInstall = async (version: ModVersionsRecord) => {
     if (isLocked) return;
 
@@ -109,29 +91,38 @@ export function ModBox(props: IModBoxProps) {
     }
 
     modals.openConfirmModal({
-      title: 'Update mod with unknown version',
+      title: t({
+        message: `Update mod with unknown version`,
+        context: 'Update modal title when the installed version is unknown',
+      }),
       children: (
         <Stack>
           <Text size="sm">
-            You are about to update the mod{' '}
-            <Text fw={600} span>
-              {mod.fetched?.name}
-            </Text>
-            .
+            <Trans>
+              You are about to update the mod{' '}
+              <Text fw={600} span>
+                {mod.fetched?.name}
+              </Text>
+              .
+            </Trans>
           </Text>
           <Text size="sm">
-            The mod is already installed, but the version is unknown. Do you
-            want to update to the latest version? Mod Manager will not be able
-            to revert to the previous version.
+            <Trans context="Update modal description">
+              The mod is already installed, but the version is unknown. Do you
+              want to update to the latest version? Mod Manager will not be able
+              to revert to the previous version.
+            </Trans>
           </Text>
           <Text size="sm" c="red">
-            Please make sure you have a backup of the mod folder.
+            <Trans context="Update modal warning">
+              Please make sure you have a backup of the mod folder.
+            </Trans>
           </Text>
         </Stack>
       ),
       labels: {
-        confirm: 'Update and overwrite',
-        cancel: 'Do not update',
+        confirm: t`Update and overwrite`,
+        cancel: t`Do not update`,
       },
       confirmProps: { color: 'red' },
       onConfirm: () => handleBaseInstall(),
@@ -143,31 +134,41 @@ export function ModBox(props: IModBoxProps) {
     const installedDependedBy = getInstalledDependedBy(mod, mods);
 
     modals.openConfirmModal({
-      title: 'Uninstall mod',
+      title: (
+        <Trans context="Uninstall mod modal window title">Uninstall mod</Trans>
+      ),
       children: (
         <Stack>
           <Text size="sm">
-            You are about to uninstall the mod{' '}
-            <Text fw={600} span>
-              {mod.name}
-            </Text>
-            .
+            <Trans>
+              You are about to uninstall the mod{' '}
+              <Text fw={600} span>
+                {mod.name}
+              </Text>
+              .
+            </Trans>
           </Text>
-          <Text size="sm">Are you sure you want to proceed?</Text>
+          <Text size="sm">
+            <Trans>Are you sure you want to proceed?</Trans>
+          </Text>
           {mod.isLocalOnly && (
             <Text size="sm" c="red">
-              This mod is not available in the mod repository. Uninstalling it
-              will remove all the files from the disk.
+              <Trans>
+                This mod is not available in the mod repository. Uninstalling it
+                will remove all the files from the disk.
+              </Trans>
             </Text>
           )}
           {installedDependedBy.length > 0 && (
             <Alert
               variant="light"
               color="red"
-              title="This mod is a dependency"
+              title={t`This mod is a dependency`}
               icon={<IconAlertCircle size={24} />}
             >
-              This mod is used by other mods. Uninstalling it will break them.
+              <Trans>
+                This mod is used by other mods. Uninstalling it will break them.
+              </Trans>
               <Stack gap={'xs'} mt="xs">
                 {installedDependedBy.map((dep) => (
                   <ModSmallRow key={dep.id} mod={dep} />
@@ -178,8 +179,8 @@ export function ModBox(props: IModBoxProps) {
         </Stack>
       ),
       labels: {
-        confirm: mod.isLocalOnly ? 'Remove from disk' : 'Uninstall',
-        cancel: 'Cancel',
+        confirm: mod.isLocalOnly ? t`Remove from disk` : t`Uninstall`,
+        cancel: t`Cancel`,
       },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
@@ -244,7 +245,7 @@ export function ModBox(props: IModBoxProps) {
                           'N/A';
                         navigator.clipboard.writeText(modinfo_id);
                         notifications.show({
-                          title: 'Mod ID copied',
+                          title: t`Mod ID copied`,
                           message: modinfo_id,
                           color: 'blue',
                         });
@@ -285,14 +286,20 @@ export function ModBox(props: IModBoxProps) {
                         color="dark.8"
                         multiline
                         w={320}
-                        label="This mod affects save files: it means that you shouldn't remove it in the middle of the game."
+                        label={t({
+                          message: `This mod affects save files: it means that you shouldn't remove it in the middle of the game.`,
+                          context: 'Tooltip when the mod affects save files',
+                        })}
                       >
                         <Text
                           c="orange.1"
                           fz={'0.85rem'}
                           className={styles.descriptionBlock}
                         >
-                          <IconDeviceFloppy size={12} /> Save file
+                          <IconDeviceFloppy size={12} />{' '}
+                          <Trans context="Short label to display in the mod box when it affects save games">
+                            Save file
+                          </Trans>
                         </Text>
                       </Tooltip>
                     )}
@@ -311,15 +318,7 @@ export function ModBox(props: IModBoxProps) {
                   </Group>
                 </Group>
               </Stack>
-              {/* {latestVersion && (
-              <Box flex="0 0 auto">
-                <Badge mt="sm" variant="outline">
-                  {latestVersion.name ?? 'N/A'}
-                </Badge>
-              </Box>
-            )} */}
             </Flex>
-            {/* <Badge>{mod.rating} ★</Badge> */}
           </Group>
           <Box flex="0 0 100px" w="100%">
             <Flex align="flex-end" justify="flex-end">
@@ -328,7 +327,9 @@ export function ModBox(props: IModBoxProps) {
                   <Tooltip
                     color="dark.8"
                     label={
-                      mod.isLocalOnly ? 'Remove folder from disk' : 'Uninstall'
+                      mod.isLocalOnly
+                        ? t`Remove folder from disk`
+                        : t`Uninstall`
                     }
                   >
                     <ActionIcon
@@ -344,7 +345,11 @@ export function ModBox(props: IModBoxProps) {
                 {isLocked && (
                   <Tooltip
                     color="dark.8"
-                    label="Mod is locked. No updates will be applied. Open the three dots menu to unlock."
+                    label={t({
+                      message:
+                        'Mod is locked. No updates will be applied. Open the three dots menu to unlock.',
+                      context: 'Tooltip when the mod is locked',
+                    })}
                   >
                     <ActionIcon color="pink">
                       <IconLock size={16} />
@@ -372,13 +377,19 @@ export function ModBox(props: IModBoxProps) {
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Label>Mod Actions</Menu.Label>
+                  <Menu.Label>
+                    <Trans context="Dropdown Menu label for mod actions">
+                      Mod Actions
+                    </Trans>
+                  </Menu.Label>
                   {!isLocked && mod.fetched && (
                     <Menu.Item
                       leftSection={<IconSwitch size={16} />}
                       onClick={() => setChoosingVersion(true)}
                     >
-                      Choose version...
+                      <Trans context="Menu item to choose mod version">
+                        Choose version...
+                      </Trans>
                     </Menu.Item>
                   )}
                   {local?.modinfo_path != null && (
@@ -388,7 +399,9 @@ export function ModBox(props: IModBoxProps) {
                         open(await resolve(local.modinfo_path!, '..'))
                       }
                     >
-                      Open mod folder
+                      <Trans context="Menu item to open mod folder">
+                        Open mod folder
+                      </Trans>
                     </Menu.Item>
                   )}
                   {mod.fetched && (
@@ -396,7 +409,9 @@ export function ModBox(props: IModBoxProps) {
                       leftSection={<IconExternalLink size={16} />}
                       onClick={() => open(mod.fetched!.url)}
                     >
-                      See on CivFanatics
+                      <Trans context="Menu item to open mod page on CivFanatics">
+                        See on CivFanatics
+                      </Trans>
                     </Menu.Item>
                   )}
                   {mod.fetched && (
@@ -409,13 +424,19 @@ export function ModBox(props: IModBoxProps) {
                           )}&instant=false`
                         );
                         notifications.show({
-                          title: 'Mod installation link copied',
-                          message: `Link for mod ${mod.name} copied to clipboard`,
+                          title: <Trans>Mod installation link copied</Trans>,
+                          message: (
+                            <Trans>
+                              Link for mod {mod.name} copied to clipboard
+                            </Trans>
+                          ),
                           color: 'blue',
                         });
                       }}
                     >
-                      Copy install link
+                      <Trans context="Menu item to copy mod install link">
+                        Copy install link
+                      </Trans>
                     </Menu.Item>
                   )}
                   <ModLockActionItem mod={mod} />
@@ -432,16 +453,22 @@ export function ModBox(props: IModBoxProps) {
         <Modal
           opened={isChoosingVersion}
           size="lg"
-          title="Choose version"
+          title={
+            <Trans context="Modal title for choosing mod version">
+              Choose version
+            </Trans>
+          }
           onClose={() => setChoosingVersion(false)}
           zIndex={1200}
         >
           <Text size="sm">
-            Choose version of the mod{' '}
-            <Text fw={600} span>
-              {fetched.name}
-            </Text>
-            .
+            <Trans>
+              Choose version of the mod{' '}
+              <Text fw={600} span>
+                {fetched.name}
+              </Text>
+              .
+            </Trans>
           </Text>
           <ModBoxVersions
             mod={mod}

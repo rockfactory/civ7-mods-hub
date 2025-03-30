@@ -1,0 +1,93 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-03-30 21:34+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: fr\n"
+
+msgctxt "Suffix for update tooltip, if some dependencies are missing"
+msgid " (will install missing dependencies)"
+msgstr ""
+
+#. placeholder {0}: availableUpdates.length
+msgid "{0, plural, one {Update one mod} other {Update # mods}}"
+msgstr ""
+
+msgctxt "Filter by state option"
+msgid "Affect Saves"
+msgstr ""
+
+msgid "All mods are updated"
+msgstr ""
+
+msgctxt "Header mods filter selection"
+msgid "Available Mods"
+msgstr ""
+
+msgctxt "placeholder"
+msgid "Filter by category."
+msgstr ""
+
+msgctxt "placeholder"
+msgid "Filter by state."
+msgstr ""
+
+msgctxt "Filtering section title"
+msgid "Filter Mods"
+msgstr ""
+
+msgctxt "Header mods filter selection"
+msgid "Installed Mods"
+msgstr ""
+
+msgctxt "Filter by state option"
+msgid "Local Only"
+msgstr ""
+
+msgctxt "Filter by state option"
+msgid "Locked"
+msgstr ""
+
+msgctxt "Filter by state option"
+msgid "Needs Update"
+msgstr ""
+
+msgctxt "Filter by state option"
+msgid "Not Affect Saves"
+msgstr ""
+
+msgctxt "Filter by state option"
+msgid "Not Installed"
+msgstr ""
+
+msgid "Refresh installed mods list and check for updates"
+msgstr ""
+
+msgctxt "Button text to reset filter"
+msgid "Reset Filters"
+msgstr ""
+
+msgctxt "placeholder"
+msgid "Search name, author..."
+msgstr ""
+
+msgctxt "Order by option"
+msgid "Sort by Downloads"
+msgstr ""
+
+msgctxt "Order by option"
+msgid "Sort by Last Update"
+msgstr ""
+
+msgctxt "Order by option"
+msgid "Sort by Name"
+msgstr ""
+
+msgctxt "Order by option"
+msgid "Sort by Rating"
+msgstr ""
+
+msgid "Sort by..."
+msgstr ""
