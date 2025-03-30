@@ -8,10 +8,15 @@
     "build": "tsc && vite build",
     "lint": "tsc --noEmit",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "lingui:extract": "lingui extract",
+    "lingui:compile": "lingui compile --typescript"
   },
   "dependencies": {
     "@civmods/parser": "*",
+    "@lingui/core": "^5.3.0",
+    "@lingui/format-json": "^5.3.0",
+    "@lingui/react": "^5.3.0",
     "@mantine/core": "^7.17.1",
     "@mantine/form": "^7.17.1",
     "@mantine/hooks": "^7.17.1",
@@ -43,6 +48,8 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@lingui/babel-plugin-lingui-macro": "^5.3.0",
+    "@lingui/vite-plugin": "^5.3.0",
     "@tauri-apps/cli": "^2.3.1",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",

@@ -8,7 +8,8 @@ import {
 } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
-
+import { i18n } from '@lingui/core';
+import { I18nProvider } from '@lingui/react';
 import { useStore } from 'zustand';
 import { useAppStore } from './store/store';
 import { ProfilesContextProvider } from './profiles/ProfilesContext';
@@ -26,6 +27,8 @@ const pastelYellow: MantineColorsTuple = [
   '#996b0b',
 ];
 
+i18n.activate('en_US');
+
 const theme = createTheme({
   colors: {
     pastelYellow,
@@ -41,18 +44,6 @@ const theme = createTheme({
       '#0a0b0d',
       '#000001',
     ],
-    // dark: [
-    //   '#d5d7e0',
-    //   '#acaebf',
-    //   '#8c8fa3',
-    //   '#666980',
-    //   '#4d4f66',
-    //   '#34354a',
-    //   '#2b2c3d',
-    //   '#1d1e30',
-    //   '#0c0d21',
-    //   '#01010a',
-    // ],
   },
   primaryColor: 'pastelYellow',
 });
@@ -60,20 +51,18 @@ const theme = createTheme({
 function App() {
   const isHydrated = useAppStore((state) => state.hydrated);
 
-  // useEffect(() => {
-
-  //   }, []);
-
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <ModalsProvider>
         <Notifications position="top-right" limit={4} />
         {isHydrated && (
-          <ProfilesContextProvider>
-            <ModsContextProvider>
-              <Home />
-            </ModsContextProvider>
-          </ProfilesContextProvider>
+          <I18nProvider i18n={i18n}>
+            <ProfilesContextProvider>
+              <ModsContextProvider>
+                <Home />
+              </ModsContextProvider>
+            </ProfilesContextProvider>
+          </I18nProvider>
         )}
         {!isHydrated && <LoadingOverlay visible>Loading...</LoadingOverlay>}
       </ModalsProvider>

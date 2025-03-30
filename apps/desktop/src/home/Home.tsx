@@ -46,6 +46,7 @@ import ThrottledLoader from './ThrottledLoader';
 import { isSameVersion } from '../mods/isSameVersion';
 import { useAppStore } from '../store/store';
 import { useCheckForGlobalUpdates } from '../settings/autoUpdater';
+import { Trans, useLingui } from '@lingui/react/macro';
 
 export default function ModsListPage() {
   const {
@@ -202,6 +203,8 @@ export default function ModsListPage() {
 
   const { availableUpdates, isUpdating, applyUpdates } = useApplyUpdates();
 
+  const { t } = useLingui();
+
   return (
     <AppShell
       padding="sm"
@@ -215,7 +218,7 @@ export default function ModsListPage() {
               Civ7 Mod Manager
             </Text>
             <Tooltip
-              label="Refresh installed mods list and check for updates"
+              label={t`Refresh installed mods list and check for updates`}
               color="dark.8"
             >
               <ActionIcon variant="subtle" onClick={() => triggerReload()}>
@@ -243,11 +246,11 @@ export default function ModsListPage() {
                 size="sm"
                 data={[
                   {
-                    label: 'Installed Mods',
+                    label: t`Installed Mods`,
                     value: 'installed',
                   },
                   {
-                    label: 'Available Mods',
+                    label: t`Available Mods`,
                     value: 'available',
                   },
                 ]}
@@ -264,12 +267,15 @@ export default function ModsListPage() {
       <AppShell.Navbar p="md">
         <AppShell.Section grow>
           <Text fw={600} size="lg" mb="sm">
-            Filter Mods
+            <Trans context="Filtering section title">Filter Mods</Trans>
           </Text>
 
           <Stack>
             <TextInput
-              placeholder="Search name, author..."
+              placeholder={t({
+                message: 'Search name, author...',
+                context: 'placeholder',
+              })}
               value={query.text}
               onChange={(event) =>
                 setQuery({ text: event.currentTarget.value })
@@ -290,7 +296,10 @@ export default function ModsListPage() {
               rightSectionPointerEvents={query.text ? 'auto' : 'none'}
             />
             <Select
-              placeholder="Filter by category.."
+              placeholder={t({
+                message: 'Filter by category.',
+                context: 'placeholder',
+              })}
               size="sm"
               // searchable
               data={categories}
@@ -300,17 +309,20 @@ export default function ModsListPage() {
             />
             <MultiSelect
               size="sm"
-              placeholder="Filter by state..."
+              placeholder={t({
+                message: 'Filter by state.',
+                context: 'placeholder',
+              })}
               value={query.state || null}
               clearable
               onChange={(value) => setQuery({ state: (value as any) ?? '' })}
               data={[
-                { label: 'Needs Update', value: 'needsUpdate' },
-                { label: 'Locked', value: 'locked' },
-                { label: 'Not Installed', value: 'uninstalled' },
-                { label: 'Local Only', value: 'localOnly' },
-                { label: 'Affect Saves', value: 'affectSaves' },
-                { label: 'Not Affect Saves', value: 'notAffectSaves' },
+                { label: t`Needs Update`, value: 'needsUpdate' },
+                { label: t`Locked`, value: 'locked' },
+                { label: t`Not Installed`, value: 'uninstalled' },
+                { label: t`Local Only`, value: 'localOnly' },
+                { label: t`Affect Saves`, value: 'affectSaves' },
+                { label: t`Not Affect Saves`, value: 'notAffectSaves' },
               ]}
             />
             {hasFilters && (
@@ -319,7 +331,9 @@ export default function ModsListPage() {
                 leftSection={<IconFilterOff size={16} />}
                 onClick={resetQuery}
               >
-                Reset Filters
+                <Trans context="Button text to reset filter">
+                  Reset Filters
+                </Trans>
               </Button>
             )}
             <Select

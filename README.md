@@ -1,5 +1,7 @@
 # CivMods
 
+[![Crowdin](https://badges.crowdin.net/civmods/localized.svg)](https://crowdin.com/project/civmods)
+
 Unofficial Civ7 Mods Manager
 
 ![CivMods](./apps/api/public/screen-background.png)
