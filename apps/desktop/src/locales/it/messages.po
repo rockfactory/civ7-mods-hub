@@ -8,7 +8,7 @@ msgstr ""
 "Language: it\n"
 "Project-Id-Version: civmods\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-03-30 20:11\n"
+"PO-Revision-Date: 2025-03-30 21:09\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -119,7 +119,7 @@ msgstr "Nessuna mod trovata"
 
 msgctxt "Filter by state option"
 msgid "Not Affect Saves"
-msgstr "Influenza i Salvataggi"
+msgstr "Non Influenza i Salvataggi"
 
 msgctxt "Filter by state option"
 msgid "Not Installed"
@@ -148,7 +148,7 @@ msgstr "Reimposta Filtri"
 
 msgctxt "Short label to display in the mod box when it affects save games"
 msgid "Save file"
-msgstr "Salva file"
+msgstr "Salvataggio"
 
 msgctxt "placeholder"
 msgid "Search name, author..."
@@ -183,7 +183,7 @@ msgstr "La mod è già installata, ma la versione è sconosciuta. Vuoi aggiornar
 
 msgctxt "Tooltip when the mod affects save files"
 msgid "This mod affects save files: it means that you shouldn't remove it in the middle of the game."
-msgstr "Questa mod influisce sul salvataggio dei file: significa che non dovresti rimuoverlo nel bel mezzo del gioco."
+msgstr "Questa mod influisce sul salvataggio dei file: significa che non dovresti rimuoverlo nel mezzo di una partita."
 
 msgid "This mod is a dependency"
 msgstr "Questa mod è una dipendenza"
@@ -192,11 +192,11 @@ msgid "This mod is not available in the mod repository. Uninstalling it will rem
 msgstr "Questa mod non è disponibile nel repository mod. La disinstallazione rimuoverà tutti i file dal disco."
 
 msgid "This mod is used by other mods. Uninstalling it will break them."
-msgstr "Questa mod è usata da altre mod. La disinstallazione le interromperà."
+msgstr "Questa mod è usata da altre mod. La disinstallazione le renderà inutilizzabili."
 
 msgctxt "Help text when no mods are found"
 msgid "Try changing your filters or open Settings and double check Mods folder"
-msgstr "Prova a cambiare i tuoi filtri o apri Impostazioni e controlla la cartella Mods"
+msgstr "Prova a cambiare i tuoi filtri o apri le Impostazioni e controlla la cartella delle Mod"
 
 msgid "Uninstall"
 msgstr "Disinstalla"
