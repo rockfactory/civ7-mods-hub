@@ -12,11 +12,12 @@ import {
 export interface IModInstallButtonProps {
   mod: ModData;
   version: ModVersionsRecord | undefined | null;
+  isTargetLatest?: boolean;
   onInstall: (version: ModVersionsRecord) => void;
 }
 
 export function ModInstallButton(props: IModInstallButtonProps) {
-  const { mod, version } = props;
+  const { mod, version, isTargetLatest } = props;
 
   // Local-only mods
   if (!mod.fetched) {
@@ -31,10 +32,6 @@ export function ModInstallButton(props: IModInstallButtonProps) {
       </Tooltip>
     );
   }
-
-  const isTargetLatest =
-    mod.fetched.expand?.mod_versions_via_mod_id[0].hash_stable ===
-    version?.hash_stable;
 
   if (mod.local && mod.installedVersion?.hash_stable === version?.hash_stable) {
     return (

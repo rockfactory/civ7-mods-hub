@@ -13,7 +13,7 @@ import { scrapeMods } from '../mods/utils/scrapeMods';
 // https://forums.civfanatics.com/resources/better-pause-menu.31873/
 
 const singleModUrl =
-  'https://forums.civfanatics.com/resources/better-pause-menu.31873/';
+  'https://forums.civfanatics.com/resources/sibr3s-transparent-appeal.32000/';
 
 const forceExtractAndStore = true;
 const maxPages = 1; // 15 full

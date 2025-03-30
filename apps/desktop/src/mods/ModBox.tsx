@@ -354,6 +354,7 @@ export function ModBox(props: IModBoxProps) {
                 {!isLocked && (
                   <ModInstallButton
                     mod={mod}
+                    isTargetLatest
                     version={latestVersion}
                     onInstall={handleInstall}
                   />
