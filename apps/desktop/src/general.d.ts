@@ -1,4 +1,3 @@
 declare module '*.po' {
-  const messages: Record<string, any>;
-  export { messages };
+  declare const messages: Record<string, any>;
 }

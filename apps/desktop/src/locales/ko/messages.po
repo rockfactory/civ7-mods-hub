@@ -6,24 +6,61 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: ko\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 msgctxt "Suffix for update tooltip, if some dependencies are missing"
 msgid " (will install missing dependencies)"
 msgstr ""
 
 #. placeholder {0}: availableUpdates.length
-msgid "{0, plural, one {Update one mod} other {Update # mods}}"
+msgid "{0, plural, one {Update 1 mod} other {Update # mods}}"
 msgstr ""
+
+#~ msgid "{0, plural, one {Update one mod} other {Update # mods}}"
+#~ msgstr ""
 
 msgctxt "Filter by state option"
 msgid "Affect Saves"
 msgstr ""
 
+msgid "All mods are the property of their respective creators.<0/>Special thanks to <1>CivFanatics</1> for hosting and supporting the modding community."
+msgstr ""
+
 msgid "All mods are updated"
+msgstr ""
+
+msgid "Are you sure you want to proceed?"
 msgstr ""
 
 msgctxt "Header mods filter selection"
 msgid "Available Mods"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgctxt "Modal title for choosing mod version"
+msgid "Choose version"
+msgstr ""
+
+#. placeholder {0}: fetched.name
+msgid "Choose version of the mod <0>{0}</0>."
+msgstr ""
+
+msgctxt "Menu item to choose mod version"
+msgid "Choose version..."
+msgstr ""
+
+msgctxt "Menu item to copy mod install link"
+msgid "Copy install link"
+msgstr ""
+
+msgid "Do not update"
 msgstr ""
 
 msgctxt "placeholder"
@@ -42,6 +79,10 @@ msgctxt "Header mods filter selection"
 msgid "Installed Mods"
 msgstr ""
 
+#. placeholder {0}: mod.name
+msgid "Link for mod {0} copied to clipboard"
+msgstr ""
+
 msgctxt "Filter by state option"
 msgid "Local Only"
 msgstr ""
@@ -50,8 +91,25 @@ msgctxt "Filter by state option"
 msgid "Locked"
 msgstr ""
 
+msgctxt "Dropdown Menu label for mod actions"
+msgid "Mod Actions"
+msgstr ""
+
+msgid "Mod ID copied"
+msgstr ""
+
+msgid "Mod installation link copied"
+msgstr ""
+
+msgctxt "Tooltip when the mod is locked"
+msgid "Mod is locked. No updates will be applied. Open the three dots menu to unlock."
+msgstr ""
+
 msgctxt "Filter by state option"
 msgid "Needs Update"
+msgstr ""
+
+msgid "No mods found"
 msgstr ""
 
 msgctxt "Filter by state option"
@@ -62,15 +120,37 @@ msgctxt "Filter by state option"
 msgid "Not Installed"
 msgstr ""
 
+msgctxt "Menu item to open mod folder"
+msgid "Open mod folder"
+msgstr ""
+
+msgctxt "Update modal warning"
+msgid "Please make sure you have a backup of the mod folder."
+msgstr ""
+
 msgid "Refresh installed mods list and check for updates"
+msgstr ""
+
+msgid "Remove folder from disk"
+msgstr ""
+
+msgid "Remove from disk"
 msgstr ""
 
 msgctxt "Button text to reset filter"
 msgid "Reset Filters"
 msgstr ""
 
+msgctxt "Short label to display in the mod box when it affects save games"
+msgid "Save file"
+msgstr ""
+
 msgctxt "placeholder"
 msgid "Search name, author..."
+msgstr ""
+
+msgctxt "Menu item to open mod page on CivFanatics"
+msgid "See on CivFanatics"
 msgstr ""
 
 msgctxt "Order by option"
@@ -90,4 +170,51 @@ msgid "Sort by Rating"
 msgstr ""
 
 msgid "Sort by..."
+msgstr ""
+
+msgctxt "Update modal description"
+msgid "The mod is already installed, but the version is unknown. Do you want to update to the latest version? Mod Manager will not be able to revert to the previous version."
+msgstr ""
+
+msgctxt "Tooltip when the mod affects save files"
+msgid "This mod affects save files: it means that you shouldn't remove it in the middle of the game."
+msgstr ""
+
+msgid "This mod is a dependency"
+msgstr ""
+
+msgid "This mod is not available in the mod repository. Uninstalling it will remove all the files from the disk."
+msgstr ""
+
+msgid "This mod is used by other mods. Uninstalling it will break them."
+msgstr ""
+
+msgctxt "Help text when no mods are found"
+msgid "Try changing your filters or open Settings and double check Mods folder"
+msgstr ""
+
+msgid "Uninstall"
+msgstr ""
+
+msgctxt "Uninstall mod modal window title"
+msgid "Uninstall mod"
+msgstr ""
+
+msgid "Update and overwrite"
+msgstr ""
+
+msgctxt "Update modal title when the installed version is unknown"
+msgid "Update mod with unknown version"
+msgstr ""
+
+msgctxt "Mods update tooltip prefix"
+msgid "Will update:"
+msgstr ""
+
+#. placeholder {0}: mod.name
+msgid "You are about to uninstall the mod <0>{0}</0>."
+msgstr ""
+
+#. placeholder {0}: mod.fetched?.name
+msgid "You are about to update the mod <0>{0}</0>."
 msgstr ""
