@@ -10,13 +10,17 @@ import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
 import { i18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
-import { useStore } from 'zustand';
 import { useAppStore } from './store/store';
 import { ProfilesContextProvider } from './profiles/ProfilesContext';
+import { useEffect, useState } from 'react';
+import { dynamicActivate } from './localization/dynamicActivate';
 
-// Locales
+// Locales (default)
 import { messages as enMessages } from './locales/en/messages.po';
+i18n.load('en', enMessages);
+i18n.activate('en');
 
+// Theme
 const pastelYellow: MantineColorsTuple = [
   '#fff7e8',
   '#f9edd5',
@@ -29,9 +33,6 @@ const pastelYellow: MantineColorsTuple = [
   '#b17d19',
   '#996b0b',
 ];
-
-i18n.load('en', enMessages);
-i18n.activate('en');
 
 const theme = createTheme({
   colors: {
@@ -54,22 +55,38 @@ const theme = createTheme({
 
 function App() {
   const isHydrated = useAppStore((state) => state.hydrated);
+  const [isLoadingLocale, setIsLoadingLocale] = useState(true);
+
+  useEffect(() => {
+    const browserLocale = navigator.language.split('-')[0];
+    console.log('Browser locale:', browserLocale);
+
+    dynamicActivate(browserLocale)
+      .catch((error) => {
+        console.error('Failed to load locale:', error);
+      })
+      .finally(() => {
+        setIsLoadingLocale(false);
+      });
+  }, []);
+
+  const isLoading = !isHydrated || isLoadingLocale;
 
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
-      <ModalsProvider>
-        <Notifications position="top-right" limit={4} />
-        {isHydrated && (
-          <I18nProvider i18n={i18n}>
+      {!isLoading && (
+        <I18nProvider i18n={i18n}>
+          <ModalsProvider>
+            <Notifications position="top-right" limit={4} />
             <ProfilesContextProvider>
               <ModsContextProvider>
                 <Home />
               </ModsContextProvider>
             </ProfilesContextProvider>
-          </I18nProvider>
-        )}
-        {!isHydrated && <LoadingOverlay visible>Loading...</LoadingOverlay>}
-      </ModalsProvider>
+          </ModalsProvider>
+        </I18nProvider>
+      )}
+      {isLoading && <LoadingOverlay visible>Loading...</LoadingOverlay>}
     </MantineProvider>
   );
 }
