@@ -259,6 +259,7 @@ async function runLowLevelInstallMod(
       properties: {
         target_modinfo_id: version.modinfo_id,
         target_modinfo_path: version.modinfo_path,
+        internal_version_id: version.id,
         mod_url: mod.fetched!.url,
         mod_version: version.name,
         mod_category: cleanCategoryName(mod.fetched!.category),

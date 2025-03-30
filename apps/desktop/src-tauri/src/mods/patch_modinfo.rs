@@ -1,6 +1,8 @@
 use diffy::create_patch;
 use diffy::Patch;
+use quick_xml::errors::IllFormedError;
 use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::Error;
 use quick_xml::Reader;
 use quick_xml::Writer;
 use serde::Deserialize;
@@ -14,6 +16,7 @@ use tauri::AppHandle;
 pub struct CivModsProperties {
     pub target_modinfo_id: Option<String>,
     pub target_modinfo_path: Option<String>,
+    pub internal_version_id: String,
     pub mod_url: String,
     pub mod_version: Option<String>,
     pub mod_category: Option<String>,
@@ -45,6 +48,10 @@ fn map_props_to_xml(props: &CivModsProperties) -> BTreeMap<String, String> {
     if let Some(version_date) = &props.mod_version_date {
         props_map.insert("CivModsVersionDate".to_string(), version_date.clone());
     }
+    props_map.insert(
+        "CivModsInternalVersionId".to_string(),
+        props.internal_version_id.clone(),
+    );
     props_map
 }
 
@@ -102,6 +109,20 @@ pub fn patch_modinfo_xml<P: AsRef<Path>>(
             Ok(Event::Eof) => break,
             Ok(e) => {
                 writer.write_event(e).unwrap();
+            }
+            Err(Error::IllFormed(IllFormedError::MismatchedEndTag { expected, found })) => {
+                log::warn!("Mismatched end tag: expected: {expected:?}, found: {found:?}");
+                writer
+                    .write_event(Event::End(BytesEnd::new(expected)))
+                    .unwrap();
+            }
+            Err(Error::IllFormed(IllFormedError::MissingEndTag(tag))) => {
+                log::warn!("Missing end tag: {tag:?}");
+                writer.write_event(Event::End(BytesEnd::new(tag))).unwrap();
+            }
+            Err(Error::IllFormed(IllFormedError::UnmatchedEndTag(tag))) => {
+                log::warn!("Unmatched end tag: {tag:?}");
+                writer.write_event(Event::End(BytesEnd::new(tag))).unwrap();
             }
             Err(e) => return Err(format!("Error parsing XML: {e}")),
         }
@@ -202,6 +223,7 @@ mod tests {
             CivModsProperties {
                 target_modinfo_id: None,
                 target_modinfo_path: None,
+                internal_version_id: "abc".to_string(),
                 mod_url: "https://test.com".to_string(),
                 mod_version: Some("1.0".to_string()),
                 mod_category: Some("Test".to_string()),

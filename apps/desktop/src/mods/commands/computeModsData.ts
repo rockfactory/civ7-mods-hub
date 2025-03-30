@@ -38,7 +38,11 @@ function mapFetchedToLocal(
   // Map local mods to fetched mods
   for (const local of modsInfo) {
     const firstMatchingVersion = allVersionsModMap.find(
-      (mod) => mod.version.modinfo_id === local.modinfo_id
+      (mod) =>
+        // 1. Check if we saved the internal version ID. This is the most reliable way to check if the mod is the same, since we write it
+        mod.version.id === local.civmods_internal_version_id ||
+        // 2. Check if the modinfo_id matches. This is less reliable, but we can use it as a fallback.
+        mod.version.modinfo_id === local.modinfo_id
     );
     if (!firstMatchingVersion) continue;
 

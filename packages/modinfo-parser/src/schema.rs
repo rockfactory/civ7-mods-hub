@@ -131,6 +131,9 @@ pub struct Properties {
 
     #[serde(rename = "URL")]
     pub url: Option<String>,
+
+    #[serde(rename = "CivModsInternalVersionId")]
+    pub civmods_internal_version_id: Option<String>,
 }
 
 #[skip_serializing_none]
@@ -270,6 +273,7 @@ mod tests {
             version: Some("VERSION".to_string()),
             compatibility: Some("COMPATIBILITY".to_string()),
             url: Some("URL".to_string()),
+            civmods_internal_version_id: None,
         };
 
         assert_eq!(actual, expected);
