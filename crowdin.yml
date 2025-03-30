@@ -1,5 +1,5 @@
 project_id: 776548
 preserve_hierarchy: 1
 files:
-  - source: /apps/desktop/src/locales/en_US/messages.po
+  - source: /apps/desktop/src/locales/en/messages.po
     translation: /apps/desktop/src/locales/%two_letters_code%/messages.po
