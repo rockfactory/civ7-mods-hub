@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
+    "lint": "tsc --noEmit",
     "start": "node dist/index.js",
     "start:worker": "node dist/worker.js",
     "dev": "tsx watch --env-file=../../.env ./src/index.ts",

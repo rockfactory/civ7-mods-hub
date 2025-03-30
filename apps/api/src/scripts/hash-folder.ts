@@ -28,7 +28,7 @@ async function hashFolder() {
   }
 
   // Compute extracted folder hash
-  const folderHash = await computeFolderHash(path.dirname(modInfoPath));
+  const folderHash = await computeFolderHash(path.dirname(modInfoPath[0]));
   console.log(`Folder hash: ${folderHash}`);
 }
 
