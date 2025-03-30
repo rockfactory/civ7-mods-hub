@@ -16,6 +16,7 @@ import {
   Select,
   Space,
   Loader,
+  MultiSelect,
 } from '@mantine/core';
 import { useState, useEffect, useMemo } from 'react';
 import {
@@ -113,6 +114,7 @@ export default function ModsListPage() {
    */
   const filteredMods = useMemo(() => {
     const lockedModIds = new Set(useAppStore.getState().lockedModIds);
+    const queryStates = new Set(query.state ?? []);
 
     return sortedMods.filter((mod) => {
       let shouldInclude = true;
@@ -141,7 +143,7 @@ export default function ModsListPage() {
         shouldInclude = shouldInclude && mod.local != null;
       }
 
-      if (query.state === 'needsUpdate') {
+      if (queryStates.has('needsUpdate')) {
         shouldInclude =
           shouldInclude &&
           mod.local?.modinfo_id != null &&
@@ -151,15 +153,30 @@ export default function ModsListPage() {
             mod.local
           ) &&
           !lockedModIds.has(mod.local.modinfo_id);
-      } else if (query.state === 'locked') {
+      }
+      if (queryStates.has('locked')) {
         shouldInclude =
           shouldInclude &&
           mod.local?.modinfo_id != null &&
           lockedModIds.has(mod.local.modinfo_id);
-      } else if (query.state === 'uninstalled') {
+      }
+      if (queryStates.has('uninstalled')) {
         shouldInclude = shouldInclude && !mod.local;
-      } else if (query.state === 'localOnly') {
+      }
+      if (queryStates.has('localOnly')) {
         shouldInclude = shouldInclude && mod.isLocalOnly;
+      }
+      if (queryStates.has('affectSaves')) {
+        shouldInclude =
+          shouldInclude &&
+          mod.fetched?.expand?.mod_versions_via_mod_id[0]?.affect_saves ===
+            true;
+      }
+      if (queryStates.has('notAffectSaves')) {
+        shouldInclude =
+          shouldInclude &&
+          mod.fetched?.expand?.mod_versions_via_mod_id[0]?.affect_saves ===
+            false;
       }
 
       return shouldInclude;
@@ -281,7 +298,7 @@ export default function ModsListPage() {
               clearable
               onChange={(value) => setQuery({ category: value ?? '' })}
             />
-            <Select
+            <MultiSelect
               size="sm"
               placeholder="Filter by state..."
               value={query.state || null}
@@ -292,6 +309,8 @@ export default function ModsListPage() {
                 { label: 'Locked', value: 'locked' },
                 { label: 'Not Installed', value: 'uninstalled' },
                 { label: 'Local Only', value: 'localOnly' },
+                { label: 'Affect Saves', value: 'affectSaves' },
+                { label: 'Not Affect Saves', value: 'notAffectSaves' },
               ]}
             />
             {hasFilters && (

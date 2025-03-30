@@ -4,14 +4,21 @@ export interface ModsQuery {
   text: string;
   category: string;
   onlyInstalled: boolean;
-  state: '' | 'needsUpdate' | 'locked' | 'uninstalled' | 'localOnly';
+  state: Array<
+    | 'needsUpdate'
+    | 'locked'
+    | 'uninstalled'
+    | 'localOnly'
+    | 'affectSaves'
+    | 'notAffectSaves'
+  >;
 }
 
 const defaultQuery: ModsQuery = {
   text: '',
   category: '',
   onlyInstalled: true,
-  state: '',
+  state: [],
 };
 
 export type ModsSortBy = 'name' | 'updated' | 'rating' | 'downloads';
@@ -27,7 +34,7 @@ export function useModsQuery() {
     ...defaultQuery,
   });
 
-  const hasFilters = query.text || query.category || query.state;
+  const hasFilters = query.text || query.category || query.state.length > 0;
 
   const [isPending, startTransition] = useTransition();
 
@@ -36,7 +43,9 @@ export function useModsQuery() {
       startTransition(() => {
         setQuery((q) => ({
           ...q,
-          ...(newQuery.state === 'uninstalled' ? { onlyInstalled: false } : {}),
+          ...(newQuery.state?.includes('uninstalled')
+            ? { onlyInstalled: false }
+            : {}),
           ...newQuery,
         }));
       });
