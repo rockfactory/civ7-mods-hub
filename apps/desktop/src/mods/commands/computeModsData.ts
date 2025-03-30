@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { FetchedMod, ModData, ModInfo } from '../../home/IModInfo';
 import { isSameVersion } from '../isSameVersion';
 
@@ -6,12 +7,61 @@ export interface ComputeModsDataOptions {
   modsInfo: ModInfo[];
 }
 
+function mapFetchedToLocal(
+  fetchedMods: FetchedMod[],
+  modsInfo: ModInfo[]
+): Map<string, ModInfo> {
+  const fetchedToLocalMap = new Map<string, ModInfo>();
+
+  // Get all versions, sorted by release date. The idea is having the _first_ version
+  // be the first one released, so we can associate the local mod to the first version
+  // with the same modinfo_id.
+  const allVersionsModMap = [];
+  for (const fetchedMod of fetchedMods) {
+    const modVersions = fetchedMod.expand?.mod_versions_via_mod_id ?? [];
+    for (const version of modVersions) {
+      allVersionsModMap.push({
+        fetchedMod,
+        version,
+      });
+    }
+  }
+  // Compare by date (ISO string)
+  allVersionsModMap.sort((a, b) => {
+    return dayjs(a.version.released).diff(
+      dayjs(b.version.released),
+      'millisecond',
+      true
+    );
+  });
+
+  // Map local mods to fetched mods
+  for (const local of modsInfo) {
+    const firstMatchingVersion = allVersionsModMap.find(
+      (mod) =>
+        // 1. Check if we saved the internal version ID. This is the most reliable way to check if the mod is the same, since we write it
+        mod.version.id === local.civmods_internal_version_id ||
+        // 2. Check if the modinfo_id matches. This is less reliable, but we can use it as a fallback.
+        mod.version.modinfo_id === local.modinfo_id
+    );
+    if (!firstMatchingVersion) continue;
+
+    // Get the first version that matches the local mod
+    const fetchedMod = firstMatchingVersion.fetchedMod;
+    fetchedToLocalMap.set(fetchedMod.id, local);
+  }
+
+  return fetchedToLocalMap;
+}
+
 export function computeModsData(options: ComputeModsDataOptions): ModData[] {
   const { fetchedMods, modsInfo } = options;
 
   const locallyFoundInFetched = new Set<string>();
   const dependencyMap = new Map<string, Set<string>>(); // modinfo_id -> modinfo_ids that depend on it
   const dependsOnMap = new Map<string, Set<string>>(); // modinfo_id -> modinfo_ids it depends on
+
+  const fetchedToLocalMap = mapFetchedToLocal(fetchedMods, modsInfo);
 
   const fetchedMapped: ModData[] = fetchedMods.map((fetchedMod) => {
     const modVersions = fetchedMod.expand?.mod_versions_via_mod_id ?? [];
@@ -37,8 +87,7 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
       };
     }
 
-    const local = modsInfo.find((info) => info.modinfo_id === modinfoId);
-
+    const local = fetchedToLocalMap.get(fetchedMod.id) ?? null;
     if (local) {
       locallyFoundInFetched.add(local.folder_name);
     }

@@ -3,7 +3,7 @@ import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
 import { ModVersionsRecord } from '@civmods/parser';
 import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
-import { isSameVersion } from './isSameVersion';
+import { getLatestVersionMatchingLocal, isSameVersion } from './isSameVersion';
 import { useAppStore } from '../store/store';
 import { installMod } from './installMod';
 import { getModDependencies } from './dependencies/getModDependencies';
@@ -29,11 +29,14 @@ export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
       continue;
     }
 
-    const latestVersion =
-      installedMod.fetched.expand?.mod_versions_via_mod_id[0];
+    // Find latest version of the mod by Variant ID
+    const latestVersion = getLatestVersionMatchingLocal(
+      installedMod.fetched,
+      installedMod.local!
+    );
 
     if (!latestVersion) {
-      console.warn(`Mod ${installedMod.fetched?.name} has no versions`);
+      console.warn(`Mod ${installedMod.fetched?.name} has no matching versions`); // prettier-ignore
       continue;
     }
 

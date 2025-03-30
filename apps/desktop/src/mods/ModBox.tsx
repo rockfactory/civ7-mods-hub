@@ -59,7 +59,7 @@ import { ModBoxVersions } from './ModBoxVersions';
 import { useModsContext } from './ModsContext';
 import { resolve } from '@tauri-apps/api/path';
 import { ModInstallButton } from './ModInstallButton';
-import { isSameVersion } from './isSameVersion';
+import { getLatestVersionMatchingLocal, isSameVersion } from './isSameVersion';
 import { ModLockActionItem } from './actions/ModLockActionItem';
 import { useAppStore } from '../store/store';
 import { notifications } from '@mantine/notifications';
@@ -86,7 +86,7 @@ export function ModBox(props: IModBoxProps) {
 
   const { install, uninstall, mods } = useModsContext();
 
-  const latestVersion = fetched?.expand?.mod_versions_via_mod_id[0];
+  const latestVersion = getLatestVersionMatchingLocal(fetched, local);
   const isLatest = latestVersion && isSameVersion(latestVersion, local);
 
   const isLocked = useAppStore((state) =>
@@ -354,6 +354,7 @@ export function ModBox(props: IModBoxProps) {
                 {!isLocked && (
                   <ModInstallButton
                     mod={mod}
+                    isTargetLatest
                     version={latestVersion}
                     onInstall={handleInstall}
                   />

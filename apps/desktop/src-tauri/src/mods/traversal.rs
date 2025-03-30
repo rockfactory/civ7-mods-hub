@@ -14,14 +14,24 @@ pub struct ModInfo {
     modinfo_id: Option<String>, // Extracted from XML <Mod id="...">
     folder_hash: String,
     folder_name: String,
+    civmods_internal_version_id: Option<String>,
 }
 
 /// XML struct for parsing .modinfo using serde
 #[derive(Debug, Deserialize)]
 #[serde(rename = "Mod")]
-struct ModXml {
+pub struct ModXml {
     #[serde(rename = "@id")]
-    id: Option<String>,
+    pub id: Option<String>,
+    #[serde(rename = "Properties")]
+    pub properties: Properties,
+}
+
+// Using this temporarly until we get the `modinfo-parser` lib integrated
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct Properties {
+    pub civ_mods_internal_version_id: Option<String>,
 }
 
 // Make sure this is aligned with the ignore list in the backend in Node.js
@@ -81,12 +91,12 @@ fn read_file_to_vec(path: &Path) -> Result<Vec<u8>, String> {
 }
 
 /// Parses the .modinfo XML and extracts the `id` attribute
-fn extract_mod_id(modinfo_path: &str) -> Option<String> {
+fn extract_mod_xml(modinfo_path: &str) -> Option<ModXml> {
     let mut buffer = vec![];
     sanitize_xml(File::open(modinfo_path).ok()?, &mut buffer).ok()?;
     let sanitized = String::from_utf8_lossy(&buffer).to_string();
     let mod_xml: ModXml = quick_xml::de::from_str(&sanitized).ok()?;
-    mod_xml.id
+    Some(mod_xml)
 }
 
 fn sanitize_xml(reader: impl Read, writer: impl Write) -> quick_xml::Result<()> {
@@ -124,7 +134,7 @@ fn sanitize_xml(reader: impl Read, writer: impl Write) -> quick_xml::Result<()> 
 }
 
 /// Finds the `.modinfo` file inside a given directory.
-pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
+pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<ModXml>) {
     if let Some(entry) = WalkDir::new(directory)
         .into_iter()
         .filter_map(Result::ok)
@@ -141,8 +151,8 @@ pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<String>) {
         })
     {
         let modinfo_path = entry.path().to_string_lossy().to_string();
-        let mod_id = extract_mod_id(&modinfo_path);
-        return (Some(modinfo_path), mod_id);
+        let mod_xml = extract_mod_xml(&modinfo_path);
+        return (Some(modinfo_path), mod_xml);
     }
     (None, None)
 }
@@ -172,7 +182,7 @@ pub fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModInfo>, S
                 .file_name()
                 .into_string()
                 .unwrap_or_else(|_| "Unknown Mod".to_string());
-            let (modinfo_path, modinfo_id) = find_modinfo_file(&mod_dir);
+            let (modinfo_path, modinfo_xml) = find_modinfo_file(&mod_dir);
 
             // Skip mod if modinfo file is not found
             let modinfo_path_str = match modinfo_path.as_deref() {
@@ -193,7 +203,10 @@ pub fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModInfo>, S
             mods_list.push(ModInfo {
                 mod_name,
                 modinfo_path: modinfo_path_str.to_string(),
-                modinfo_id,
+                modinfo_id: modinfo_xml.as_ref().and_then(|xml| xml.id.clone()),
+                civmods_internal_version_id: modinfo_xml
+                    .as_ref()
+                    .and_then(|xml| xml.properties.civ_mods_internal_version_id.clone()),
                 folder_hash,
                 // Only the folder name without the full path
                 // Should be the same as mod_name for now

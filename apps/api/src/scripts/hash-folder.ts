@@ -2,7 +2,7 @@ import path from 'path';
 import { pb } from '../core/pocketbase';
 import {
   computeFolderHash,
-  findModInfoFile,
+  findModInfoFiles,
 } from '../mods/utils/extractAndStoreModVersionMetadata';
 import { EXTRACTED_DIR } from '../mods/utils/fs/extractionDirs';
 
@@ -21,7 +21,7 @@ async function hashFolder() {
     `Processing ${version.name} (${version.id}, ${version.download_url})`
   );
   const extractPath = path.join(EXTRACTED_DIR, version.id);
-  const modInfoPath = await findModInfoFile(extractPath);
+  const modInfoPath = await findModInfoFiles(extractPath);
   if (!modInfoPath) {
     console.warn(`No .modinfo found in ${version.name}`);
     return;

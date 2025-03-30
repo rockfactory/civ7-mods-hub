@@ -112,12 +112,6 @@ export default function ModsListPage() {
    * Filter mods based on query
    */
   const filteredMods = useMemo(() => {
-    const installedModIds = new Set(
-      sortedMods
-        .filter(({ local }) => local?.modinfo_id)
-        .map(({ local }) => local?.modinfo_id)
-    );
-
     const lockedModIds = new Set(useAppStore.getState().lockedModIds);
 
     return sortedMods.filter((mod) => {
@@ -144,7 +138,7 @@ export default function ModsListPage() {
       }
 
       if (query.onlyInstalled) {
-        shouldInclude = shouldInclude && installedModIds.has(mod.modinfo_id);
+        shouldInclude = shouldInclude && mod.local != null;
       }
 
       if (query.state === 'needsUpdate') {

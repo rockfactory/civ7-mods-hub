@@ -18,6 +18,8 @@ import { getFilesRecursively } from './fs/getFilesRecursively';
 import { ARCHIVE_DIR, EXTRACTED_DIR } from './fs/extractionDirs';
 import { downloadVersionFile } from './download/downloadVersionFile';
 import { getModInfoDependencies } from './modinfo/getModInfoDependencies';
+import { upsertVariantVersion } from './db/versionRepo';
+import { getModInfoLocalizedNames } from './modinfo/getModInfoLocalizedNames';
 
 export async function extractAndStoreModVersionMetadata(
   options: ScrapeModsOptions,
@@ -76,52 +78,78 @@ export async function extractAndStoreModVersionMetadata(
     }
 
     // Find .modinfo file
-    const modInfoPath = await findModInfoFile(extractPath);
-    if (!modInfoPath) {
-      throw new SkipInstallError(`No .modinfo file found in ${version.name}`);
+    const modInfoPaths = await findModInfoFiles(extractPath);
+    if (modInfoPaths.length === 0) {
+      throw new SkipInstallError(`No .modinfo files found in ${version.name}`);
     }
 
-    // Compute extracted folder hash
-    const folderHash = await computeFolderHash(path.dirname(modInfoPath));
-
     // Parse .modinfo XML file
-    const modInfoXML = await fs.readFile(modInfoPath, 'utf8');
     const parser = new XMLParser({ ignoreAttributes: false });
-    let modInfo: any;
-
+    let modInfos: { xml: any; path: string }[] = [];
     try {
-      modInfo = parser.parse(modInfoXML);
+      for (const modInfoPath of modInfoPaths) {
+        const modInfoXML = await fs.readFile(modInfoPath, 'utf8');
+        const parsedModInfo = parser.parse(modInfoXML);
+        modInfos.push({ xml: parsedModInfo, path: modInfoPath });
+      }
     } catch (error) {
       throw new SkipInstallError(
         `Failed to parse .modinfo XML for ${version.name}. Make sure it's a valid XML: ${error}`
       );
     }
 
-    const versionUpdate = {
-      archive_hash: archiveHash,
-      hash_stable: folderHash,
-      modinfo_url: modInfo?.Mod?.Properties?.URL || null,
-      modinfo_version: modInfo?.Mod?.Properties?.Version || null,
-      modinfo_id: modInfo?.Mod?.['@_id'] || null,
-      affect_saves:
-        modInfo?.Mod?.Properties?.AffectsSavedGames == 1 ||
-        modInfo?.Mod?.Properties?.AffectsSavedGames == null,
-      archive_size: archiveSize,
-      dependencies: getModInfoDependencies(modInfo),
-      skip_install: false,
-      download_error: false,
-      is_processing: false,
-    } as Partial<ModVersionsRecord>;
+    if (modInfos.length === 0) {
+      throw new SkipInstallError(
+        `No valid .modinfo files found in ${version.name}`
+      );
+    }
 
-    // Update PocketBase record
-    await pb.collection('mod_versions').update(version.id, versionUpdate);
+    const [mainModInfo, ...otherModInfos] = modInfos;
+    let mainVersionUpdate: Partial<ModVersionsRecord> | null = null;
+
+    // Now that we have multiple modInfo, we need to parse them all
+    for (const modInfo of modInfos) {
+      const folderHash = await computeFolderHash(path.dirname(modInfo.path));
+
+      const parentVersionId = modInfo === mainModInfo ? undefined : version.id;
+
+      const versionUpdate = {
+        archive_hash: archiveHash,
+        hash_stable: folderHash,
+        modinfo_path: path.relative(extractPath, modInfo.path),
+        modinfo_url: modInfo?.xml?.Mod?.Properties?.URL || null,
+        modinfo_version: modInfo?.xml?.Mod?.Properties?.Version || null,
+        modinfo_id: modInfo?.xml?.Mod?.['@_id'] || null,
+        affect_saves:
+          modInfo?.xml?.Mod?.Properties?.AffectsSavedGames == 1 ||
+          modInfo?.xml?.Mod?.Properties?.AffectsSavedGames == null,
+        archive_size: archiveSize,
+        dependencies: getModInfoDependencies(modInfo?.xml),
+        localized_names: await getModInfoLocalizedNames({
+          modInfoXml: modInfo.xml,
+          modInfoAbsolutePath: modInfo.path,
+        }),
+        skip_install: false,
+        download_error: false,
+        is_processing: false,
+        parent_version_id: parentVersionId,
+      } as Partial<ModVersionsRecord>;
+
+      // Update PocketBase record
+      if (modInfo === mainModInfo) {
+        mainVersionUpdate = versionUpdate;
+        await pb.collection('mod_versions').update(version.id, versionUpdate);
+      } else {
+        await upsertVariantVersion(mod, version, versionUpdate);
+      }
+    }
 
     // Store metadata
     try {
       await upsertVersionMetadata(options, {
         modId: mod.id,
         versionId: version.id,
-        modInfo,
+        modInfo: modInfos[0].xml,
         archivePath,
         filename,
         skipFileUpload: isCached,
@@ -131,9 +159,9 @@ export async function extractAndStoreModVersionMetadata(
       if (process.env.NODE_ENV === 'development') throw error;
     }
 
-    console.log(`Updated PocketBase for: ${version.name}`);
+    console.log(`Updated DB version for: ${version.name}\n`);
     if (!options.forceExtractAndStore) {
-      DiscordLog.onVersionProcessed(mod, { ...version, ...versionUpdate });
+      DiscordLog.onVersionProcessed(mod, { ...version, ...mainVersionUpdate });
     }
   } catch (error) {
     console.error(`Failed to process ${version.name}: ${error}`);
@@ -206,12 +234,11 @@ export async function computeFolderHash(folderPath: string): Promise<string> {
 }
 
 // Utility: Recursively find .modinfo file
-export async function findModInfoFile(
-  directory: string
-): Promise<string | null> {
+export async function findModInfoFiles(directory: string): Promise<string[]> {
   const files = await getFilesRecursively(directory);
   return (
-    files.find((file) => file.endsWith('.modinfo') && !file.startsWith('.')) ||
-    null
+    files.filter(
+      (file) => file.endsWith('.modinfo') && !file.startsWith('.')
+    ) || []
   );
 }

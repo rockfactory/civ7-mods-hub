@@ -13,6 +13,7 @@ export interface ModInfo {
   modinfo_id?: string;
   folder_hash: string;
   folder_name: string;
+  civmods_internal_version_id?: string;
 }
 
 export type ModDependency = {

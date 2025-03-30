@@ -3,11 +3,10 @@ use mods::extract_archive::extract_mod_archive;
 use mods::patch_modinfo::patch_modinfo_xml_command;
 use mods::{
     backup::{backup_mod_to_temp, cleanup_mod_backup, restore_mod_from_temp},
-    extract_archive,
     profiles::{create_empty_profile, delete_profile, list_profiles},
     traversal::scan_civ_mods,
 };
-use std::{fs, path::PathBuf};
+use std::fs;
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
@@ -42,35 +41,46 @@ pub fn run() {
     let time_log_format =
         time::format_description::parse("[year]-[month]-[day] [hour]:[minute]:[second]").unwrap();
 
+    log::info!("[CivMods] Starting Tauri app...");
+    println!("[CivMods] Starting Tauri app...");
+
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            println!("a new app instance was opened with {argv:?} and the deep link event was already triggered");
-            // when defining deep link schemes at runtime, you must also check `argv` here
+            println!("a new app instance was opened with {argv:?}");
             log::info!("argv: {:?}", argv);
 
-          let _ = app.get_webview_window("main")
-                       .expect("no main window")
-                       .set_focus();
+            let _ = app
+                .get_webview_window("main")
+                .expect("no main window")
+                .set_focus();
         }))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(
             tauri_plugin_log::Builder::new()
-            .max_file_size(5_000_000) // 5MB in bytes
-            .clear_targets()
-            .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout))
-            .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir { file_name: Some("CivMods.v2".to_string()) }),)
-            .format(move |out, message, record| {
-                let msg = format!("{}", message);
-                let redacted = redact_path_for_logs(&msg);
-                out.finish(format_args!(
-                  "[{}][{}][{}] {}",
-                  time::OffsetDateTime::now_utc().format(&time_log_format).unwrap(),
-                  record.level(),
-                  record.target(),
-                  redacted
+                .max_file_size(5_000_000) // 5MB in bytes
+                .clear_targets()
+                .target(tauri_plugin_log::Target::new(
+                    tauri_plugin_log::TargetKind::Stdout,
                 ))
-            })
-            .build(),
+                .target(tauri_plugin_log::Target::new(
+                    tauri_plugin_log::TargetKind::LogDir {
+                        file_name: Some("CivMods.v2".to_string()),
+                    },
+                ))
+                .format(move |out, message, record| {
+                    let msg = format!("{}", message);
+                    let redacted = redact_path_for_logs(&msg);
+                    out.finish(format_args!(
+                        "[{}][{}][{}] {}",
+                        time::OffsetDateTime::now_utc()
+                            .format(&time_log_format)
+                            .unwrap(),
+                        record.level(),
+                        record.target(),
+                        redacted
+                    ))
+                })
+                .build(),
         )
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_process::init())
@@ -82,18 +92,23 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|app| { // prefix with _ to avoid unused variable warning in MacOS
+        .setup(|app| {
+            // prefix with _ to avoid unused variable warning in MacOS
             #[cfg(any(windows, target_os = "linux"))]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
                 app.deep_link().register_all()?;
             }
 
+            println!("[CivMods] Tauri app setup complete");
             log::info!("[CivMods] Tauri app setup complete");
-            // We show the main window manually in order to avoid 
-            // flickering due to window_state plugin changing the window 
+            // We show the main window manually in order to avoid
+            // flickering due to window_state plugin changing the window
             // position after it's shown
-            let _ = app.get_webview_window("main").expect("no main  window").show();
+            let _ = app
+                .get_webview_window("main")
+                .expect("no main  window")
+                .show();
 
             // Delete previous logs in app_log_dir CivMods.log if they exist
             let log_dir = app.path().app_log_dir();

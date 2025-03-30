@@ -6,8 +6,14 @@ import { scrapeMods } from '../mods/utils/scrapeMods';
 // https://forums.civfanatics.com/resources/matts-leaders-oliver-cromwell.32128/
 // https://forums.civfanatics.com/resources/addon-leader-model-changer.32124/
 
+// Test for variants:
+// https://forums.civfanatics.com/resources/sibr3s-transparent-appeal.32000/
+
+// Test for loc:
+// https://forums.civfanatics.com/resources/better-pause-menu.31873/
+
 const singleModUrl =
-  'https://forums.civfanatics.com/resources/addon-leader-model-changer.32124/';
+  'https://forums.civfanatics.com/resources/sibr3s-transparent-appeal.32000/';
 
 const forceExtractAndStore = true;
 const maxPages = 1; // 15 full
