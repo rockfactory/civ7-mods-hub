@@ -31,6 +31,7 @@ export async function upsertVariantVersion(
     console.log(` - Updating existing variant version: ${existing.id}`); // prettier-ignore
     await pb.collection('mod_versions').update(existing.id, {
       ...version,
+      name: `${parent.name} (variant)`,
     });
   } else {
     console.log(` - Creating new variant version`); // prettier-ignore
@@ -41,7 +42,7 @@ export async function upsertVariantVersion(
       cf_id: parent.cf_id,
       download_url: parent.download_url,
       released: parent.released,
-      name: `${parent.name} (${version.modinfo_id})`,
+      name: `${parent.name} (variant)`,
       is_processing: false,
       // We set the is_variant flag to true for variant versions
       is_variant: true,
