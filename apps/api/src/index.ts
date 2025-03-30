@@ -187,6 +187,13 @@ app.get('/profile', async (req, res) => {
     sort: 'name',
   });
 
+  // Sort mods case-insensitively
+  mods.sort((a, b) => {
+    return a.name.localeCompare(b.name.toLowerCase(), 'en-US', {
+      sensitivity: 'base',
+    });
+  });
+
   res.render('profile', {
     title: 'Profile',
     mods,
