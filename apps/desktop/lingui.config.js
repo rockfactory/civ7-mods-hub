@@ -2,18 +2,8 @@ import { defineConfig } from '@lingui/cli';
 import { formatter } from '@lingui/format-json';
 
 export default defineConfig({
-  sourceLocale: 'en_US',
-  locales: [
-    'it_IT',
-    'en_US',
-    'fr_FR',
-    'de_DE',
-    'es_ES',
-    'zh_CN',
-    'ko_KR',
-    'pt_PT',
-    'ja_JP',
-  ],
+  sourceLocale: 'en',
+  locales: ['it', 'en', 'fr', 'de', 'es', 'zh', 'ko', 'pt', ,],
   format: formatter({ style: 'lingui' }),
   catalogs: [
     {
