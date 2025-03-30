@@ -19,6 +19,7 @@ import { ARCHIVE_DIR, EXTRACTED_DIR } from './fs/extractionDirs';
 import { downloadVersionFile } from './download/downloadVersionFile';
 import { getModInfoDependencies } from './modinfo/getModInfoDependencies';
 import { upsertVariantVersion } from './db/versionRepo';
+import { getModInfoLocalizedNames } from './modinfo/getModInfoLocalizedNames';
 
 export async function extractAndStoreModVersionMetadata(
   options: ScrapeModsOptions,
@@ -124,6 +125,10 @@ export async function extractAndStoreModVersionMetadata(
           modInfo?.xml?.Mod?.Properties?.AffectsSavedGames == null,
         archive_size: archiveSize,
         dependencies: getModInfoDependencies(modInfo?.xml),
+        localized_names: await getModInfoLocalizedNames({
+          modInfoXml: modInfo.xml,
+          modInfoAbsolutePath: modInfo.path,
+        }),
         skip_install: false,
         download_error: false,
         is_processing: false,

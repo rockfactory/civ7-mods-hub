@@ -9,8 +9,11 @@ import { scrapeMods } from '../mods/utils/scrapeMods';
 // Test for variants:
 // https://forums.civfanatics.com/resources/sibr3s-transparent-appeal.32000/
 
+// Test for loc:
+// https://forums.civfanatics.com/resources/better-pause-menu.31873/
+
 const singleModUrl =
-  'https://forums.civfanatics.com/resources/sibr3s-transparent-appeal.32000/';
+  'https://forums.civfanatics.com/resources/better-pause-menu.31873/';
 
 const forceExtractAndStore = true;
 const maxPages = 1; // 15 full
@@ -21,7 +24,7 @@ const onlyListData = false;
 scrapeMods({
   firstPage: 1,
   maxPages,
-  // singleModUrl,
+  singleModUrl,
   forceExtractAndStore,
   stopAfterLastModVersion,
   onlyListData,
