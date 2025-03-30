@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { lingui } from '@lingui/vite-plugin';
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -11,6 +12,7 @@ export default defineConfig(async () => ({
         plugins: ['@lingui/babel-plugin-lingui-macro'],
       },
     }),
+    lingui(),
   ],
   envDir: '../..',
 
