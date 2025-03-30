@@ -1,6 +1,6 @@
 {
   "fA1n+Y": {
-    "translation": "",
+    "translation": "Affect Saves",
     "message": "Affect Saves",
     "placeholders": {},
     "comments": [],
@@ -12,7 +12,7 @@
     ]
   },
   "XtQhy9": {
-    "translation": "",
+    "translation": "Available Mods",
     "message": "Available Mods",
     "placeholders": {},
     "comments": [],
@@ -24,7 +24,7 @@
     ]
   },
   "CXYKSr": {
-    "translation": "",
+    "translation": "Filter by category.",
     "message": "Filter by category.",
     "context": "placeholder",
     "placeholders": {},
@@ -37,7 +37,7 @@
     ]
   },
   "LdFl4m": {
-    "translation": "",
+    "translation": "Filter by state.",
     "message": "Filter by state.",
     "context": "placeholder",
     "placeholders": {},
@@ -50,7 +50,7 @@
     ]
   },
   "hrt+fa": {
-    "translation": "",
+    "translation": "Filter Mods",
     "message": "Filter Mods",
     "context": "Filtering section title",
     "placeholders": {},
@@ -63,7 +63,7 @@
     ]
   },
   "LP1Gbh": {
-    "translation": "",
+    "translation": "Installed Mods",
     "message": "Installed Mods",
     "placeholders": {},
     "comments": [],
@@ -75,7 +75,7 @@
     ]
   },
   "dTa89z": {
-    "translation": "",
+    "translation": "Local Only",
     "message": "Local Only",
     "placeholders": {},
     "comments": [],
@@ -87,7 +87,7 @@
     ]
   },
   "G2fuEb": {
-    "translation": "",
+    "translation": "Locked",
     "message": "Locked",
     "placeholders": {},
     "comments": [],
@@ -99,7 +99,7 @@
     ]
   },
   "PhDR5X": {
-    "translation": "",
+    "translation": "Needs Update",
     "message": "Needs Update",
     "placeholders": {},
     "comments": [],
@@ -111,7 +111,7 @@
     ]
   },
   "r5/6ox": {
-    "translation": "",
+    "translation": "Not Affect Saves",
     "message": "Not Affect Saves",
     "placeholders": {},
     "comments": [],
@@ -123,7 +123,7 @@
     ]
   },
   "zfVUpC": {
-    "translation": "",
+    "translation": "Not Installed",
     "message": "Not Installed",
     "placeholders": {},
     "comments": [],
@@ -135,7 +135,7 @@
     ]
   },
   "VjRc6E": {
-    "translation": "",
+    "translation": "Refresh installed mods list and check for updates",
     "message": "Refresh installed mods list and check for updates",
     "placeholders": {},
     "comments": [],
@@ -147,7 +147,7 @@
     ]
   },
   "J5Nvbx": {
-    "translation": "",
+    "translation": "Reset Filters",
     "message": "Reset Filters",
     "context": "Button text to reset filter",
     "placeholders": {},
@@ -160,7 +160,7 @@
     ]
   },
   "S3bzU/": {
-    "translation": "",
+    "translation": "Search name, author...",
     "message": "Search name, author...",
     "context": "placeholder",
     "placeholders": {},
