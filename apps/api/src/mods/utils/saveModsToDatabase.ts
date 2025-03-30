@@ -90,10 +90,13 @@ export async function saveModToDatabase(
     let version = await pb
       .collection('mod_versions')
       .getList(1, 1, {
-        filter: pb.filter('mod_id = {:mod_id} && cf_id = {:cf_id}', {
-          mod_id: mod.id,
-          cf_id: versionCfId,
-        }),
+        filter: pb.filter(
+          'mod_id = {:mod_id} && cf_id = {:cf_id} && version_parent_id = null',
+          {
+            mod_id: mod.id,
+            cf_id: versionCfId,
+          }
+        ),
       })
       .then((versions) =>
         versions.items.length > 0 ? versions.items[0] : null

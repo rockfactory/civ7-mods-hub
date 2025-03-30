@@ -128,7 +128,7 @@ async function downloadCachedVersion(
     .collection('mod_versions_metadata')
     .getList(1, 1, {
       filter: pb.filter('version_id = {:version_id}', {
-        version_id: version.id,
+        version_id: version.version_parent_id ?? version.id,
       }),
     })
     .then((res) => res.items?.[0]);
@@ -257,6 +257,8 @@ async function runLowLevelInstallMod(
       archivePath: tempArchivePath,
       extractPath,
       properties: {
+        target_modinfo_id: version.modinfo_id,
+        target_modinfo_path: version.modinfo_path,
         mod_url: mod.fetched!.url,
         mod_version: version.name,
         mod_category: cleanCategoryName(mod.fetched!.category),
@@ -289,7 +291,11 @@ export async function uninstallMod(modInfo: ModInfo) {
 
   const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
   if (lockedModIds.has(modInfo.modinfo_id ?? '')) {
-    console.warn('Skipping locked mod:', modInfo.mod_name, modInfo.modinfo_id);
+    console.warn(
+      'Skipping locked mod:',
+      modInfo.folder_name,
+      modInfo.modinfo_id
+    );
     return;
   }
 

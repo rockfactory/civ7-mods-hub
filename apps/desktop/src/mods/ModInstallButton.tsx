@@ -11,7 +11,7 @@ import {
 
 export interface IModInstallButtonProps {
   mod: ModData;
-  version: ModVersionsRecord | undefined;
+  version: ModVersionsRecord | undefined | null;
   onInstall: (version: ModVersionsRecord) => void;
 }
 

@@ -28,7 +28,12 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
     return null;
   }
 
-  const modVersions = mod.fetched.expand?.mod_versions_via_mod_id;
+  const modVersions = mod.fetched.expand?.mod_versions_via_mod_id?.filter(
+    (version) => !version.is_variant
+  );
+  const modVariants = mod.fetched.expand?.mod_versions_via_mod_id?.filter(
+    (version) => version.is_variant
+  );
 
   return (
     <Box mt="sm" pos="relative">
@@ -44,31 +49,60 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
         </Table.Thead>
         <Table.Tbody>
           {modVersions?.map((version) => (
-            <Table.Tr key={version.id}>
-              <Table.Td>{version.name}</Table.Td>
-              <Table.Td>
-                {DateFormatter.format(new Date(version.released || ''))}
-              </Table.Td>
-              <Table.Td>
-                {version.archive_size
-                  ? humanizeSize(version.archive_size)
-                  : 'N/A'}
-              </Table.Td>
-              <Table.Td align="right">
-                {isSameVersion(version, mod.local) ? (
-                  <ActionIcon color="green">
-                    <IconCircleCheckFilled size={16} />
-                  </ActionIcon>
-                ) : (
-                  <ActionIcon
-                    color={mod.isUnknown ? 'grape' : 'blue'}
-                    onClick={() => props.onInstall(version)}
-                  >
-                    <IconDownload size={16} />
-                  </ActionIcon>
-                )}
-              </Table.Td>
-            </Table.Tr>
+            <>
+              <Table.Tr key={version.id}>
+                <Table.Td>{version.name}</Table.Td>
+                <Table.Td>
+                  {DateFormatter.format(new Date(version.released || ''))}
+                </Table.Td>
+                <Table.Td>
+                  {version.archive_size
+                    ? humanizeSize(version.archive_size)
+                    : 'N/A'}
+                </Table.Td>
+                <Table.Td align="right">
+                  {isSameVersion(version, mod.local) ? (
+                    <ActionIcon color="green">
+                      <IconCircleCheckFilled size={16} />
+                    </ActionIcon>
+                  ) : (
+                    <ActionIcon
+                      color={mod.isUnknown ? 'grape' : 'blue'}
+                      onClick={() => props.onInstall(version)}
+                    >
+                      <IconDownload size={16} />
+                    </ActionIcon>
+                  )}
+                </Table.Td>
+              </Table.Tr>
+              {modVariants
+                ?.filter((variant) => variant.version_parent_id === version.id)
+                .map((variant) => (
+                  <Table.Tr key={variant.id} bg={'dark.8'}>
+                    <Table.Td pl={40}>
+                      <Text size="sm" c="dimmed">
+                        Variant: {variant.name}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td></Table.Td>
+                    <Table.Td></Table.Td>
+                    <Table.Td align="right">
+                      {isSameVersion(variant, mod.local) ? (
+                        <ActionIcon color="green">
+                          <IconCircleCheckFilled size={16} />
+                        </ActionIcon>
+                      ) : (
+                        <ActionIcon
+                          color={mod.isUnknown ? 'grape' : 'blue'}
+                          onClick={() => props.onInstall(variant)}
+                        >
+                          <IconDownload size={16} />
+                        </ActionIcon>
+                      )}
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+            </>
           ))}
         </Table.Tbody>
       </Table>

@@ -2,7 +2,7 @@ use flate2::read::GzDecoder;
 use sevenz_rust::decompress_file;
 use std::fs::{self, File};
 use std::io::{self, BufReader};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use unrar::Archive;
 use zip::ZipArchive;
 
@@ -15,7 +15,7 @@ pub async fn extract_mod_archive(
     extract_path: &str,
     properties: CivModsProperties,
 ) -> Result<(), String> {
-    let info = extract_archive(&archive_path, &extract_path)
+    let info = extract_archive(&archive_path, &extract_path, &properties)
         .map_err(|e| format!("Failed to extract archive: {}", e))?;
 
     if let Err(e) = patch_modinfo_xml(info.modinfo_path.clone(), properties) {
@@ -110,7 +110,11 @@ pub struct ExtractArchiveInfo {
 }
 
 /// Extracts any archive format based on file extension
-pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<ExtractArchiveInfo, String> {
+pub fn extract_archive(
+    archive_path: &str,
+    extract_to: &str,
+    properties: &CivModsProperties,
+) -> Result<ExtractArchiveInfo, String> {
     let ext = Path::new(archive_path)
         .extension()
         .and_then(|ext| ext.to_str())
@@ -133,7 +137,13 @@ pub fn extract_archive(archive_path: &str, extract_to: &str) -> Result<ExtractAr
         return Err(format!("Failed to extract archive: {}", e));
     }
 
-    let (modinfo_path, _) = find_modinfo_file(Path::new(&temp_target));
+    let mut modinfo_search_dir = PathBuf::from(&temp_target);
+    if let Some(target_modinfo_path) = &properties.target_modinfo_path {
+        log::info!("Appending variant modinfo path: {}", target_modinfo_path);
+        modinfo_search_dir = modinfo_search_dir.join(target_modinfo_path);
+    }
+
+    let (modinfo_path, _) = find_modinfo_file(modinfo_search_dir.as_path());
     let modinfo_dir = Path::new(modinfo_path.as_deref().unwrap())
         .parent()
         .ok_or("Modinfo file not found")?;

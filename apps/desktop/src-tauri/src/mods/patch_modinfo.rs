@@ -12,6 +12,8 @@ use tauri::AppHandle;
 
 #[derive(Debug, Deserialize)]
 pub struct CivModsProperties {
+    pub target_modinfo_id: Option<String>,
+    pub target_modinfo_path: Option<String>,
     pub mod_url: String,
     pub mod_version: Option<String>,
     pub mod_category: Option<String>,
@@ -198,6 +200,8 @@ mod tests {
         patch_modinfo_xml(
             &modinfo_path,
             CivModsProperties {
+                target_modinfo_id: None,
+                target_modinfo_path: None,
                 mod_url: "https://test.com".to_string(),
                 mod_version: Some("1.0".to_string()),
                 mod_category: Some("Test".to_string()),

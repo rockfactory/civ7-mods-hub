@@ -89,7 +89,7 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type ModVersionsRecord<Tdependencies = unknown> = {
+export type ModVersionsRecord<Tdependencies = unknown, Tlocalized_names = unknown> = {
 	affect_saves?: boolean
 	archive_hash?: string
 	archive_size?: number
@@ -102,8 +102,11 @@ export type ModVersionsRecord<Tdependencies = unknown> = {
 	id: string
 	is_external_download?: boolean
 	is_processing?: boolean
+	is_variant?: boolean
+	localized_names?: null | Tlocalized_names
 	mod_id: RecordIdString
 	modinfo_id?: string
+	modinfo_path?: string
 	modinfo_url?: string
 	modinfo_version?: string
 	name?: string
@@ -111,6 +114,7 @@ export type ModVersionsRecord<Tdependencies = unknown> = {
 	released?: IsoDateString
 	skip_install?: boolean
 	updated?: IsoDateString
+	version_parent_id?: RecordIdString
 }
 
 export type ModVersionsMetadataRecord<Tcontent = unknown> = {
@@ -170,7 +174,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type ModVersionsResponse<Tdependencies = unknown, Texpand = unknown> = Required<ModVersionsRecord<Tdependencies>> & BaseSystemFields<Texpand>
+export type ModVersionsResponse<Tdependencies = unknown, Tlocalized_names = unknown, Texpand = unknown> = Required<ModVersionsRecord<Tdependencies, Tlocalized_names>> & BaseSystemFields<Texpand>
 export type ModVersionsMetadataResponse<Tcontent = unknown, Texpand = unknown> = Required<ModVersionsMetadataRecord<Tcontent>> & BaseSystemFields<Texpand>
 export type ModsResponse<Texpand = unknown> = Required<ModsRecord> & BaseSystemFields<Texpand>
 export type ScheduledTasksResponse<Toptions = unknown, Texpand = unknown> = Required<ScheduledTasksRecord<Toptions>> & BaseSystemFields<Texpand>
