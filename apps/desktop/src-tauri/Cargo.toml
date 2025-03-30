@@ -23,11 +23,11 @@ tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-fs = "2"
-dirs = "5.0"
+dirs = "6.0"
 zip = "2"
 sevenz-rust = "0.6.1"
 unrar = "0.5.8"
-tokio = { version = "1", features = ["full"] }               # Required for async handling
+tokio = { version = "1", features = ["sync", "macros"] }               # Required for async handling
 tauri-plugin-http = "=2.4.0"
 sha2 = "0.10"
 walkdir = "2"
