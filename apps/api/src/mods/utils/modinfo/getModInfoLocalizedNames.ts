@@ -28,7 +28,7 @@ export async function getModInfoLocalizedNames(
   );
 
   if (Object.keys(localizedNames).length === 0) {
-    localizedNames['en_US'] = {
+    localizedNames['en_us'] = {
       name,
       description,
     };
@@ -44,7 +44,7 @@ async function getLocalizedTexts(input: ModInfoLocalizedNamesInput) {
     .map((file) => {
       if (typeof file === 'string') return { file, locale: undefined };
       if (typeof file === 'object') {
-        return { file: file['#text'], locale: file['@_locale'] };
+        return { file: file['#text'], locale: file['@_locale']?.toLowerCase() };
       }
       return null;
     })
@@ -75,11 +75,7 @@ async function getLocalizedTexts(input: ModInfoLocalizedNamesInput) {
       const parsedContent = xmlParser.parse(fileContent);
       const isEnglishText = parsedContent?.Database?.EnglishText != null;
 
-      console.log(
-        `Parsed localized text file: ${filePath}`,
-        parsedContent,
-        isEnglishText
-      );
+      console.log(`Parsed localized text file: ${filePath}`, isEnglishText);
       const rows = parseXmlArray(
         parsedContent?.Database?.LocalizedText?.Row ??
           parsedContent?.Database?.EnglishText?.Row
@@ -88,12 +84,17 @@ async function getLocalizedTexts(input: ModInfoLocalizedNamesInput) {
       for (const row of rows) {
         if (!row?.['@_Tag']) {
           console.warn(
-            `Missing @Tag in localized text row: ${JSON.stringify(row)}`
+            ` Missing @Tag in localized text row: ${JSON.stringify(row)}`
           );
           continue;
         }
 
-        const rowLocale = row?.['@_Locale'] || file.locale || 'en_US';
+        const rowLocale = (
+          row?.['@_Language'] ||
+          file.locale ||
+          'en_US'
+        ).toLowerCase();
+
         if (!localizedTexts[rowLocale]) {
           localizedTexts[rowLocale] = {};
         }

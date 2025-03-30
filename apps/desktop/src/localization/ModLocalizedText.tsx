@@ -28,6 +28,7 @@ export function getLocalizedName(
     Record<string, string>
   >;
   const text =
-    localizedText?.[locale]?.[type] ?? localizedText?.['en_US']?.[type];
+    localizedText?.[locale.toLocaleLowerCase()]?.[type] ??
+    localizedText?.['en_us']?.[type];
   return text;
 }
