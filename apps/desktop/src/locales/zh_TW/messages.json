@@ -1,0 +1,175 @@
+{
+  "fA1n+Y": {
+    "translation": "Affect Saves",
+    "message": "Affect Saves",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        324
+      ]
+    ]
+  },
+  "XtQhy9": {
+    "translation": "Available Mods",
+    "message": "Available Mods",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        253
+      ]
+    ]
+  },
+  "CXYKSr": {
+    "translation": "Filter by category.",
+    "message": "Filter by category.",
+    "context": "placeholder",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        299
+      ]
+    ]
+  },
+  "LdFl4m": {
+    "translation": "Filter by state.",
+    "message": "Filter by state.",
+    "context": "placeholder",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        312
+      ]
+    ]
+  },
+  "hrt+fa": {
+    "translation": "Filter Mods",
+    "message": "Filter Mods",
+    "context": "Filtering section title",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        270
+      ]
+    ]
+  },
+  "LP1Gbh": {
+    "translation": "Installed Mods",
+    "message": "Installed Mods",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        249
+      ]
+    ]
+  },
+  "dTa89z": {
+    "translation": "Local Only",
+    "message": "Local Only",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        323
+      ]
+    ]
+  },
+  "G2fuEb": {
+    "translation": "Locked",
+    "message": "Locked",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        321
+      ]
+    ]
+  },
+  "PhDR5X": {
+    "translation": "Needs Update",
+    "message": "Needs Update",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        320
+      ]
+    ]
+  },
+  "r5/6ox": {
+    "translation": "Not Affect Saves",
+    "message": "Not Affect Saves",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        325
+      ]
+    ]
+  },
+  "zfVUpC": {
+    "translation": "Not Installed",
+    "message": "Not Installed",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        322
+      ]
+    ]
+  },
+  "VjRc6E": {
+    "translation": "Refresh installed mods list and check for updates",
+    "message": "Refresh installed mods list and check for updates",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        221
+      ]
+    ]
+  },
+  "J5Nvbx": {
+    "translation": "Reset Filters",
+    "message": "Reset Filters",
+    "context": "Button text to reset filter",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        334
+      ]
+    ]
+  },
+  "S3bzU/": {
+    "translation": "Search name, author...",
+    "message": "Search name, author...",
+    "context": "placeholder",
+    "placeholders": {},
+    "comments": [],
+    "origin": [
+      [
+        "src/home/Home.tsx",
+        275
+      ]
+    ]
+  }
+}
