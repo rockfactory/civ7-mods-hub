@@ -6,7 +6,6 @@ import { ModProfile } from '../profiles/ModProfile';
 import { omit } from 'es-toolkit';
 
 const persistStore = new LazyStore('civStorage.json', { autoSave: true });
-console.log();
 appDataDir().then((dir) => {
   console.log(`App Data Dir: `, dir);
 });
