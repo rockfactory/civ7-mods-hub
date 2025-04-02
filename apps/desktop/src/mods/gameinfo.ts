@@ -1,4 +1,4 @@
-export var LatestGameUpdate = await getLatestGameUpdate()
+export const LatestGameUpdate = await getLatestGameUpdate()
 
 async function getLatestGameUpdate() {
   const appId = "1295660"
