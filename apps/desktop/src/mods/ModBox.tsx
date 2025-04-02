@@ -51,6 +51,8 @@ import {
   IconTransitionBottom,
   IconTrash,
   IconUser,
+  IconCalendarWeek,
+  IconCheckbox,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { modals } from '@mantine/modals';
@@ -72,6 +74,8 @@ import {
   getNotInstalledDependsOn,
 } from './dependencies/getInstalledDependsOn';
 import { ModUnsatisfiedDependenciesRow } from './components/ModUnsatisfiedDependenciesRow';
+import { LatestGameUpdate } from './gameinfo';
+
 
 export interface IModBoxProps {
   mod: ModData;
@@ -137,6 +141,19 @@ export function ModBox(props: IModBoxProps) {
       onConfirm: () => handleBaseInstall(),
     });
   };
+
+  const updated = (updated: string) => {
+    var diff = (new Date().valueOf() - new Date(updated).valueOf()) / (1000 * 3600 * 24)
+    return diff < 1 ? "today" : Math.ceil(diff / (1000 * 3600 * 24)) + " days ago"
+  }
+
+  const isUpdatedSinceGameUpdate = (updated: string) => {
+    console.log("updated", new Date(updated).valueOf(), "LatestGameUpdate", LatestGameUpdate)
+    if(new Date(updated).valueOf() > LatestGameUpdate) {
+      return true;
+      }
+    return false;
+  }
 
   const handleUninstall = async () => {
     if (isLocked) return;
@@ -306,6 +323,22 @@ export function ModBox(props: IModBoxProps) {
                     {mod.fetched?.rating && (
                       <Text c="dimmed" className={styles.textStatic}>
                         <IconStar size={12} /> {mod.fetched.rating}
+                      </Text>
+                    )}
+                  </Group>
+                </Group>
+                <Group gap={2} justify="space-between" w={'100%'}>
+                <Group gap={2} align="flex-start" mr="md">
+                  {mod.fetched?.updated && (
+                      <Text c="dimmed" className={styles.textStatic}>
+                        <IconCalendarWeek size={12} /> Last updated {updated(mod.fetched.updated.valueOf())}
+                      </Text>
+                    )}
+                </Group>
+                <Group gap={2} align="flex-start" mr="md">
+                 {mod.fetched?.updated && isUpdatedSinceGameUpdate(mod.fetched.updated) && (
+                      <Text c="dimmed" className={styles.textStatic}>
+                        <IconCheckbox size={12} /> Updated since latest patch
                       </Text>
                     )}
                   </Group>
