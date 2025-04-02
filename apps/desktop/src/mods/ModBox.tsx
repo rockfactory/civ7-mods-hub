@@ -148,7 +148,6 @@ export function ModBox(props: IModBoxProps) {
   }
 
   const isUpdatedSinceGameUpdate = (updated: string) => {
-    console.log("updated", new Date(updated).valueOf(), "LatestGameUpdate", LatestGameUpdate)
     if(new Date(updated).valueOf() > LatestGameUpdate) {
       return true;
       }
