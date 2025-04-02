@@ -141,8 +141,6 @@ export function ModBox(props: IModBoxProps) {
       onConfirm: () => handleBaseInstall(),
     });
   };
-  1743343076.428
-  1743106113
 
   const updated = (updated: string) => {
     var diff = (new Date().valueOf() - new Date(updated).valueOf()) / (1000 * 3600 * 24)
