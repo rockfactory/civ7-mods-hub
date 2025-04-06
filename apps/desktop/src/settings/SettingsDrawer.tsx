@@ -29,6 +29,7 @@ import { getVersion } from '@tauri-apps/api/app';
 import styles from './SettingsDrawer.module.css';
 import { checkForAppUpdates } from './autoUpdater';
 import { invoke } from '@tauri-apps/api/core';
+import { LocaleSwitcher } from './locale/LocalSwitcher';
 
 export interface ISettingsDrawerProps {}
 
@@ -132,7 +133,9 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
           App Settings
         </Title>
         <Space h="md" />
+        <LocaleSwitcher />
         <Button
+          mt="xs"
           onClick={() => {
             checkForAppUpdates(true).catch((err) => {
               console.error('[autoUpdater] Failed to check for updates:', err);

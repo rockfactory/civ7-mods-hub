@@ -23,17 +23,11 @@ import { notifications } from '@mantine/notifications';
 import { DuplicateProfileModal } from './DuplicateProfileModal';
 import { ModProfile } from './ModProfile';
 import {
-  IconAlertCircle,
   IconCards,
-  IconCheck,
   IconCircleCheckFilled,
-  IconCopy,
   IconCopyPlus,
-  IconDots,
   IconExternalLink,
   IconPencil,
-  IconPlayCard,
-  IconPlayerPlayFilled,
   IconShare,
   IconTableImport,
 } from '@tabler/icons-react';

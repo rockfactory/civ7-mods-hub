@@ -55,20 +55,22 @@ const theme = createTheme({
 
 function App() {
   const isHydrated = useAppStore((state) => state.hydrated);
+  const locale = useAppStore((state) => state.locale);
   const [isLoadingLocale, setIsLoadingLocale] = useState(true);
 
   useEffect(() => {
     const browserLocale = navigator.language.split('-')[0];
-    console.log('Browser locale:', browserLocale);
+    const activeLocale = locale || browserLocale;
+    console.log('Browser locale:', browserLocale, 'Active locale:', activeLocale); // prettier-ignore
 
-    dynamicActivate(browserLocale)
+    dynamicActivate(activeLocale)
       .catch((error) => {
-        console.error('Failed to load locale:', error);
+        console.error('Failed to load locale, switching to fallback', activeLocale, error); // prettier-ignore
       })
       .finally(() => {
         setIsLoadingLocale(false);
       });
-  }, []);
+  }, [locale]);
 
   const isLoading = !isHydrated || isLoadingLocale;
 

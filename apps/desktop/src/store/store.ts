@@ -31,6 +31,8 @@ export type AppState = {
   setModFolder: (folder: string) => void;
   hydrated: boolean;
   setHydrated: (hydrated: boolean) => void;
+  locale: string | null;
+  setLocale: (locale: string | null) => void;
 
   /**
    * Array of mod IDs (modinfo_id) that are locked and cannot be uninstalled / updated.
@@ -56,7 +58,13 @@ export const useAppStore = create<AppState>()(
       setModFolder: (folder: string) => set({ modFolder: folder }),
       hydrated: false,
       setHydrated: (hydrated: boolean) => set({ hydrated }),
+      locale: null,
+      setLocale: (locale: string | null) => set({ locale }),
 
+      /**
+       * Locked mods are mods that are not allowed to be uninstalled or updated,
+       * nor moved when switching profiles.
+       */
       lockedModIds: [],
       setModLock: (id: string, active: boolean = true) => {
         const lockedModIds = get().lockedModIds ?? [];
@@ -72,6 +80,10 @@ export const useAppStore = create<AppState>()(
         console.log('[store.setModLock] Locked mods:', get().lockedModIds);
       },
 
+      /**
+       * Profiles here are stored to keep track of the current profile and the list of profiles.
+       * Actual profile data is stored in the profiles folder.
+       */
       profiles: [],
       setProfiles: (profiles: ModProfile[]) => set({ profiles }),
       setCurrentProfile: (profile: string) => {
