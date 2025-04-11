@@ -1,5 +1,9 @@
+use quick_xml::de::Text;
+use quick_xml::escape;
+use quick_xml::events::BytesText;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use std::borrow::Cow;
 use std::fs::{self, File};
 use std::io::{BufReader, Read, Write};
 use std::path::Path;
@@ -78,6 +82,7 @@ fn compute_folder_hash(directory: &Path) -> Result<String, String> {
     }
 
     let hash_result = hasher.finalize();
+    log::debug!("Hash result for {}: {:x}", directory.display(), hash_result);
     Ok(format!("{:x}", hash_result))
 }
 
@@ -95,8 +100,15 @@ fn extract_mod_xml(modinfo_path: &str) -> Option<ModXml> {
     let mut buffer = vec![];
     sanitize_xml(File::open(modinfo_path).ok()?, &mut buffer).ok()?;
     let sanitized = String::from_utf8_lossy(&buffer).to_string();
-    let mod_xml: ModXml = quick_xml::de::from_str(&sanitized).ok()?;
-    Some(mod_xml)
+
+    let mod_xml: Result<ModXml, _> = quick_xml::de::from_str(&sanitized);
+    match mod_xml {
+        Ok(xml) => Some(xml),
+        Err(err) => {
+            log::error!("Failed to parse modinfo XML: {err}");
+            None
+        }
+    }
 }
 
 fn sanitize_xml(reader: impl Read, writer: impl Write) -> quick_xml::Result<()> {
@@ -113,6 +125,17 @@ fn sanitize_xml(reader: impl Read, writer: impl Write) -> quick_xml::Result<()> 
     loop {
         let event = match reader.read_event_into(&mut buffer) {
             Ok(Event::Eof) => return Ok(()),
+            Ok(Event::Text(text)) => {
+                // If we fail to unescape, it means it's not a valid XML text node
+                // and we should escape it instead.
+                let unescaped = text.unescape().unwrap_or_else(|_| {
+                    Cow::Owned(String::from_utf8_lossy(&text.into_inner()).to_string())
+                });
+
+                let escaped = escape::escape(unescaped);
+                let bytes_text = BytesText::from_escaped(escaped.into_owned());
+                Event::Text(bytes_text)
+            }
             Ok(event) => event,
             Err(Error::IllFormed(IllFormedError::MismatchedEndTag { expected, found })) => {
                 log::warn!("Mismatched end tag: expected: {expected:?}, found: {found:?}");
@@ -268,5 +291,19 @@ mod tests {
 
         let mod_xml: ModXml = quick_xml::de::from_str(&sanitized).unwrap();
         assert_eq!(mod_xml.id, Some("a_mod".to_string()));
+    }
+
+    #[test]
+    fn test_parse_ampersand_in_text() {
+        let xml =
+            r#"<Mod id="a_mod"><Properties><Name>Mod by me & friends</Name></Properties></Mod>"#;
+        let mut buffer = vec![];
+        sanitize_xml(xml.as_bytes(), &mut buffer).unwrap();
+        let sanitized = String::from_utf8_lossy(&buffer).to_string();
+
+        assert_eq!(
+            sanitized,
+            r#"<Mod id="a_mod"><Properties><Name>Mod by me &amp; friends</Name></Properties></Mod>"#,
+        );
     }
 }
