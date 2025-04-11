@@ -113,17 +113,21 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
           batch: 500,
         });
 
-        const data = records.map((record) => {
-          return {
-            ...record,
-            expand: {
-              ...record.expand,
-              mod_versions_via_mod_id: sortVersionsByDate(
-                record.expand?.mod_versions_via_mod_id ?? []
-              ),
-            },
-          };
-        });
+        const data = records
+          // We don't want mods without versions since we can't install them anyway;
+          // Plus they break the `[0]` check as latest version check
+          .filter((r) => r.expand?.mod_versions_via_mod_id?.length)
+          .map((record) => {
+            return {
+              ...record,
+              expand: {
+                ...record.expand,
+                mod_versions_via_mod_id: sortVersionsByDate(
+                  record.expand?.mod_versions_via_mod_id ?? []
+                ),
+              },
+            };
+          });
 
         console.log('Mods data:', data.length);
         setFetchedMods(data ?? []);
