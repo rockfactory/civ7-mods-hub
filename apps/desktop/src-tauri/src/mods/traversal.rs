@@ -129,6 +129,7 @@ fn sanitize_xml(reader: impl Read, writer: impl Write) -> quick_xml::Result<()> 
                 // If we fail to unescape, it means it's not a valid XML text node
                 // and we should escape it instead.
                 let unescaped = text.unescape().unwrap_or_else(|_| {
+                    log::warn!("Illegal XML text node, escaping instead: {:?}", text);
                     Cow::Owned(String::from_utf8_lossy(&text.into_inner()).to_string())
                 });
 
