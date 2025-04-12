@@ -46,6 +46,7 @@ import ThrottledLoader from './ThrottledLoader';
 import { isSameVersion } from '../mods/isSameVersion';
 import { useAppStore } from '../store/store';
 import { useCheckForGlobalUpdates } from '../settings/autoUpdater';
+import { ExecutableButton } from '../executable/ExecutableButton';
 
 export default function ModsListPage() {
   const {
@@ -343,6 +344,7 @@ export default function ModsListPage() {
         </AppShell.Section>
         <AppShell.Section>
           <Stack mb="md">
+            <ExecutableButton />
             {availableUpdates.length > 0 ? (
               <Tooltip
                 color="dark.8"

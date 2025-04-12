@@ -46,8 +46,14 @@ tauri-plugin-process = "2"
 diffy = "0.4.2"
 tempfile = "3"
 time = { version = "0.3", features = ["formatting"] }
+sysinfo = "0.34.2"
+open = "5"
+winreg = { version = "0.55.0", optional = true }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 tauri-plugin-updater = "2"
 tauri-plugin-window-state = "2"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55.0"

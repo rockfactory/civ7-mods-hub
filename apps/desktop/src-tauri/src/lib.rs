@@ -10,6 +10,7 @@ use std::fs;
 use tauri::Manager;
 use tauri_plugin_fs::FsExt; // Important: new way to access fs plugin
 
+mod executable;
 mod logger;
 mod mods;
 use crate::mods::get_civ_mods_folder;
@@ -140,7 +141,11 @@ pub fn run() {
             // Backups
             backup_mod_to_temp,
             restore_mod_from_temp,
-            cleanup_mod_backup
+            cleanup_mod_backup,
+            // Game Executable
+            executable::installation::find_civ7_installation,
+            executable::launcher::launch_civ7,
+            executable::launcher::is_civ7_running,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
