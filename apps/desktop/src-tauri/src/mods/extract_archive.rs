@@ -6,8 +6,9 @@ use std::path::{Path, PathBuf};
 use unrar::Archive;
 use zip::ZipArchive;
 
+use crate::mods::traversal::find_all_modinfo_files;
+
 use super::patch_modinfo::{patch_modinfo_xml, CivModsProperties};
-use super::traversal::find_modinfo_file;
 
 #[tauri::command]
 pub async fn extract_mod_archive(
@@ -15,11 +16,13 @@ pub async fn extract_mod_archive(
     extract_path: &str,
     properties: CivModsProperties,
 ) -> Result<(), String> {
-    let info = extract_archive(&archive_path, &extract_path, &properties)
+    let info = extract_archive(archive_path, extract_path, &properties)
         .map_err(|e| format!("Failed to extract archive: {}", e))?;
 
-    if let Err(e) = patch_modinfo_xml(info.modinfo_path.clone(), properties) {
-        log::error!("Failed to patch modinfo '{}': {}", info.modinfo_path, e);
+    for modinfo_path in info.modinfo_paths {
+        if let Err(e) = patch_modinfo_xml(modinfo_path.clone(), properties.clone()) {
+            log::error!("Failed to patch modinfo '{}': {}", modinfo_path, e);
+        }
     }
 
     Ok(())
@@ -105,8 +108,7 @@ fn extract_tgz(archive_path: &str, extract_to: &str) -> io::Result<()> {
 }
 
 pub struct ExtractArchiveInfo {
-    modinfo_path: String,
-    modinfo_dir: String,
+    modinfo_paths: Vec<String>,
 }
 
 /// Extracts any archive format based on file extension
@@ -139,40 +141,62 @@ pub fn extract_archive(
 
     let mut modinfo_search_dir = PathBuf::from(&temp_target);
     if let Some(target_modinfo_path) = &properties.target_modinfo_path {
-        log::info!("Appending variant modinfo path: {}", target_modinfo_path);
-        modinfo_search_dir = modinfo_search_dir.join(target_modinfo_path);
+        // log::info!("Appending variant modinfo path: {}", target_modinfo_path);
+        // modinfo_search_dir = modinfo_search_dir.join(target_modinfo_path);
     }
 
-    let (modinfo_path, _) = find_modinfo_file(modinfo_search_dir.as_path());
-    let modinfo_dir = Path::new(modinfo_path.as_deref().unwrap())
-        .parent()
-        .ok_or("Modinfo file not found")?;
+    // Create the target directory
+    fs::create_dir_all(extract_to)
+        .map_err(|e| format!("Failed to create target directory: {}", e))?;
 
-    println!("Modinfo directory: {:?}", modinfo_dir);
+    // Get all the modinfo (single submods) we have found and install them.
+    // Use subdirectories if there are multiple modinfo files
+    let modinfo_results = find_all_modinfo_files(modinfo_search_dir.as_path());
+    let is_multiple = modinfo_results.len() > 1;
 
-    recursively_grant_write_permissions(modinfo_dir)
-        .map_err(|e| format!("Failed to grant write permissions: {}", e))?;
+    for (i, modinfo_result) in modinfo_results.iter().enumerate() {
+        let (modinfo_path, _) = modinfo_result;
+        let modinfo_dir = Path::new(modinfo_path)
+            .parent()
+            .ok_or("Modinfo file not found")?;
 
-    // Copy the modinfo_dir directory to the target directory
-    let _ = fs::create_dir_all(extract_to);
+        println!("Modinfo directory: {:?}", modinfo_dir);
 
-    let mut copy_options = fs_extra::dir::CopyOptions::new();
-    copy_options.overwrite = true;
-    copy_options.content_only = true;
+        recursively_grant_write_permissions(modinfo_dir)
+            .map_err(|e| format!("Failed to grant write permissions: {}", e))?;
 
-    fs_extra::dir::copy(modinfo_dir, extract_to, &copy_options)
-        .map_err(|e| format!("Failed to copy modinfo directory: {}", e))?;
+        let mut copy_options = fs_extra::dir::CopyOptions::new();
+        copy_options.overwrite = true;
+        copy_options.content_only = true;
+
+        // If we have multiple modinfo files, create a subdirectory for each
+        // Otherwise, copy to the main directory
+        let extract_submod_path = if is_multiple {
+            let subdir_name = format!("modinfo_{}", i);
+            let subdir_path = Path::new(extract_to).join(&subdir_name);
+            fs::create_dir_all(&subdir_path)
+                .map_err(|e| format!("Failed to create subdirectory: {}", e))?;
+            subdir_path
+        } else {
+            extract_to.into()
+        };
+
+        fs_extra::dir::copy(modinfo_dir, extract_submod_path, &copy_options)
+            .map_err(|e| format!("Failed to copy modinfo directory: {}", e))?;
+    }
 
     // Remove the temp directory
     fs::remove_dir_all(&temp_target)
         .map_err(|e| format!("Failed to remove temp directory: {}", e))?;
 
-    // Find the modinfo file and return the path
-    let (updated_modinfo_path, _) = find_modinfo_file(Path::new(extract_to));
+    // Find the modinfo files and return their path
+    let updated_modinfo_paths = find_all_modinfo_files(Path::new(extract_to));
 
     Ok(ExtractArchiveInfo {
-        modinfo_path: updated_modinfo_path.ok_or("Modinfo file not found")?,
-        modinfo_dir: extract_to.to_string(),
+        modinfo_paths: updated_modinfo_paths
+            .iter()
+            .map(|(path, _)| path.to_string())
+            .collect(),
     })
 }
 

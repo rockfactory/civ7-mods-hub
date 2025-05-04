@@ -18,6 +18,7 @@ pub struct ModInfo {
     modinfo_id: Option<String>, // Extracted from XML <Mod id="...">
     folder_hash: String,
     folder_name: String,
+    root_folder_name: String,
     civmods_internal_version_id: Option<String>,
 }
 
@@ -181,6 +182,30 @@ pub fn find_modinfo_file(directory: &Path) -> (Option<String>, Option<ModXml>) {
     (None, None)
 }
 
+pub fn find_all_modinfo_files(directory: &Path) -> Vec<(String, Option<ModXml>)> {
+    let mut modinfo_files = Vec::new();
+
+    for entry in WalkDir::new(directory)
+        .into_iter()
+        .filter_entry(|e| !is_entry_hidden(e))
+        .filter_map(Result::ok)
+    {
+        if entry.file_type().is_file()
+            && entry
+                .path()
+                .extension()
+                .map(|ext| ext == "modinfo")
+                .unwrap_or(false)
+        {
+            let modinfo_path = entry.path().to_string_lossy().to_string();
+            let mod_xml = extract_mod_xml(&modinfo_path);
+            modinfo_files.push((modinfo_path, mod_xml));
+        }
+    }
+
+    modinfo_files
+}
+
 /// Scans the Civ7 Mods directory and returns a list of `ModInfo`.
 #[tauri::command]
 pub fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModInfo>, String> {
@@ -206,36 +231,38 @@ pub fn scan_civ_mods(mods_folder_path: Option<String>) -> Result<Vec<ModInfo>, S
                 .file_name()
                 .into_string()
                 .unwrap_or_else(|_| "Unknown Mod".to_string());
-            let (modinfo_path, modinfo_xml) = find_modinfo_file(&mod_dir);
+            let modinfo_results = find_all_modinfo_files(&mod_dir);
+            if modinfo_results.is_empty() {
+                log::warn!("No modinfo found for mod: {}", mod_name);
+                continue;
+            }
 
-            // Skip mod if modinfo file is not found
-            let modinfo_path_str = match modinfo_path.as_deref() {
-                Some(path) => path,
-                None => {
-                    log::info!("Skipping mod folder without modinfo: {}", mod_name);
-                    continue;
-                }
-            };
+            for (modinfo_path, modinfo_xml) in modinfo_results {
+                let modinfo_folder = Path::new(modinfo_path.as_str())
+                    .parent()
+                    .ok_or("Invalid modinfo path")?;
 
-            let modinfo_folder = Path::new(modinfo_path_str)
-                .parent()
-                .ok_or("Invalid modinfo path")?;
+                let folder_hash = compute_folder_hash(modinfo_folder)
+                    .unwrap_or_else(|_| "<unable to compute folder hash>".to_string());
 
-            let folder_hash = compute_folder_hash(modinfo_folder)
-                .unwrap_or_else(|_| "<unable to compute folder hash>".to_string());
-
-            mods_list.push(ModInfo {
-                mod_name,
-                modinfo_path: modinfo_path_str.to_string(),
-                modinfo_id: modinfo_xml.as_ref().and_then(|xml| xml.id.clone()),
-                civmods_internal_version_id: modinfo_xml
-                    .as_ref()
-                    .and_then(|xml| xml.properties.civ_mods_internal_version_id.clone()),
-                folder_hash,
-                // Only the folder name without the full path
-                // Should be the same as mod_name for now
-                folder_name: mod_dir.file_name().unwrap().to_string_lossy().to_string(),
-            });
+                mods_list.push(ModInfo {
+                    mod_name: mod_name.clone(),
+                    modinfo_path: modinfo_path.to_string(),
+                    modinfo_id: modinfo_xml.as_ref().and_then(|xml| xml.id.clone()),
+                    civmods_internal_version_id: modinfo_xml
+                        .as_ref()
+                        .and_then(|xml| xml.properties.civ_mods_internal_version_id.clone()),
+                    folder_hash,
+                    // Only the folder name without the full path
+                    // Should be the same as mod_name for now
+                    folder_name: modinfo_folder
+                        .file_name()
+                        .unwrap()
+                        .to_string_lossy()
+                        .to_string(),
+                    root_folder_name: mod_dir.file_name().unwrap().to_string_lossy().to_string(),
+                });
+            }
         }
     }
 

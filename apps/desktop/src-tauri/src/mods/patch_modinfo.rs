@@ -12,7 +12,7 @@ use std::io::Cursor;
 use std::path::Path;
 use tauri::AppHandle;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct CivModsProperties {
     pub target_modinfo_id: Option<String>,
     pub target_modinfo_path: Option<String>,
