@@ -42,13 +42,13 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
       return {
         id: fetchedMod.id,
         fetched: fetchedMod,
-        locals: null,
+        locals: [],
         installedVersion: undefined,
         availableVersions,
         isUnknown: false,
         isLocalOnly: false,
         name: fetchedMod.name,
-        modinfo_id: undefined,
+        modinfoIds: [],
         dependedBy: [],
         dependsOn: [],
         areDependenciesSatisfied: true,
@@ -182,7 +182,7 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
         const depMod = modinfoIdMap.get(depId);
         if (!depMod) return true; // If the dependency is not found, we assume it's satisfied, e.g. DLCs
         // TODO We should probablu check the _specific_ installed version
-        return (depMod.locals?.length ?? 0) > 0;
+        return depMod.locals.length > 0;
       });
     }
   }

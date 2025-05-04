@@ -54,7 +54,7 @@ export interface ModDataVersion {
 
 export type ModData = {
   fetched?: FetchedMod;
-  locals: ModLocal[] | null;
+  locals: ModLocal[];
   installedVersion?: ModDataVersion;
   availableVersions?: ModDataVersion[];
   isUnknown: boolean;
@@ -63,6 +63,6 @@ export type ModData = {
   dependsOn: string[];
   id: string;
   name: string;
-  modinfoIds?: string[];
+  modinfoIds: string[];
   areDependenciesSatisfied: boolean;
 };

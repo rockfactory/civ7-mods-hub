@@ -123,7 +123,7 @@ export default function ModsListPage() {
         const searchText =
           mod.name.toLocaleLowerCase() +
           ' ' +
-          mod.local?.modinfo_id +
+          mod.locals?.map((l) => l.modinfo.modinfo_id ?? '').join(' ') +
           ' ' +
           mod.fetched?.author.toLocaleLowerCase();
 

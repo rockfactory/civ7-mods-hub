@@ -172,7 +172,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
    */
   const uninstall = useCallback(
     async (mod: ModData) => {
-      if (!mod.local) {
+      if (mod.locals.length === 0) {
         notifications.show({
           color: 'red',
           title: 'Failed to uninstall mod',
@@ -182,7 +182,11 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       }
 
       try {
-        await uninstallMod(mod.local);
+        for (const local of mod.locals) {
+          // TODO Should we backup the mod before uninstalling in case
+          // of submods? Low priority for now
+          await uninstallMod(local.modinfo);
+        }
       } catch (error) {
         notifications.show({
           color: 'red',
