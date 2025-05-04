@@ -1,28 +1,43 @@
 import { invoke } from '@tauri-apps/api/core';
 import { ModInfo } from '../../home/IModInfo';
 
+export type ModBackup = {
+  /** Original (to-be-resoted) mod path */
+  modPath: string;
+  /** Temporary backup path */
+  backupPath: string;
+};
+
 /**
  * Invokes `backup_mod_to_temp` to create a backup of the given mod folder in the temp directory.
  * @param modPath Path of the mod folder to back up.
  * @returns The path to the created temp backup folder.
  */
-export async function invokeBackupModToTemp(modPath: string): Promise<string> {
-  return await invoke<string>('backup_mod_to_temp', { modPath });
+export async function invokeBackupModToTemp(
+  modPaths: string[]
+): Promise<ModBackup[]> {
+  const backups: ModBackup[] = [];
+  for (const modPath of modPaths) {
+    const backupPath = await invoke<string>('backup_mod_to_temp', { modPath });
+    backups.push({ modPath, backupPath });
+  }
+  return backups;
 }
 
 /**
  * Invokes `restore_mod_from_temp` to restore a mod folder from a previously created temp backup.
- * @param modsFolderPath The destination mods folder path.
- * @param tempBackupPath The temporary backup folder path.
+ * @param backups.modPath The destination mod folder path.
+ * @param backups.tempBackupPath The temporary backup folder path.
  */
 export async function invokeRestoreModFromTemp(
-  modsFolderPath: string,
-  tempBackupPath: string
+  backups: ModBackup[]
 ): Promise<void> {
-  return await invoke('restore_mod_from_temp', {
-    modsFolderPath,
-    tempBackupPath,
-  });
+  for (const { modPath, backupPath } of backups) {
+    await invoke('restore_mod_from_temp', {
+      modRestorePath: modPath,
+      tempBackupPath: backupPath,
+    });
+  }
 }
 
 /**
@@ -30,10 +45,12 @@ export async function invokeRestoreModFromTemp(
  * @param tempBackupPath The path to the backup folder to delete.
  */
 export async function invokeCleanupModBackup(
-  tempBackupPath: string
+  backups: ModBackup[]
 ): Promise<void> {
   try {
-    await invoke('cleanup_mod_backup', { tempBackupPath });
+    for (const { backupPath: tempBackupPath } of backups) {
+      await invoke('cleanup_mod_backup', { tempBackupPath });
+    }
   } catch (error) {
     console.error('HIGH: Failed to cleanup mod backup:', error);
     // We don't want to throw an error here, as it's not critical to the operation.

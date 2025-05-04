@@ -6,5 +6,5 @@ export async function getModFolderPath(
   modsFolderPath: string,
   modInfo: ModInfo
 ) {
-  return await path.join(modsFolderPath, modInfo.mod_name);
+  return await path.join(modsFolderPath, modInfo.folder_name);
 }

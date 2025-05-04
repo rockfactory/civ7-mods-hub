@@ -70,37 +70,33 @@ pub async fn backup_mod_to_temp(app: AppHandle, mod_path: String) -> Result<Stri
 #[tauri::command]
 pub async fn restore_mod_from_temp(
     _app: AppHandle,
-    mods_folder_path: String,
+    mod_restore_path: String,
     temp_backup_path: String, // Now this is the exact mod path
 ) -> Result<(), String> {
-    let mods_folder = PathBuf::from(&mods_folder_path);
+    let mod_restore_folder = PathBuf::from(&mod_restore_path);
     let mod_backup_path = PathBuf::from(&temp_backup_path);
 
     if !mod_backup_path.exists() || !mod_backup_path.is_dir() {
         return Err("Invalid temp mod path: directory does not exist".to_string());
     }
 
-    let mod_name = mod_backup_path
-        .file_name()
-        .ok_or("Failed to determine mod folder name")?
-        .to_string_lossy()
-        .to_string();
-
-    let restore_target = mods_folder.join(&mod_name);
-
     // Remove existing mod folder before restoring (to prevent conflicts)
-    if restore_target.exists() {
-        async_fs::remove_dir_all(&restore_target)
+    if mod_restore_folder.exists() {
+        async_fs::remove_dir_all(&mod_restore_folder)
             .await
             .map_err(|e| format!("Failed to remove existing mod folder: {}", e))?;
     }
+
+    async_fs::create_dir_all(&mod_restore_folder)
+        .await
+        .map_err(|e| format!("Failed to create mod restore folder: {}", e))?;
 
     // Restore the mod from the exact backup folder
     let mut options = CopyOptions::new();
     options.overwrite = true;
     options.copy_inside = true;
 
-    let copy_result = copy(&mod_backup_path, &restore_target, &options);
+    let copy_result = copy(&mod_backup_path, &mod_restore_folder, &options);
 
     if let Err(e) = copy_result {
         return Err(format!("Failed to restore mod from temp: {}", e));

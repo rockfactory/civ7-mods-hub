@@ -8,7 +8,7 @@ import * as fs from '@tauri-apps/plugin-fs';
 // import { parseContentDisposition } from '../../../../packages/parser/src/headers';
 import { invoke } from '@tauri-apps/api/core';
 import * as path from '@tauri-apps/api/path';
-import { ModData, ModInfo } from '../home/IModInfo';
+import { ModData, ModInfo, ModLocal } from '../home/IModInfo';
 import { useAppStore } from '../store/store';
 import { getModFolderPath } from './commands/getModFolderPath';
 import { getActiveModsFolder } from './getModsFolder';
@@ -18,6 +18,7 @@ import {
   invokeCleanupModBackup,
   invokeExtractModArchive,
   invokeRestoreModFromTemp,
+  ModBackup,
 } from './commands/modsRustBindings';
 import { cleanCategoryName } from './modCategory';
 import { pb } from '../network/pocketbase';
@@ -59,9 +60,22 @@ function getGoogleDriveDirectDownloadUrl(url: string): string | null {
   return null;
 }
 
-export function isModLocked(mod: ModInfo) {
+export function isModLocked(mod: ModInfo | ModInfo[]) {
   const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
-  return lockedModIds.has(mod.modinfo_id ?? '');
+  const modinfoIds = Array.isArray(mod)
+    ? mod.map((m) => m.modinfo_id ?? '')
+    : [mod.modinfo_id ?? ''];
+
+  return modinfoIds.some((id) => lockedModIds.has(id));
+}
+
+export function isModLocalLocked(mod: ModLocal | ModLocal[]) {
+  const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
+  const modinfoIds = Array.isArray(mod)
+    ? mod.map((m) => m.modinfo.modinfo_id ?? '')
+    : [mod.modinfo.modinfo_id ?? ''];
+
+  return modinfoIds.some((id) => lockedModIds.has(id));
 }
 
 /**
@@ -76,37 +90,49 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
   const modsFolder = await getActiveModsFolder();
 
   // Allow to restore mod if installation fails
-  let backupPath: string | null = null;
+  let backups: ModBackup[] | null = null;
 
   try {
     if (!modsFolder) {
       throw new Error('Mods folder not set');
     }
 
-    if (mod.local != null) {
-      if (isModLocked(mod.local)) {
+    if (mod.locals != null) {
+      if (isModLocalLocked(mod.locals)) {
         throw new Error('Mod is locked');
       }
 
-      const modPath = await getModFolderPath(modsFolder!, mod.local);
-      backupPath = await invokeBackupModToTemp(modPath);
+      const modPaths = await Promise.all(
+        mod.locals.map((local) => getModFolderPath(modsFolder!, local.modinfo))
+      );
+      backups = await invokeBackupModToTemp(modPaths);
 
-      await uninstallMod(mod.local);
+      for (const local of mod.locals) {
+        await uninstallMod(local.modinfo);
+      }
+      console.log('Uninstalled submods:', modPaths);
     }
 
+    // TODO:
+    // 1. We don't support picking a version + submods yet
+    // 2. If we pick a version, we should "keep" only the submods that
+    // were previously installed.
     await runLowLevelInstallMod(mod, version, { modsFolderPath: modsFolder });
 
     // This is a delicate moment where mod is installed and backup would be restored
     // if something goes wrong. If we reach this point, we _Need_ to cleanup the backup.
     // We already do it in the finally block, but in case we'll add other operations
     // we need to make sure that cleanup is called before.
-    if (backupPath) await invokeCleanupModBackup(backupPath);
+    if (backups) await invokeCleanupModBackup(backups);
   } catch (error) {
     console.error('Failed to install mod:', error, error instanceof Error && error.stack); // prettier-ignore
-    if (backupPath && modsFolder) {
+    if (backups && modsFolder) {
       try {
-        await invokeRestoreModFromTemp(modsFolder, backupPath);
-        console.log(`Restored mod backup from`, backupPath);
+        await invokeRestoreModFromTemp(backups);
+        console.log(
+          `Restored mod backup from`,
+          backups.map((b) => b.backupPath)
+        );
       } catch (error) {
         // Already failed, no need to throw another error
         console.error('HIGH: Failed to restore mod:', error);
@@ -114,8 +140,8 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
     }
     throw error;
   } finally {
-    if (backupPath) {
-      await invokeCleanupModBackup(backupPath);
+    if (backups) {
+      await invokeCleanupModBackup(backups);
     }
   }
 }
@@ -284,19 +310,18 @@ async function runLowLevelInstallMod(
 /**
  * Uninstall mod
  */
+// TODO We should handle submods here. If we uninstall a parent, we should
+// also uninstall all submods. If we uninstall a submod, we should only
+// uninstall it.
+// TODO We should cleanup empty folders in case of submods
 export async function uninstallMod(modInfo: ModInfo) {
   const modsFolderPath = await getActiveModsFolder();
   if (!modsFolderPath) {
     throw new Error('No mods folder provided. Please set it in the settings.');
   }
 
-  const lockedModIds = new Set(useAppStore.getState().lockedModIds ?? []);
-  if (lockedModIds.has(modInfo.modinfo_id ?? '')) {
-    console.warn(
-      'Skipping locked mod:',
-      modInfo.folder_name,
-      modInfo.modinfo_id
-    );
+  if (isModLocked(modInfo)) {
+    console.warn('Skipping locked mod:', modInfo);
     return;
   }
 
