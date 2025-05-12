@@ -1,9 +1,10 @@
 import { ModVersionsRecord } from '@civmods/parser';
-import { ModData } from '../../home/IModInfo';
+import { FetchedModule, FetchedVersion, ModData } from '../../home/IModInfo';
 
 export interface ModInstallTarget {
   mod: ModData;
-  version: ModVersionsRecord | undefined;
+  version: FetchedVersion | undefined;
+  modules?: FetchedModule[] | undefined;
 }
 
 export type DependencyInfo = {
@@ -12,7 +13,7 @@ export type DependencyInfo = {
    */
   id: string;
   modData?: ModData;
-  targetVersion?: ModVersionsRecord;
+  targetVersion?: FetchedVersion;
   /**
    * If a mod is present in the fetched list
    * (i.e. it exists in the database)

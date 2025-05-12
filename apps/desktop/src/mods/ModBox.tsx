@@ -1,54 +1,39 @@
 import {
   Card,
   Group,
-  Badge,
-  Button,
   Text,
   LoadingOverlay,
-  Image,
   Stack,
   Box,
   Flex,
-  Grid,
   ActionIcon,
   Tooltip,
   Menu,
   Modal,
-  Loader,
-  CopyButton,
   Alert,
-  List,
-  ThemeIcon,
 } from '@mantine/core';
 import * as React from 'react';
 import type { ModVersionsRecord } from '@civmods/parser';
-import { ModData, ModInfo } from '../home/IModInfo';
+import {
+  FetchedModule,
+  FetchedVersion,
+  ModData,
+  ModInfo,
+} from '../home/IModInfo';
 import { open } from '@tauri-apps/plugin-shell';
 import {
   IconAlertCircle,
-  IconAlertHexagon,
-  IconCategory,
-  IconCheck,
-  IconChecklist,
-  IconCircleCheckFilled,
-  IconCode,
   IconCopy,
   IconDeviceFloppy,
   IconDots,
   IconDownload,
   IconExternalLink,
-  IconFileDescription,
   IconFolder,
   IconHexagonPlus,
-  IconLink,
   IconLock,
-  IconSettings,
-  IconSettings2,
-  IconSettingsExclamation,
   IconStar,
   IconSwitch,
   IconTag,
-  IconTransitionBottom,
   IconTrash,
   IconUser,
 } from '@tabler/icons-react';
@@ -59,7 +44,6 @@ import { ModBoxVersions } from './ModBoxVersions';
 import { useModsContext } from './ModsContext';
 import { resolve } from '@tauri-apps/api/path';
 import { ModInstallButton } from './ModInstallButton';
-import { getLatestVersionMatchingLocal, isSameVersion } from './isSameVersion';
 import { ModLockActionItem } from './actions/ModLockActionItem';
 import { useAppStore } from '../store/store';
 import { notifications } from '@mantine/notifications';
@@ -67,11 +51,10 @@ import { cleanCategoryName } from './modCategory';
 import { SetModsQueryFn } from '../home/ModsQuery';
 import { ModIcon } from './components/ModIcon';
 import { ModSmallRow } from './components/ModSmallRow';
-import {
-  getInstalledDependedBy,
-  getNotInstalledDependsOn,
-} from './dependencies/getInstalledDependsOn';
+import { getInstalledDependedBy } from './dependencies/getInstalledDependsOn';
 import { ModUnsatisfiedDependenciesRow } from './components/ModUnsatisfiedDependenciesRow';
+import { useIsModLocked } from './actions/useIsModLocked';
+import { InstallModOptions } from './installMod';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -80,25 +63,27 @@ export interface IModBoxProps {
 
 export function ModBox(props: IModBoxProps) {
   const { mod, setQuery } = props;
-  const { local, fetched } = mod;
+  const { locals, fetched } = mod;
 
   const [loading, setLoading] = useState(false);
 
   const { install, uninstall, mods } = useModsContext();
 
-  const latestVersion = getLatestVersionMatchingLocal(fetched, local);
-  const isLatest = latestVersion && isSameVersion(latestVersion, local);
+  const latestVersion = mod.fetched?.versions[0];
+  const isLatest =
+    latestVersion && latestVersion.id === mod.installedVersion?.id;
 
-  const isLocked = useAppStore((state) =>
-    state.lockedModIds?.includes(props.mod.local?.modinfo_id ?? '')
-  );
+  const isLocked = useIsModLocked(mod.modinfoIds);
 
-  const handleInstall = async (version: ModVersionsRecord) => {
+  const handleInstall = async (
+    version: FetchedVersion,
+    options: InstallModOptions = {}
+  ) => {
     if (isLocked) return;
 
     const handleBaseInstall = async () => {
       setLoading(true);
-      await install(mod, version);
+      await install(mod, version, options);
       setLoading(false);
     };
 
@@ -167,7 +152,7 @@ export function ModBox(props: IModBoxProps) {
               title="This mod is a dependency"
               icon={<IconAlertCircle size={24} />}
             >
-              This mod is used by other mods. Uninstalling it will break them.
+              This mod is used by other mods. Uninstalling it may break them.
               <Stack gap={'xs'} mt="xs">
                 {installedDependedBy.map((dep) => (
                   <ModSmallRow key={dep.id} mod={dep} />
@@ -238,9 +223,10 @@ export function ModBox(props: IModBoxProps) {
                       c="dimmed"
                       className={styles.textAction}
                       onClick={(e) => {
+                        // TODO This is only the first modinfo_id;
                         const modinfo_id =
                           latestVersion?.modinfo_id ??
-                          local?.modinfo_id ??
+                          locals?.[0].modinfo.modinfo_id ??
                           'N/A';
                         navigator.clipboard.writeText(modinfo_id);
                         notifications.show({
@@ -251,9 +237,9 @@ export function ModBox(props: IModBoxProps) {
                       }}
                     >
                       <IconCopy size={12} />{' '}
-                      {latestVersion?.modinfo_id ?? local?.modinfo_id}
+                      {latestVersion?.modinfo_id ??
+                        locals?.[0]?.modinfo.modinfo_id}
                     </Text>
-                    {/* TODO: Add back author when fetched from modinfo */}
                     {fetched && (
                       <Text
                         c="dimmed"
@@ -278,7 +264,7 @@ export function ModBox(props: IModBoxProps) {
                       </Text>
                     )}
                     {/**
-                     * TODO Read this from modinfo
+                     * TODO Support submods
                      */}
                     {latestVersion?.affect_saves && (
                       <Tooltip
@@ -324,7 +310,7 @@ export function ModBox(props: IModBoxProps) {
           <Box flex="0 0 100px" w="100%">
             <Flex align="flex-end" justify="flex-end">
               <Group gap={4} align="flex-end">
-                {!isLocked && mod.local && (
+                {!isLocked && mod.locals.length > 0 && (
                   <Tooltip
                     color="dark.8"
                     label={
@@ -381,11 +367,13 @@ export function ModBox(props: IModBoxProps) {
                       Choose version...
                     </Menu.Item>
                   )}
-                  {local?.modinfo_path != null && (
+                  {locals?.[0].modinfo.modinfo_path != null && (
                     <Menu.Item
                       leftSection={<IconFolder size={16} />}
                       onClick={async () =>
-                        open(await resolve(local.modinfo_path!, '..'))
+                        open(
+                          await resolve(locals?.[0].modinfo.modinfo_path!, '..')
+                        )
                       }
                     >
                       Open mod folder

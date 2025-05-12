@@ -1,15 +1,14 @@
-import * as React from 'react';
-import { ModData, ModInfo } from '../home/IModInfo';
-import type { ModVersionsRecord } from '@civmods/parser';
+import { FetchedModule, FetchedVersion, ModData } from '../home/IModInfo';
 import { ActionIcon, Box, LoadingOverlay, Table, Text } from '@mantine/core';
 import { IconCircleCheckFilled, IconDownload } from '@tabler/icons-react';
 import { DateFormatter } from '../ui/DateFormatter';
 import { isSameVersion } from './isSameVersion';
 import { ModLocalizedText } from '../localization/ModLocalizedText';
+import { InstallModOptions } from './installMod';
 
 export interface IModBoxVersionsProps {
   mod: ModData;
-  onInstall: (version: ModVersionsRecord) => void;
+  onInstall: (version: FetchedVersion, options?: InstallModOptions) => void;
   loading?: boolean;
 }
 
@@ -29,9 +28,7 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
     return null;
   }
 
-  const modVersions = mod.fetched.expand?.mod_versions_via_mod_id?.filter(
-    (version) => !version.is_variant
-  );
+  const modVersions = mod.fetched.versions;
 
   return (
     <Box mt="sm" pos="relative">
@@ -61,56 +58,46 @@ export function ModBoxVersions(props: IModBoxVersionsProps) {
 }
 
 function ModVersionRow(props: {
-  version: ModVersionsRecord;
+  version: FetchedVersion;
   mod: ModData;
-  onInstall: (version: ModVersionsRecord) => void;
+  onInstall: (version: FetchedVersion, options?: InstallModOptions) => void;
 }) {
   const { version, mod } = props;
-  const variants = mod.fetched?.expand?.mod_versions_via_mod_id?.filter(
-    (v) => v.is_variant && v.version_parent_id === version.id
-  );
 
-  const variantsAndVersion = variants?.length ? [version, ...variants] : [];
+  // We do not want to display multiple modules if the version
+  // has only _one_ module.
+  const modules = version.hasMultipleModules ? version.modules : [];
 
   return (
     <>
       <Table.Tr key={version.id}>
         <Table.Td>{version.name}</Table.Td>
         <Table.Td>
+          {/* TODO use dayjs atleast for parsing */}
           {DateFormatter.format(new Date(version.released || ''))}
         </Table.Td>
         <Table.Td>
           {version.archive_size ? humanizeSize(version.archive_size) : 'N/A'}
         </Table.Td>
-        {variants?.length == 0 && (
-          <ModVersionInstallButton
-            version={version}
-            mod={mod}
-            onInstall={props.onInstall}
-          />
-        )}
+        <ModVersionInstallButton
+          mod={mod}
+          version={version}
+          onInstall={props.onInstall}
+        />
       </Table.Tr>
-      {variantsAndVersion.map((variant) => (
-        <Table.Tr key={variant.id}>
+      {modules.map((module) => (
+        <Table.Tr key={module.id}>
           <Table.Td pl={30} colSpan={3}>
             <Text size="sm" c="dimmed">
-              Variant: <ModLocalizedText version={variant} type="name" />
+              Module: <ModLocalizedText version={module} type="name" />
             </Text>
           </Table.Td>
-          <Table.Td align="right">
-            {isSameVersion(variant, mod.local) ? (
-              <ActionIcon color="green">
-                <IconCircleCheckFilled size={16} />
-              </ActionIcon>
-            ) : (
-              <ActionIcon
-                color={mod.isUnknown ? 'grape' : 'blue'}
-                onClick={() => props.onInstall(variant)}
-              >
-                <IconDownload size={16} />
-              </ActionIcon>
-            )}
-          </Table.Td>
+          <ModVersionInstallButton
+            mod={mod}
+            version={version}
+            module={module}
+            onInstall={props.onInstall}
+          />
         </Table.Tr>
       ))}
     </>
@@ -118,23 +105,28 @@ function ModVersionRow(props: {
 }
 
 interface ModVersionInstallButtonProps {
-  version: ModVersionsRecord;
   mod: ModData;
-  onInstall: (version: ModVersionsRecord) => void;
+  version: FetchedVersion;
+  module?: FetchedModule;
+  onInstall: (version: FetchedVersion, options?: InstallModOptions) => void;
 }
 
 function ModVersionInstallButton(props: ModVersionInstallButtonProps) {
-  const { version, mod } = props;
+  const { version, mod, module } = props;
   return (
     <Table.Td align="right">
-      {isSameVersion(version, mod.local) ? (
+      {mod.locals.some((local) => local.version === version) ? (
         <ActionIcon color="green">
           <IconCircleCheckFilled size={16} />
         </ActionIcon>
       ) : (
         <ActionIcon
           color={mod.isUnknown ? 'grape' : 'blue'}
-          onClick={() => props.onInstall(version)}
+          onClick={() =>
+            props.onInstall(version, {
+              modules: module ? [module] : undefined,
+            })
+          }
         >
           <IconDownload size={16} />
         </ActionIcon>

@@ -1,27 +1,39 @@
 import { notifications } from '@mantine/notifications';
-import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
+import {
+  FetchedMod,
+  FetchedModule,
+  FetchedVersion,
+  ModData,
+  ModInfo,
+} from '../home/IModInfo';
 import { ModVersionsRecord } from '@civmods/parser';
 import { useModsContext } from './ModsContext';
 import { useCallback, useMemo, useState } from 'react';
-import { getLatestVersionMatchingLocal, isSameVersion } from './isSameVersion';
 import { useAppStore } from '../store/store';
-import { installMod } from './installMod';
-import { getModDependencies } from './dependencies/getModDependencies';
+import { installMod, isModLocalLocked } from './installMod';
 import { installModDependencies } from './dependencies/installModDependencies';
+import { filterVersionModulesByIds } from './isSameVersion';
 
 export interface IModUpdate {
   mod: ModData;
   fetched: FetchedMod;
-  targetVersion?: ModVersionsRecord;
+  targetVersion: FetchedVersion;
+  /**
+   * If we installed only _some_ of the modules, we
+   * want to update only those modules that were installed
+   * and not all of them..
+   */
+  targetModinfoIds?: string[];
+  targetModules?: FetchedModule[];
 }
 
 export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
   let needUpdates: IModUpdate[] = [];
 
-  const installedMods = mods.filter((m) => m.local != null);
+  const installedMods = mods.filter((m) => m.locals.length > 0);
 
   for (const installedMod of installedMods) {
-    if (lockedModIds.has(installedMod.local?.modinfo_id ?? '')) {
+    if (isModLocalLocked(installedMod.locals)) {
       continue;
     }
 
@@ -29,11 +41,7 @@ export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
       continue;
     }
 
-    // Find latest version of the mod by Variant ID
-    const latestVersion = getLatestVersionMatchingLocal(
-      installedMod.fetched,
-      installedMod.local!
-    );
+    const latestVersion = installedMod.fetched.versions[0];
 
     if (!latestVersion) {
       console.warn(`Mod ${installedMod.fetched?.name} has no matching versions`); // prettier-ignore
@@ -45,11 +53,29 @@ export function checkUpdates(mods: ModData[], lockedModIds: Set<string>) {
       continue;
     }
 
-    if (!isSameVersion(latestVersion, installedMod.local)) {
+    if (installedMod.installedVersion?.id !== latestVersion.id) {
+      const installedModinfoIds = installedMod.locals
+        .map((local) => local.modinfo.modinfo_id!)
+        .filter(Boolean) as string[];
+
+      // If the mod is installed _partially_ (some modules are installed, some are not),
+      // we want to update _ONLY_ the modules that are installed.
+      const shouldFilterModules =
+        installedMod.installedVersion?.modules.length !==
+        installedModinfoIds.length;
+
+      // TODO We should check if the modinfos are available
+      // in the latest version, and if not, we should install
+      // _all_ modules instead of just the ones that are installed.
+
       needUpdates.push({
         mod: installedMod,
         fetched: installedMod.fetched,
         targetVersion: latestVersion,
+        targetModinfoIds: shouldFilterModules ? installedModinfoIds : undefined,
+        targetModules: shouldFilterModules
+          ? filterVersionModulesByIds(latestVersion, installedModinfoIds)
+          : undefined,
       });
     }
   }
@@ -83,6 +109,7 @@ export function useApplyUpdates() {
         availableUpdates.map((update) => ({
           mod: update.mod,
           version: update.targetVersion,
+          modules: update.targetModules,
         })),
         mods
       );
@@ -103,13 +130,15 @@ export function useApplyUpdates() {
     for (const update of availableUpdates) {
       console.log('Applying update:', update.fetched.id);
       try {
-        if (lockedModIds.has(update.mod.local?.modinfo_id ?? '')) {
-          console.warn('Skipping locked mod:', update.fetched.name, update.mod.local?.modinfo_id); // prettier-ignore
+        if (isModLocalLocked(update.mod.locals)) {
+          console.warn('Skipping locked mod:', update.fetched.name); // prettier-ignore
           continue;
         }
 
         // Install already handles uninstalling the previous version
-        await installMod(update.mod, update.targetVersion!);
+        await installMod(update.mod, update.targetVersion!, {
+          modules: update.targetModules,
+        });
       } catch (error) {
         errors.push(error);
         console.error('Failed to apply update:', error);

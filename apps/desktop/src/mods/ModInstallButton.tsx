@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ModData } from '../home/IModInfo';
+import { FetchedVersion, ModData } from '../home/IModInfo';
 import type { ModVersionsRecord } from '@civmods/parser';
 import { Tooltip, ActionIcon } from '@mantine/core';
 import {
@@ -8,12 +8,13 @@ import {
   IconCircleCheckFilled,
   IconAlertHexagon,
 } from '@tabler/icons-react';
+import { InstallModOptions } from './installMod';
 
 export interface IModInstallButtonProps {
   mod: ModData;
-  version: ModVersionsRecord | undefined | null;
+  version: FetchedVersion | undefined | null;
   isTargetLatest?: boolean;
-  onInstall: (version: ModVersionsRecord) => void;
+  onInstall: (version: FetchedVersion, options?: InstallModOptions) => void;
 }
 
 export function ModInstallButton(props: IModInstallButtonProps) {
@@ -33,7 +34,10 @@ export function ModInstallButton(props: IModInstallButtonProps) {
     );
   }
 
-  if (mod.local && mod.installedVersion?.hash_stable === version?.hash_stable) {
+  if (
+    mod.locals.length &&
+    mod.installedVersion?.hash_stable === version?.hash_stable
+  ) {
     return (
       <Tooltip
         color="dark.8"
@@ -80,7 +84,7 @@ export function ModInstallButton(props: IModInstallButtonProps) {
     );
   }
 
-  if (mod.local) {
+  if (mod.locals.length) {
     if (!mod.installedVersion) {
       console.warn(
         `Mod ${mod.fetched.name} has local data but no installed version`

@@ -51,7 +51,7 @@ export function useInstallDeepLink() {
       return;
     }
 
-    const latestVersion = mod?.fetched?.expand?.mod_versions_via_mod_id[0];
+    const latestVersion = mod?.fetched?.versions[0];
 
     if (!mod || !mod.fetched || !latestVersion) {
       console.warn(
@@ -83,7 +83,7 @@ export function useInstallDeepLink() {
             </Text>
             ?
           </Text>
-          {mod.local && mod.local.modinfo_id && (
+          {mod.locals.length && (
             <Text size="sm">
               Already installed:{' '}
               {mod.installedVersion?.name ?? 'unknown version'}

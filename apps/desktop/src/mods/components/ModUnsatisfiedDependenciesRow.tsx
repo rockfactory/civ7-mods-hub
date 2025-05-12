@@ -19,7 +19,7 @@ export function ModUnsatisfiedDependenciesRow(
   const { mod, setLoading } = props;
   const { mods, install } = useModsContext();
 
-  const shouldShow = mod.local != null && !mod.areDependenciesSatisfied;
+  const shouldShow = mod.locals.length > 0 && !mod.areDependenciesSatisfied;
 
   const notInstalledDependsOn = useMemo(() => {
     return getNotInstalledDependsOn(mod, mods);

@@ -7,12 +7,18 @@ import {
   useState,
 } from 'react';
 import type { ModsResponse, ModVersionsRecord } from '@civmods/parser';
-import { FetchedMod, ModData, ModInfo } from '../home/IModInfo';
+import {
+  FetchedMod,
+  FetchedVersion,
+  ModData,
+  ModInfo,
+  RawFetchedMod,
+} from '../home/IModInfo';
 import { invoke } from '@tauri-apps/api/core';
 import { sortVersionsByDate } from './fetchMods';
 import { ClientResponseError } from 'pocketbase';
 import { useAppStore } from '../store/store';
-import { installMod, uninstallMod } from './installMod';
+import { installMod, InstallModOptions, uninstallMod } from './installMod';
 import { notifications } from '@mantine/notifications';
 import { open } from '@tauri-apps/plugin-dialog';
 import { getActiveModsFolder } from './getModsFolder';
@@ -22,6 +28,7 @@ import { getVersion } from '@tauri-apps/api/app';
 import { installModDependencies } from './dependencies/installModDependencies';
 import { notifyAddedDependencies } from './dependencies/notifyAddedDependencies';
 import { pb } from '../network/pocketbase';
+import { parseFetchedMods } from './commands/parseFetchedMods';
 
 export type ModsContextType = {
   mods: ModData[];
@@ -29,7 +36,7 @@ export type ModsContextType = {
   uninstall: (mod: ModData) => Promise<void>;
   install: (
     mod: ModData,
-    version: ModVersionsRecord,
+    version: FetchedVersion,
     options?: InstallModContextOptions
   ) => Promise<void>;
   triggerReload: () => void;
@@ -40,9 +47,9 @@ export type ModsContextType = {
   lastFetch: Date | null;
 };
 
-export type InstallModContextOptions = {
+export interface InstallModContextOptions extends InstallModOptions {
   onlyDependencies?: boolean;
-};
+}
 
 export const ModsContext = createContext({} as ModsContextType);
 
@@ -101,7 +108,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
       setIsFetching(true);
       try {
         const version = await getVersion();
-        const records = await pb.collection('mods').getFullList<FetchedMod>({
+        const records = await pb.collection('mods').getFullList<RawFetchedMod>({
           filter: 'is_hidden != true',
           expand: 'mod_versions_via_mod_id',
           sort: '-mod_updated',
@@ -113,21 +120,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
           batch: 500,
         });
 
-        const data = records
-          // We don't want mods without versions since we can't install them anyway;
-          // Plus they break the `[0]` check as latest version check
-          .filter((r) => r.expand?.mod_versions_via_mod_id?.length)
-          .map((record) => {
-            return {
-              ...record,
-              expand: {
-                ...record.expand,
-                mod_versions_via_mod_id: sortVersionsByDate(
-                  record.expand?.mod_versions_via_mod_id ?? []
-                ),
-              },
-            };
-          });
+        const data = parseFetchedMods(records);
 
         console.log('Mods data:', data.length);
         setFetchedMods(data ?? []);
@@ -170,6 +163,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
    * Uninstall mod.
    * Handles notifications
    */
+  // TODO Support uninstalling submods?
   const uninstall = useCallback(
     async (mod: ModData) => {
       if (mod.locals.length === 0) {
@@ -207,10 +201,8 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
   const install = useCallback(
     async (
       mod: ModData,
-      version: ModVersionsRecord,
-      options?: {
-        onlyDependencies?: boolean;
-      }
+      version: FetchedVersion,
+      options: InstallModContextOptions = {}
     ) => {
       try {
         let dependencies = await installModDependencies(
@@ -219,7 +211,7 @@ export function ModsContextProvider(props: { children: React.ReactNode }) {
         );
 
         if (!options?.onlyDependencies) {
-          await installMod(mod, version);
+          await installMod(mod, version, options);
           notifications.show({
             color: 'green',
             title: 'Mod installed',

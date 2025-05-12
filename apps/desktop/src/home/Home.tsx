@@ -46,6 +46,7 @@ import ThrottledLoader from './ThrottledLoader';
 import { isSameVersion } from '../mods/isSameVersion';
 import { useAppStore } from '../store/store';
 import { useCheckForGlobalUpdates } from '../settings/autoUpdater';
+import { isModLocalLocked } from '../mods/installMod';
 
 export default function ModsListPage() {
   const {
@@ -140,28 +141,25 @@ export default function ModsListPage() {
       }
 
       if (query.onlyInstalled) {
-        shouldInclude = shouldInclude && mod.local != null;
+        shouldInclude = shouldInclude && mod.locals.length > 0;
       }
 
       if (queryStates.has('needsUpdate')) {
         shouldInclude =
           shouldInclude &&
-          mod.local?.modinfo_id != null &&
+          mod.modinfoIds.length > 0 &&
           mod.fetched != null &&
-          !isSameVersion(
-            mod.fetched?.expand?.mod_versions_via_mod_id[0],
-            mod.local
-          ) &&
-          !lockedModIds.has(mod.local.modinfo_id);
+          mod.installedVersion?.id !== mod.fetched.versions[0].id &&
+          !isModLocalLocked(mod.locals);
       }
       if (queryStates.has('locked')) {
         shouldInclude =
           shouldInclude &&
-          mod.local?.modinfo_id != null &&
-          lockedModIds.has(mod.local.modinfo_id);
+          mod.modinfoIds.length > 0 &&
+          isModLocalLocked(mod.locals);
       }
       if (queryStates.has('uninstalled')) {
-        shouldInclude = shouldInclude && !mod.local;
+        shouldInclude = shouldInclude && mod.locals.length === 0;
       }
       if (queryStates.has('localOnly')) {
         shouldInclude = shouldInclude && mod.isLocalOnly;
@@ -169,14 +167,12 @@ export default function ModsListPage() {
       if (queryStates.has('affectSaves')) {
         shouldInclude =
           shouldInclude &&
-          mod.fetched?.expand?.mod_versions_via_mod_id[0]?.affect_saves ===
-            true;
+          // TODO Update to include all packages (submods)
+          mod.fetched?.versions[0].affect_saves === true;
       }
       if (queryStates.has('notAffectSaves')) {
         shouldInclude =
-          shouldInclude &&
-          mod.fetched?.expand?.mod_versions_via_mod_id[0]?.affect_saves ===
-            false;
+          shouldInclude && mod.fetched?.versions[0]?.affect_saves === false;
       }
 
       return shouldInclude;
@@ -409,7 +405,7 @@ export default function ModsListPage() {
               totalCount={filteredMods.length}
               itemContent={(index) => (
                 <ModBox
-                  key={filteredMods[index].modinfo_id || index}
+                  key={filteredMods[index].id || index}
                   mod={filteredMods[index]}
                   setQuery={setQuery}
                 />

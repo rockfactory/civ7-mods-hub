@@ -53,7 +53,7 @@ export function getModDependencies(
     const currentTargetVersion =
       currentMod.version ??
       currentMod.mod.installedVersion ??
-      currentMod.mod.fetched?.expand?.mod_versions_via_mod_id?.[0];
+      currentMod.mod.fetched?.versions[0];
 
     const dependencies = currentTargetVersion?.dependencies as
       | ModDependency[]
@@ -65,7 +65,7 @@ export function getModDependencies(
 
       const depMod = allModsMap.get(dep.id);
       const isPresent = depMod?.fetched != null;
-      const isInstalled = depMod?.local != null;
+      const isInstalled = (depMod?.locals.length ?? 0) > 0;
 
       // We want to install the dependency if:
       // 1. The dependency is not already in the list of desired mods
@@ -81,7 +81,7 @@ export function getModDependencies(
           isPresent,
           isInstalled,
           shouldInstall,
-          targetVersion: depMod?.fetched?.expand?.mod_versions_via_mod_id[0],
+          targetVersion: depMod?.fetched?.versions[0],
         });
         added.add(dep.id);
       }

@@ -61,7 +61,7 @@ export function mapFetchedToLocal(
   // with the same modinfo_id.
   const allVersionsModMap: ModVersionsMap = [];
   for (const fetchedMod of fetchedMods) {
-    const modVersions = fetchedMod.expand?.mod_versions_via_mod_id ?? [];
+    const modVersions = fetchedMod._rawVersions;
     for (const version of modVersions) {
       allVersionsModMap.push({
         fetchedMod,

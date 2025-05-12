@@ -33,7 +33,7 @@ export function getNotInstalledDependsOn(
   allMods: ModData[]
 ): ModData[] {
   const dependsOn = mod.dependsOn
-    .map((id) => allMods.find((m) => m.modinfo_id === id))
+    .map((id) => allMods.find((m) => m.modinfoIds.includes(id)))
     .filter(Boolean) as ModData[];
   const notInstalledDependsOn = dependsOn.filter((m) => m.local == null);
   return notInstalledDependsOn;

@@ -8,7 +8,7 @@ import * as fs from '@tauri-apps/plugin-fs';
 // import { parseContentDisposition } from '../../../../packages/parser/src/headers';
 import { invoke } from '@tauri-apps/api/core';
 import * as path from '@tauri-apps/api/path';
-import { ModData, ModInfo, ModLocal } from '../home/IModInfo';
+import { FetchedModule, ModData, ModInfo, ModLocal } from '../home/IModInfo';
 import { useAppStore } from '../store/store';
 import { getModFolderPath } from './commands/getModFolderPath';
 import { getActiveModsFolder } from './getModsFolder';
@@ -44,6 +44,13 @@ function parseContentDisposition(contentDisposition: string | null): {
 }
 
 export interface InstallModOptions {
+  /**
+   * Install only some modules of the mod
+   */
+  modules?: FetchedModule[];
+}
+
+interface LowLevelInstallModOptions extends InstallModOptions {
   modsFolderPath: string | null;
 }
 
@@ -82,7 +89,11 @@ export function isModLocalLocked(mod: ModLocal | ModLocal[]) {
  * Installs a specific version of a Mod.
  * Handles automatically the update (removal of previous version) if needed
  */
-export async function installMod(mod: ModData, version: ModVersionsRecord) {
+export async function installMod(
+  mod: ModData,
+  version: ModVersionsRecord,
+  options: InstallModOptions = {}
+) {
   if (!version?.download_url) {
     throw new Error(`Mod ${mod.name} v: ${version?.name} has no download URL`);
   }
@@ -107,17 +118,22 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
       );
       backups = await invokeBackupModToTemp(modPaths);
 
+      // TODO This should be handled in a different way in case
+      // we are trying to install a specific module of a version
       for (const local of mod.locals) {
         await uninstallMod(local.modinfo);
       }
       console.log('Uninstalled submods:', modPaths);
     }
 
-    // TODO:
+    // TODO Installation of submods is not supported yet
     // 1. We don't support picking a version + submods yet
     // 2. If we pick a version, we should "keep" only the submods that
     // were previously installed.
-    await runLowLevelInstallMod(mod, version, { modsFolderPath: modsFolder });
+    await runLowLevelInstallMod(mod, version, {
+      modsFolderPath: modsFolder,
+      ...options,
+    });
 
     // This is a delicate moment where mod is installed and backup would be restored
     // if something goes wrong. If we reach this point, we _Need_ to cleanup the backup.
@@ -129,10 +145,7 @@ export async function installMod(mod: ModData, version: ModVersionsRecord) {
     if (backups && modsFolder) {
       try {
         await invokeRestoreModFromTemp(backups);
-        console.log(
-          `Restored mod backup from`,
-          backups.map((b) => b.backupPath)
-        );
+        console.log(`Restored mod backup from`, backups.map((b) => b.backupPath)); // prettier-ignore
       } catch (error) {
         // Already failed, no need to throw another error
         console.error('HIGH: Failed to restore mod:', error);
@@ -181,7 +194,7 @@ async function downloadCachedVersion(
 async function runLowLevelInstallMod(
   mod: ModData,
   version: ModVersionsRecord,
-  options: InstallModOptions
+  options: LowLevelInstallModOptions
 ) {
   if (!version.download_url) {
     throw new Error(`Mod ${version.id} has no download URL`);
@@ -283,6 +296,7 @@ async function runLowLevelInstallMod(
       archivePath: tempArchivePath,
       extractPath,
       properties: {
+        // TODO Use the new targetModules to install multiple modules
         target_modinfo_id: version.modinfo_id,
         target_modinfo_path: version.modinfo_path,
         internal_version_id: version.id,

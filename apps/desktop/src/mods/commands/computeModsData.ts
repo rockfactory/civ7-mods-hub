@@ -1,15 +1,7 @@
 import dayjs from 'dayjs';
-import {
-  FetchedMod,
-  ModData,
-  ModInfo,
-  ModLocal,
-  ModPrimaryVersionRecord,
-} from '../../home/IModInfo';
+import { FetchedMod, ModData, ModInfo, ModLocal } from '../../home/IModInfo';
 import { isSameVersion } from '../isSameVersion';
-import { ModVersionsRecord } from '@civmods/parser';
 import { mapFetchedToLocal } from './mapFetchedToLocal';
-import { getModVersionsWithVariants } from './getModVersionsWithVariants';
 
 export interface ComputeModsDataOptions {
   fetchedMods: FetchedMod[];
@@ -27,9 +19,7 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
   const fetchedToLocalMap = mapFetchedToLocal(fetchedMods, modsInfo);
 
   const fetchedMapped: ModData[] = fetchedMods.map((fetchedMod) => {
-    const modVersions = fetchedMod.expand?.mod_versions_via_mod_id ?? [];
-    const availableVersions = getModVersionsWithVariants(fetchedMod);
-    const latest = availableVersions[0];
+    const latest = fetchedMod.versions[0];
     // const latestVersion = modVersions.find(
     //   (v) => !v.is_variant
     // ) as ModPrimaryVersionRecord;
@@ -44,7 +34,6 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
         fetched: fetchedMod,
         locals: [],
         installedVersion: undefined,
-        availableVersions,
         isUnknown: false,
         isLocalOnly: false,
         name: fetchedMod.name,
@@ -61,41 +50,53 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
     for (const modinfo of modinfos) {
       locallyFoundInFetched.add(modinfo.folder_name);
 
-      const installedVersion = modVersions.find((version) =>
-        isSameVersion(version, modinfo)
+      const installedVersion = fetchedMod.versions.find((version) =>
+        version.modules.some((module) => isSameVersion(module, modinfo))
+      );
+
+      const installedModule = installedVersion?.modules.find((module) =>
+        isSameVersion(module, modinfo)
       );
 
       locals.push({
         modinfo,
         version: installedVersion,
+        module: installedModule,
         isUnknown: installedVersion == null,
       });
     }
 
-    const installedVersions = locals
-      .filter((local) => local.version != null)
-      .map((local) => local.version) as ModVersionsRecord[];
+    const installedModules = locals
+      .filter((local) => local.module != null)
+      .map((local) => local.module!);
 
     // We use only the _latest_, even if we could have multiple versions installed
-    const installedVersion = availableVersions.find((v) =>
-      v.versions.some((version) => installedVersions.includes(version))
+    const installedVersion = fetchedMod.versions.find((version) =>
+      version.modules.some((module) =>
+        installedModules.some((installed) => installed === module)
+      )
     );
 
     // We want to track the dependencies of the installed version, if it exists,
     // since the user might have installed a specific version of the mod that has
     // _different_ dependencies than the latest version.
     // If the installed version is not found, we fall back to the latest version.
-    const depsVersions =
-      installedVersions.length > 0 ? installedVersions : latest.versions;
-    const deps = depsVersions.flatMap((dv) => dv.dependencies) as
+    const depsModules =
+      installedModules.length > 0 ? installedModules : latest.modules;
+    const deps = depsModules.flatMap((dv) => dv.dependencies) as
       | { id: string }[]
       | undefined;
 
     if (deps && deps.length > 0) {
+      const siblingModinfoIds = new Set(
+        depsModules
+          .map((module) => module.modinfo_id)
+          .filter((id): id is string => !!id)
+      );
+
       for (const dep of deps) {
-        // TODO Maybe we should check `installedVersion` instead of `latest`?
-        if (latest.modinfoIds.includes(dep.id)) {
-          // We don't want to track dependencies that depend on themselves
+        if (siblingModinfoIds.has(dep.id)) {
+          // We don't want to track dependencies on the mod itself
           continue;
         }
 
@@ -115,12 +116,10 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
       id: fetchedMod.id,
       fetched: fetchedMod,
       installedVersion,
-      availableVersions,
       locals,
       isUnknown: locals.some((local) => local.isUnknown),
       isLocalOnly: false,
       name: fetchedMod.name,
-      // TODO Double check this
       modinfoIds: latest.modinfoIds,
       dependedBy: [],
       dependsOn: [],
@@ -137,11 +136,11 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
         {
           modinfo: info,
           version: null,
+          module: null,
           isUnknown: true,
         },
       ],
       installedVersion: undefined,
-      availableVersions: undefined,
       isUnknown: true,
       isLocalOnly: true,
       name: info.modinfo_id ?? info.folder_name ?? 'Unknown mod',
@@ -181,7 +180,7 @@ export function computeModsData(options: ComputeModsDataOptions): ModData[] {
       mod.areDependenciesSatisfied = depsArray.every((depId) => {
         const depMod = modinfoIdMap.get(depId);
         if (!depMod) return true; // If the dependency is not found, we assume it's satisfied, e.g. DLCs
-        // TODO We should probablu check the _specific_ installed version
+        // TODO We should probably check the _specific_ installed version
         return depMod.locals.length > 0;
       });
     }

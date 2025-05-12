@@ -1,6 +1,34 @@
-import { ModsResponse, ModVersionsRecord } from '@civmods/parser';
+import { ModsRecord, ModsResponse, ModVersionsRecord } from '@civmods/parser';
 
-export type FetchedMod = ModsResponse<{
+export type FetchedModule = ModVersionsRecord & {
+  _brand: 'Module';
+};
+
+export type FetchedVersion = ModVersionsRecord & {
+  _brand: 'Version';
+  modules: FetchedModule[];
+  /**
+   * List of modinfo IDs that this version contains.
+   */
+  modinfoIds: string[];
+  hasMultipleModules: boolean;
+
+  is_variant: false;
+  version_parent_id: undefined;
+};
+
+export type FetchedMod = Omit<ModsResponse<{}>, 'versions'> & {
+  versions: FetchedVersion[];
+
+  /**
+   * @protected Use this only if you know what you're doing.
+   * This is the raw data from the server. It contains all the mod versions,
+   * which are both "Versions" and "Modules".
+   */
+  _rawVersions: ModVersionsRecord[];
+};
+
+export type RawFetchedMod = ModsResponse<{
   mod_versions_via_mod_id: ModVersionsRecord[];
 }>;
 
@@ -30,33 +58,18 @@ export type ModDependency = {
 
 export interface ModLocal {
   modinfo: ModInfo;
-  version: ModVersionsRecord | null | undefined;
+  version: FetchedVersion | null | undefined;
+  /**
+   * Module version that is installed in the modinfo folder.
+   */
+  module: FetchedModule | null | undefined;
   isUnknown: boolean;
-}
-
-export type ModPrimaryVersionRecord = ModVersionsRecord & {
-  is_variant: false;
-  version_parent_id: undefined;
-};
-
-export type ModVariantVersionRecord = ModVersionsRecord & {
-  is_variant: true;
-  version_parent_id: string;
-};
-
-export interface ModDataVersion {
-  modinfoIds: string[];
-  primary: ModPrimaryVersionRecord;
-  variants: ModVariantVersionRecord[] | null;
-  versions: ModVersionsRecord[];
-  hasVariants: boolean;
 }
 
 export type ModData = {
   fetched?: FetchedMod;
   locals: ModLocal[];
-  installedVersion?: ModDataVersion;
-  availableVersions?: ModDataVersion[];
+  installedVersion?: FetchedVersion;
   isUnknown: boolean;
   isLocalOnly: boolean;
   dependedBy: string[];
