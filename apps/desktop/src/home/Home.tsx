@@ -46,6 +46,7 @@ import ThrottledLoader from './ThrottledLoader';
 import { isSameVersion } from '../mods/isSameVersion';
 import { useAppStore } from '../store/store';
 import { useCheckForGlobalUpdates } from '../settings/autoUpdater';
+import dayjs from 'dayjs';
 
 export default function ModsListPage() {
   const {
@@ -92,9 +93,9 @@ export default function ModsListPage() {
           return a.name.localeCompare(b.name);
         case 'updated':
           // Compare two ISO dates
-          return (
-            new Date(b.fetched?.mod_updated ?? 0).getTime() -
-            new Date(a.fetched?.mod_updated ?? 0).getTime()
+          return dayjs(b.fetched?.mod_updated ?? 0).diff(
+            dayjs(a.fetched?.mod_updated ?? 0),
+            'millisecond'
           );
         case 'rating':
           return (b.fetched?.rating ?? 0) - (a.fetched?.rating ?? 0);

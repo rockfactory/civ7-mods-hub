@@ -1,4 +1,5 @@
 import { ModVersionsRecord } from '@civmods/parser';
+import dayjs from 'dayjs';
 
 /**
  * Safely sorts an array of objects by a Date field stored as a string.
@@ -11,16 +12,16 @@ export function sortVersionsByDate(
   ascending = false
 ): ModVersionsRecord[] {
   return [...array].sort((a, b) => {
-    const dateA = new Date(a.released ?? '');
-    const dateB = new Date(b.released ?? '');
+    const dateA = dayjs(a.released ?? '');
+    const dateB = dayjs(b.released ?? '');
 
-    if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+    if (!dateA.isValid() || !dateB.isValid()) {
       console.warn(`Invalid date detected: ${a.released} or ${b.released}`);
       return 0; // Keep original order if any date is invalid
     }
 
     return ascending
-      ? dateA.getTime() - dateB.getTime()
-      : dateB.getTime() - dateA.getTime();
+      ? dateA.diff(dateB, 'millisecond')
+      : dateB.diff(dateA, 'millisecond');
   });
 }

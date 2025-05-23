@@ -6,6 +6,7 @@ import { IconCircleCheckFilled, IconDownload } from '@tabler/icons-react';
 import { DateFormatter } from '../ui/DateFormatter';
 import { isSameVersion } from './isSameVersion';
 import { ModLocalizedText } from '../localization/ModLocalizedText';
+import dayjs from 'dayjs';
 
 export interface IModBoxVersionsProps {
   mod: ModData;
@@ -77,7 +78,7 @@ function ModVersionRow(props: {
       <Table.Tr key={version.id}>
         <Table.Td>{version.name}</Table.Td>
         <Table.Td>
-          {DateFormatter.format(new Date(version.released || ''))}
+          {DateFormatter.format(dayjs(version.released || '').toDate())}
         </Table.Td>
         <Table.Td>
           {version.archive_size ? humanizeSize(version.archive_size) : 'N/A'}
