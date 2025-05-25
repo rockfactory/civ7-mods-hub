@@ -23,7 +23,7 @@ import {
 import * as React from 'react';
 import type { ModVersionsRecord } from '@civmods/parser';
 import { ModData, ModInfo } from '../home/IModInfo';
-import { open } from '@tauri-apps/plugin-shell';
+import { openPath, openUrl } from '@tauri-apps/plugin-opener';
 import {
   IconAlertCircle,
   IconAlertHexagon,
@@ -385,7 +385,7 @@ export function ModBox(props: IModBoxProps) {
                     <Menu.Item
                       leftSection={<IconFolder size={16} />}
                       onClick={async () =>
-                        open(await resolve(local.modinfo_path!, '..'))
+                        openPath(await resolve(local.modinfo_path!, '..'))
                       }
                     >
                       Open mod folder
@@ -394,7 +394,7 @@ export function ModBox(props: IModBoxProps) {
                   {mod.fetched && (
                     <Menu.Item
                       leftSection={<IconExternalLink size={16} />}
-                      onClick={() => open(mod.fetched!.url)}
+                      onClick={() => openUrl(mod.fetched!.url)}
                     >
                       See on CivFanatics
                     </Menu.Item>

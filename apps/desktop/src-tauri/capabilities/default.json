@@ -6,6 +6,28 @@
   "permissions": [
     "core:default",
     "opener:default",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "https://civmods.com"
+        },
+        {
+          "url": "https://forums.civfanatics.com"
+        },
+        {
+          "url": "civmods:*"
+        }
+      ]
+    },
     "fs:default",
     "fs:write-all",
     "fs:scope-appdata-recursive",

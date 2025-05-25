@@ -23,12 +23,12 @@ import {
 import * as React from 'react';
 import { useModsContext } from '../mods/ModsContext';
 import { useEffect, useMemo, useState } from 'react';
-import { open } from '@tauri-apps/plugin-shell';
 import { appDataDir, appLogDir, resolve } from '@tauri-apps/api/path';
 import { getVersion } from '@tauri-apps/api/app';
 import styles from './SettingsDrawer.module.css';
 import { checkForAppUpdates } from './autoUpdater';
 import { invoke } from '@tauri-apps/api/core';
+import { openPath } from '@tauri-apps/plugin-opener';
 
 export interface ISettingsDrawerProps {}
 
@@ -117,7 +117,7 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             leftSection={<IconExternalLink size={16} />}
             color="blue"
             variant="light"
-            onClick={() => open(displayedFolders.mods?.full || '')}
+            onClick={() => openPath(displayedFolders.mods?.full || '')}
           >
             Open
           </Button>
@@ -155,7 +155,7 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             size="xs"
             color="blue"
             onClick={async () => {
-              open(await appLogDir());
+              openPath(await appLogDir());
             }}
           >
             Open CivMods (this app) logs folder
@@ -166,7 +166,7 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             size="xs"
             color="blue"
             onClick={async () => {
-              open(await appDataDir());
+              openPath(await appDataDir());
             }}
           >
             Open CivMods (this app) profiles folder
@@ -178,7 +178,7 @@ export function SettingsDrawer(props: ISettingsDrawerProps) {
             color="blue"
             disabled={!displayedFolders.logs?.full}
             onClick={async () => {
-              open(displayedFolders.logs?.full || '');
+              openPath(displayedFolders.logs?.full || '');
             }}
           >
             Open Civilization7 logs folder
