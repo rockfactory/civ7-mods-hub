@@ -21,6 +21,7 @@ import {
 } from './commands/modsRustBindings';
 import { cleanCategoryName } from './modCategory';
 import { pb } from '../network/pocketbase';
+import { parseDate } from '../date/parseDate';
 
 function parseContentDisposition(contentDisposition: string | null): {
   filename?: string;
@@ -263,7 +264,7 @@ async function runLowLevelInstallMod(
         mod_url: mod.fetched!.url,
         mod_version: version.name,
         mod_category: cleanCategoryName(mod.fetched!.category),
-        mod_version_date: dayjs(version.released).toISOString(),
+        mod_version_date: parseDate(version.released ?? '').toISOString(),
       },
     });
 

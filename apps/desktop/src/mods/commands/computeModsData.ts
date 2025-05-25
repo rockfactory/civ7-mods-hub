@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { FetchedMod, ModData, ModInfo } from '../../home/IModInfo';
 import { isSameVersion } from '../isSameVersion';
+import { parseDate } from '../../date/parseDate';
 
 export interface ComputeModsDataOptions {
   fetchedMods: FetchedMod[];
@@ -28,8 +29,8 @@ function mapFetchedToLocal(
   }
   // Compare by date (ISO string)
   allVersionsModMap.sort((a, b) => {
-    return dayjs(a.version.released).diff(
-      dayjs(b.version.released),
+    return parseDate(a.version.released ?? '').diff(
+      parseDate(b.version.released ?? ''),
       'millisecond',
       true
     );

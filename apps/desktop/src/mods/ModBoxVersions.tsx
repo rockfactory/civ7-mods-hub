@@ -3,10 +3,11 @@ import { ModData, ModInfo } from '../home/IModInfo';
 import type { ModVersionsRecord } from '@civmods/parser';
 import { ActionIcon, Box, LoadingOverlay, Table, Text } from '@mantine/core';
 import { IconCircleCheckFilled, IconDownload } from '@tabler/icons-react';
-import { DateFormatter } from '../ui/DateFormatter';
+import { DateFormatter } from '../date/DateFormatter';
 import { isSameVersion } from './isSameVersion';
 import { ModLocalizedText } from '../localization/ModLocalizedText';
 import dayjs from 'dayjs';
+import { DateRender } from '../date/DateRender';
 
 export interface IModBoxVersionsProps {
   mod: ModData;
@@ -78,7 +79,7 @@ function ModVersionRow(props: {
       <Table.Tr key={version.id}>
         <Table.Td>{version.name}</Table.Td>
         <Table.Td>
-          {DateFormatter.format(dayjs(version.released || '').toDate())}
+          <DateRender date={version.released || ''} />
         </Table.Td>
         <Table.Td>
           {version.archive_size ? humanizeSize(version.archive_size) : 'N/A'}
