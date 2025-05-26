@@ -51,6 +51,8 @@ import {
   IconTransitionBottom,
   IconTrash,
   IconUser,
+  IconCalendarWeek,
+  IconCheckbox,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { modals } from '@mantine/modals';
@@ -72,6 +74,7 @@ import {
   getNotInstalledDependsOn,
 } from './dependencies/getInstalledDependsOn';
 import { ModUnsatisfiedDependenciesRow } from './components/ModUnsatisfiedDependenciesRow';
+import { LatestGameUpdate } from './gameinfo';
 
 export interface IModBoxProps {
   mod: ModData;
@@ -136,6 +139,21 @@ export function ModBox(props: IModBoxProps) {
       confirmProps: { color: 'red' },
       onConfirm: () => handleBaseInstall(),
     });
+  };
+
+  const updated = (updated: string) => {
+    var diff =
+      (new Date().valueOf() - new Date(updated).valueOf()) / (1000 * 3600 * 24);
+    return diff < 1 ? 'today' : Math.ceil(diff) + ' days ago';
+  };
+
+  const isUpdatedSinceGameUpdate = (updated: string) => {
+    if (
+      Math.ceil(new Date(updated).valueOf() / 1000) > Number(LatestGameUpdate)
+    ) {
+      return true;
+    }
+    return false;
   };
 
   const handleUninstall = async () => {
@@ -308,6 +326,24 @@ export function ModBox(props: IModBoxProps) {
                         <IconStar size={12} /> {mod.fetched.rating}
                       </Text>
                     )}
+                  </Group>
+                </Group>
+                <Group gap={2} justify="space-between" w={'100%'}>
+                  <Group gap={2} align="flex-start" mr="md">
+                    {mod.fetched?.mod_updated && (
+                      <Text c="dimmed" className={styles.textStatic}>
+                        <IconCalendarWeek size={12} /> Last updated{' '}
+                        {updated(mod.fetched.mod_updated.valueOf())}
+                      </Text>
+                    )}
+                  </Group>
+                  <Group gap={2} align="flex-start" mr="md">
+                    {mod.fetched?.mod_updated &&
+                      isUpdatedSinceGameUpdate(mod.fetched.mod_updated) && (
+                        <Text c="dimmed" className={styles.textStatic}>
+                          <IconCheckbox size={12} /> Updated since latest patch
+                        </Text>
+                      )}
                   </Group>
                 </Group>
               </Stack>
