@@ -8,7 +8,7 @@ msgstr ""
 "Language: ru\n"
 "Project-Id-Version: civmods\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-10-15 12:12\n"
+"PO-Revision-Date: 2025-10-15 14:26\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
@@ -37,7 +37,7 @@ msgid "All mods are the property of their respective creators.<0/>Special thanks
 msgstr ""
 
 msgid "All mods are updated"
-msgstr ""
+msgstr "Все моды были обновлены"
 
 msgid "Are you sure you want to proceed?"
 msgstr ""
@@ -51,38 +51,38 @@ msgstr "Отмена"
 
 msgctxt "Modal title for choosing mod version"
 msgid "Choose version"
-msgstr ""
+msgstr "Выберите версию"
 
 #. placeholder {0}: fetched.name
 msgid "Choose version of the mod <0>{0}</0>."
-msgstr ""
+msgstr "Выберите версию мода <0>{0}</0>."
 
 msgctxt "Menu item to choose mod version"
 msgid "Choose version..."
-msgstr ""
+msgstr "Выбрать версию..."
 
 msgctxt "Menu item to copy mod install link"
 msgid "Copy install link"
-msgstr ""
+msgstr "Скопировать ссылку для скачивания"
 
 msgid "Do not update"
-msgstr ""
+msgstr "Не обновлять"
 
 msgctxt "placeholder"
 msgid "Filter by category."
-msgstr ""
+msgstr "Фильтровать по категории."
 
 msgctxt "placeholder"
 msgid "Filter by state."
-msgstr ""
+msgstr "Фильтровать по состоянию."
 
 msgctxt "Filtering section title"
 msgid "Filter Mods"
-msgstr ""
+msgstr "Фильтр модов"
 
 msgctxt "Header mods filter selection"
 msgid "Installed Mods"
-msgstr ""
+msgstr "Установленные моды"
 
 #. placeholder {0}: mod.name
 msgid "Link for mod {0} copied to clipboard"
@@ -101,10 +101,10 @@ msgid "Mod Actions"
 msgstr ""
 
 msgid "Mod ID copied"
-msgstr ""
+msgstr "ID мода скопирован"
 
 msgid "Mod installation link copied"
-msgstr ""
+msgstr "Ссылка для скачивания мода скопирована"
 
 msgctxt "Tooltip when the mod is locked"
 msgid "Mod is locked. No updates will be applied. Open the three dots menu to unlock."
@@ -112,10 +112,10 @@ msgstr ""
 
 msgctxt "Filter by state option"
 msgid "Needs Update"
-msgstr ""
+msgstr "Требуется обновление"
 
 msgid "No mods found"
-msgstr ""
+msgstr "Модов не найдено"
 
 msgctxt "Filter by state option"
 msgid "Not Affect Saves"
@@ -123,7 +123,7 @@ msgstr ""
 
 msgctxt "Filter by state option"
 msgid "Not Installed"
-msgstr ""
+msgstr "Не установленные"
 
 msgctxt "Menu item to open mod folder"
 msgid "Open mod folder"
@@ -137,45 +137,45 @@ msgid "Refresh installed mods list and check for updates"
 msgstr ""
 
 msgid "Remove folder from disk"
-msgstr ""
+msgstr "Удалить папку с диска"
 
 msgid "Remove from disk"
-msgstr ""
+msgstr "Удалить с диска"
 
 msgctxt "Button text to reset filter"
 msgid "Reset Filters"
-msgstr ""
+msgstr "Сбросить фильтры"
 
 msgctxt "Short label to display in the mod box when it affects save games"
 msgid "Save file"
-msgstr ""
+msgstr "Сохранить файл"
 
 msgctxt "placeholder"
 msgid "Search name, author..."
-msgstr ""
+msgstr "Поиск по названию, по автора..."
 
 msgctxt "Menu item to open mod page on CivFanatics"
 msgid "See on CivFanatics"
-msgstr ""
+msgstr "См. на CivFanatics"
 
 msgctxt "Order by option"
 msgid "Sort by Downloads"
-msgstr ""
+msgstr "Сортировать по загрузкам"
 
 msgctxt "Order by option"
 msgid "Sort by Last Update"
-msgstr ""
+msgstr "Сортировать по последнему обновлению"
 
 msgctxt "Order by option"
 msgid "Sort by Name"
-msgstr ""
+msgstr "Сортировать по алфавиту"
 
 msgctxt "Order by option"
 msgid "Sort by Rating"
-msgstr ""
+msgstr "Сортировать по рейтингу"
 
 msgid "Sort by..."
-msgstr ""
+msgstr "Сортировать по..."
 
 msgctxt "Update modal description"
 msgid "The mod is already installed, but the version is unknown. Do you want to update to the latest version? Mod Manager will not be able to revert to the previous version."
@@ -192,18 +192,18 @@ msgid "This mod is not available in the mod repository. Uninstalling it will rem
 msgstr ""
 
 msgid "This mod is used by other mods. Uninstalling it will break them."
-msgstr ""
+msgstr "Этот мод используется другими модами. Удаление этого мода, сломает остальные моды."
 
 msgctxt "Help text when no mods are found"
 msgid "Try changing your filters or open Settings and double check Mods folder"
 msgstr ""
 
 msgid "Uninstall"
-msgstr ""
+msgstr "Удалить"
 
 msgctxt "Uninstall mod modal window title"
 msgid "Uninstall mod"
-msgstr ""
+msgstr "Удалить мод"
 
 msgid "Update and overwrite"
 msgstr ""
@@ -218,9 +218,9 @@ msgstr ""
 
 #. placeholder {0}: mod.name
 msgid "You are about to uninstall the mod <0>{0}</0>."
-msgstr ""
+msgstr "Вы собираетесь удалить мод <0>{0}</0>."
 
 #. placeholder {0}: mod.fetched?.name
 msgid "You are about to update the mod <0>{0}</0>."
-msgstr ""
+msgstr "Вы собираетесь обновить мод <0>{0}</0>."
 
