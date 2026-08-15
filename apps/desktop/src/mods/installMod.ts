@@ -129,7 +129,7 @@ async function downloadCachedVersion(
     .collection('mod_versions_metadata')
     .getList(1, 1, {
       filter: pb.filter('version_id = {:version_id}', {
-        version_id: version.version_parent_id ?? version.id,
+        version_id: version.version_parent_id?.trim() || version.id,
       }),
     })
     .then((res) => res.items?.[0]);
@@ -169,8 +169,19 @@ async function runLowLevelInstallMod(
   console.log('Downloading mod from:', version.download_url);
   let response = await fetch(version.download_url);
 
-  // Fallback to cached version if download fails for 5xx errors
-  if (!response.ok && response.status >= 500) {
+  // CivFanatics may return HTTP 200 with a Stile anti-bot challenge page.
+  // In that case the response is not the mod archive, so use the CivMods cache.
+  const isCivFanaticsStileChallenge =
+    response.url.includes('/.stile/challenge');
+
+  if (
+    (!response.ok && response.status >= 500) ||
+    isCivFanaticsStileChallenge
+  ) {
+    console.log(
+      'CivFanatics Stile challenge detected; using cached mod version.'
+    );
+
     response = await downloadCachedVersion(
       `Failed to download mod: ${response.statusText}`,
       version
